@@ -1,0 +1,61 @@
+<?php
+
+namespace App;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class FixedAssetOpeningBalance extends Model
+{
+    protected $guarded = ['id'];
+
+	protected $casts = [
+		'product_allocations'=>'array'
+		
+	];
+    public function project():BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'project_id', 'id');
+    }
+	
+    public function getName():string 
+    {
+        return $this->name ;
+    }
+	public function getMonthlyCounts():int 
+	{
+		return $this->monthly_counts;
+	}
+	
+	public function getGrossAmount():float
+	{
+		return $this->gross_amount;
+	}
+	public function getAccumulatedDepreciation():float
+	{
+		return $this->accumulated_depreciation;
+	}
+	public function getNetAmount():float
+	{
+		return $this->getGrossAmount() - $this->getAccumulatedDepreciation();
+	}
+    public function getMonthlyDepreciation():float 
+	{
+		return $this->monthly_depreciation;
+	}  public function getAdminDepreciationPercentage()
+	{
+		return $this->admin_depreciation_percentage;
+	}
+	 public function getManufacturingDepreciationPercentage()
+	{
+		return $this->manufacturing_depreciation_percentage;
+	}
+	public function getProductAllocationPercentageForTypeAndProduct(int $productId):?float{
+		return $this->getProductAllocations()[$productId]??null;
+	}
+	public function getProductAllocations():array 
+	{
+		return $this->product_allocations;
+	}
+}

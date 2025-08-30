@@ -1,0 +1,127 @@
+.global{ height: 100%; width: 100% !important; margin: auto;   }
+.login{background: url(images/back_2.png); color: #fff; background-repeat: no-repeat; background-size: cover;}
+.loginInner{ background: #3b368c4d; padding-bottom: 200px;min-height: 1000px;}
+.logo{ margin-top: 20px; }
+.lang{  margin-right: 2%;}
+.login h2{margin:30px 0; }
+.button-view{ display: block !important;margin: 2%;float: left;}
+h1,h2{background: #3b368c; font-size: 14px; padding: 13px; color: #fff; }
+.logout{background: #3b368c; font-size: 14px; padding: 10px; color: #fff;float: right; }
+.btn-rev{background: hsl(215deg 44% 38%); color: #fff}
+.otherLinks { margin:20px 0; }
+a:hover{ text-decoration: none;border-bottom: none;  }
+.otherLinks a{ color: #fff;background:#3b368c; padding: 3px; display: inline-block; }
+.otherLinks a:hover,.btn-rev:hover{ background:#ee4730; color:#fff; }
+.main-page-button{margin-right: 1%;}
+.projectItem{ background:#3b368c;}
+.projectItem a{ color: #fff; }
+.ProjectList{ margin: 10px 0; }
+.projectItem{ color: #fff; padding: 10px; margin-top: 5px }
+.projectItem:hover{ background:#ee4730;}
+.text-left{text-align: left;}
+.CreateProject,.hoverProject{background:#ee4730; margin-bottom: 20px;}
+.delete-btn{margin-top: 4%;}
+.modal-text{ color: black;line-height: 184%;}
+.formItem{ background: #fff ; color: #000; padding:10px 0; margin-bottom: 10px }
+.chartBackGround {background-color: rgba(255, 255, 255, 0.6);color: #000; padding:10px 0; margin-bottom: 10px  };
+.container{ width:100%; }
+.lang-ar{text-align: right}
+.lang-en{text-align: left}
+.nav-tabs{ border-bottom:none; }
+.nav li a{color: #3b368c; width: 100%; display: inline-block;padding: 10px; font-size:12px; }
+.nav .active{ background:#060331; color: #fff;border-radius: 10px !important ; }
+.nav li{ width: 33.3%; }
+.nav li{ background: #fff;border-radius: 10px !important;}
+.nav .active, .nav li:hover{background: #3b368c;
+-webkit-box-shadow: inset -9px -6px 47px -5px rgba(0,0,0,0.75);
+-moz-box-shadow: inset -9px -6px 47px -5px rgba(0,0,0,0.75);
+box-shadow: inset -9px -6px 47px -5px rgba(0,0,0,0.75);
+}
+.dash-tap {margin-top: 2%;}
+.nav li.active a,.nav li:hover a{ color: #fff; }
+.tab-pane{  margin-top:-7px; background-color: #fff; }
+#chartdiv { width: 100%; height: 500px; }
+#chartdiv1 { width: 100%; height: 500px; }
+.dashboard_item{ width: 100%; float: right; margin-top: 10px;  }
+.Dashboard .projectItem,.Dashboard .formItem{ margin: 0px !important; }
+.dashboard_item span{background: #ccc; color: #fff; border-radius: 10%; padding: 4px;
+font-size: 12px !important;
+-webkit-box-shadow: inset -9px -6px 47px -5px rgba(0,0,0,0.75);
+-moz-box-shadow: inset -9px -6px 47px -5px rgba(0,0,0,0.75);
+box-shadow: inset -9px -6px 47px -5px rgba(0,0,0,0.75);
+
+}
+
+.hidden{display: none;}
+#dashboard .form-control{ width:90%; margin:auto;}
+.Privacy{height: 400px; overflow-y: scroll; margin-bottom: 20px;}
+.red{color:#f00;}
+.disabled-class{ background-color: lightgray !important;}
+.text-center {text-align: center;}
+
+
+.dashboardTable td,.dashboardTable th{  padding:10px;}
+.dashboardTable th{background:#3b368c;color: #fff;}
+.dashboardTable td{ color: #0e0b0b;}
+/* { color: #908d8d;} */
+.black{ color: #0e0b0b!important;}
+.dashboardTable{ overflow:scroll; border-spacing: 10px;
+    border-collapse: separate;}
+.tableItem{ overflow-x: scroll;}
+.percentage-td{ background-color: lightgray !important;}
+
+hr.new1 {width: 100%; border-top: 5px solid lightgrey;}
+.position{margin: 2%;}
+
+.share_button{
+    margin-left: 2px;
+    background: hsl(215deg 44% 38%);
+}
+.position{margin: 2%;}
+
+.info-bar{
+    margin-top: 4px;
+}
+.bread-crumbs{
+    color: hsl(215deg 44% 38%) ;
+    background-color: white !important;
+    margin-top : -8px;
+}
+.bread-crumbs-study{
+    color: hsl(215deg 44% 38%) ;
+    background-color: white !important;
+}
+.logo-img{
+    margin-top: -5px;
+}
+.step{
+    background: #3b368c;
+    color: white;
+}
+.step:hover{
+    background: #3b368c;
+    color: white;
+}
+.steps-span{
+    background-color: hsl(215deg 44% 38%)  !important;
+    color: white !important;
+
+}
+.share_header{
+    background: white;
+    border-radius: 9px;
+    padding: 5px !important;
+    font-size: 1rem;
+}
+.noHover:hover{ background:#3b368c !important;}
+.closed-link{
+
+    background: darkgrey !important;
+}
+.closed-link:hover{ background:darkgrey !important;}
+
+.sharing-span{
+    font-size: small;
+}
+
+
