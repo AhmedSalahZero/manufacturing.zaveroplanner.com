@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Helpers\HArr;
+use App\Http\CustomResponse;
 use App\Project;
 use App\RawMaterial;
 use App\ReadyFunctions\SeasonalityService;
@@ -27,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+		$this->app->bind(\Illuminate\Http\Response::class, CustomResponse::class);
 //	echo phpinfo();
 		// dd(RawMaterial::calculateInventoryQuantityStatement(133));		
     }
