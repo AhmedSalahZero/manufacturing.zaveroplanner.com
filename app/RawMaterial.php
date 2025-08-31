@@ -74,64 +74,18 @@ class RawMaterial extends Model
 			$manufacturingQuantity = $currentInventoryQuantityStatement['manufacturing_quantity']??[];
 			// $dueDayWithAnd
 			// (new self)->calculateCollectionOrPaymentForMultiCustomizedAmounts();
-			$collectionPolicyStatement = $rawMaterial->calculateMultiYearsCollectionPolicy($manufacturingQuantity);
+			$collectionPolicyStatement = $rawMaterial->calculateMultiYearsCollectionPolicy($manufacturingQuantity,null);
 			$rawMaterial->update([
 				'collection_statement'=>$collectionPolicyStatement
 			]);
 	//		$inventoryQuantityStatements[$rawMaterialId]=$currentInventoryQuantityStatement;
 		}
-	//	dd($inventoryQuantityStatements);
 		
 	}
 	public function getSalesActiveYearsIndexWithItsMonths()
 	{
 		return $this->project->getOperationDurationPerYearFromIndexes();
 	}
-	// public function calculateMultiYearsCollectionPolicy(array $manufacturingQuantity)
-	// {
-		// return $this->calculateMultiYearsCollectionPolicy($manufacturingQuantity);
-		// $monthlySalesTargetValueBeforeVat  = $manufacturingQuantity;
-        // $withholdRate = $this->getWithholdTaxRate() / 100;
-        // $vatRate  = $this->getVatRate() / 100;
-        // $withholdAmounts = HArr::MultiplyWithNumber($monthlySalesTargetValueBeforeVat, $withholdRate);
-        // $vatAmounts = HArr::MultiplyWithNumber($monthlySalesTargetValueBeforeVat, $vatRate);
-		// $monthlySalesTargetValueAfterVat = HArr::sumAtDates([$monthlySalesTargetValueBeforeVat,$vatAmounts], array_keys($monthlySalesTargetValueBeforeVat));
-        // $salesActiveYearsIndexWithItsMonths=  $this->project->getOperationDurationPerYearFromIndexes();
-        // $hasMultiYear = array_key_exists(1, $salesActiveYearsIndexWithItsMonths) ;
-        // $monthlySalesTargetValueAfterVatForFirstYearMonths = array_intersect_key($monthlySalesTargetValueAfterVat, array_flip(array_keys($salesActiveYearsIndexWithItsMonths[0])));
-        // $dueDayWithRates = $this->getDueDayWithRates(0);
-        // $amountAfterVat = [];
-        // $amountAfterVatForFirstYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $monthlySalesTargetValueAfterVatForFirstYearMonths);
-        // $amountAfterVat = $amountAfterVatForFirstYear;
-        // if ($hasMultiYear) {
-        //     $secondYearStartMonthIndex = array_key_last(($salesActiveYearsIndexWithItsMonths[0])) + 1 ;
-        //     $monthlySalesTargetValueAfterVatForMultiYearMonths = array_slice($monthlySalesTargetValueAfterVat, $secondYearStartMonthIndex, null, true);
-        //     $dueDayWithRates = $this->getDueDayWithRates(1);
-        //     $amountAfterVatForMultiYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $monthlySalesTargetValueAfterVatForMultiYearMonths);
-        //     $amountAfterVat = HArr::sumAtDates([$amountAfterVatForFirstYear,$amountAfterVatForMultiYear], array_keys($monthlySalesTargetValueAfterVat));
-        // }
-		
-		// $salesActiveYearsIndexWithItsMonths=  $this->getSalesActiveYearsIndexWithItsMonths();
-        // $withholdAmountsForFirstYearMonths = array_intersect_key($withholdAmounts, array_flip(array_keys($salesActiveYearsIndexWithItsMonths[0])));
-        // $dueDayWithRates = $this->getDueDayWithRates(0);
-    
-        // $withholdAmountsForFirstYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $withholdAmountsForFirstYearMonths);
-        // $withholdPayments = $withholdAmountsForFirstYear;
-        // if ($hasMultiYear) {
-        //     $secondYearStartMonthIndex = array_key_last(($salesActiveYearsIndexWithItsMonths[0])) + 1 ;
-        //     $withholdAmountsForMultiYearMonths = array_slice($withholdAmounts, $secondYearStartMonthIndex, null, true);
-        //     $dueDayWithRates = $this->getDueDayWithRates(1);
-        //     $amountAfterVatForMultiYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $withholdAmountsForMultiYearMonths);
-        //     $withholdPayments = HArr::sumAtDates([$withholdAmountsForFirstYear,$amountAfterVatForMultiYear], array_keys($withholdAmounts));
-        // }
-        // $netPaymentsAfterWithhold = HArr::subtractAtDates([$amountAfterVat,$withholdPayments], array_keys($monthlySalesTargetValueBeforeVat));
-		
-        //     $collectionStatement = Product::calculateStatement($monthlySalesTargetValueBeforeVat, $vatAmounts, $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
-
-		
-		// return $amountAfterVat;
-		// return HArr::sumAtDates([$amountAfterVatForFirstYear,$amountAfterVatForMultiYear],array_keys($monthlySalesTargetValueAfterVat));
-		// dd($amountAfterVatForFirstYear,$amountAfterVatForMultiYear);
-	// }
+	
 	
 }

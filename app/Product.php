@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Helpers\HArr;
 use App\ReadyFunctions\Manufacturing\InventoryQuantityStatement;
 use App\ReadyFunctions\SeasonalityService;
 use App\Traits\HasBasicStoreRequest;
@@ -37,8 +38,12 @@ class Product extends Model
 				'max_capacity'=>false , 
 				'target_percentages'=>false ,
 				'target_quantities'=>false ,
-				'growth_rates'=>false ,
-				'price_per_unit'=>false ,
+				'local_target_quantities'=>false ,
+				'export_target_quantities'=>false ,
+				'local_growth_rates'=>false ,
+				'export_growth_rates'=>false ,
+				'local_price_per_unit'=>false ,
+				'export_price_per_unit'=>false ,
 				'sales_target_values'=>false ,
 				'monthly_sales_target_values'=>true,
 				'sensitivity_monthly_sales_target_values'=>true,	
@@ -59,8 +64,12 @@ class Product extends Model
 		'max_capacity'=>'array',
 		'target_percentages'=>'array',
 		'target_quantities'=>'array',
-		'growth_rates'=>'array',
-		'price_per_unit'=>'array',
+		'local_target_quantities'=>'array',
+		'export_target_quantities'=>'array',
+		'local_growth_rates'=>'array',
+		'export_growth_rates'=>'array',
+		'local_price_per_unit'=>'array',
+		'export_price_per_unit'=>'array',
 		'sales_target_values'=>'array',
 		// 'quarterly_seasonality'=>'array',
 		// 'monthly_seasonality'=>'array',
@@ -75,10 +84,15 @@ class Product extends Model
 		'product_manpower_allocation'=>'array',
 		'product_manpower_statement'=>'array',
 		'product_overheads_allocation'=>'array',
+		'product_depreciation_allocation'=>'array',
+		'product_depreciation_statement'=>'array',
 		'product_overheads_statement'=>'array',
 		'product_raw_material_consumed'=>'array',
-		'product_overheads_statement'=>'array',
-		'collection_statement'=>'array'
+		'collection_statement'=>'array',
+		'local_collection_statement'=>'array',
+		'export_collection_statement'=>'array',
+		'local_target_quantity_percentages'=>'array',
+		'export_target_quantity_percentages'=>'array',
 		
 	];
     protected $guarded = [];
@@ -146,26 +160,71 @@ class Product extends Model
 	{
 		return $this->target_percentages[$yearAsIndex] ?? 0;
 	}
+	public function getLocalTargetQuantityPercentagesAtYearIndex(int $yearAsIndex)
+	{
+		return $this->local_target_quantity_percentages[$yearAsIndex] ?? 0;
+	}
 	
 	public function getTargetQuantity():array
 	{
-		return $this->target_quantities;
+		return $this->target_quantities?:[];
 	}
 	public function getTargetQuantityAtYearIndex(int $yearAsIndex)
 	{
 		return $this->getTargetQuantity()[$yearAsIndex] ?? 0;
 	}
-	public function getGrowthRateAtYearIndex(int $yearAsIndex)
+	
+	
+	public function getLocalTargetQuantity():array
 	{
-		return $this->growth_rates[$yearAsIndex] ?? 0;
+		return $this->local_target_quantities?:[];
 	}
-	public function getPricePerUnit():array 
+	public function getLocalTargetQuantityAtYearIndex(int $yearAsIndex)
 	{
-		return $this->price_per_unit;
+		return $this->getLocalTargetQuantity()[$yearAsIndex] ?? 0;
 	}
-	public function getPricePerUnitAtYearIndex(int $yearAsIndex)
+	
+	public function getExportTargetQuantity():array
 	{
-		return $this->getPricePerUnit()[$yearAsIndex] ?? 0;
+		return $this->export_target_quantities?:[];
+	}
+	public function getExportTargetQuantityAtYearIndex(int $yearAsIndex)
+	{
+		return $this->getExportTargetQuantity()[$yearAsIndex] ?? 0;
+	}
+	
+	public function getExportTargetQuantityPercentages():array
+	{
+		return $this->export_target_quantity_percentages?:[];
+	}
+	
+	public function getExportTargetQuantityPercentagesAtYearIndex(int $yearAsIndex)
+	{
+		return $this->getExportTargetQuantityPercentages()[$yearAsIndex] ?? 0;
+	}
+	public function getLocalGrowthRateAtYearIndex(int $yearAsIndex)
+	{
+		return $this->local_growth_rates[$yearAsIndex] ?? 0;
+	}
+	public function getExportGrowthRateAtYearIndex(int $yearAsIndex)
+	{
+		return $this->export_growth_rates[$yearAsIndex] ?? 0;
+	}
+	public function getLocalPricePerUnit():array 
+	{
+		return $this->local_price_per_unit?:[];
+	}
+	public function getLocalPricePerUnitAtYearIndex(int $yearAsIndex)
+	{
+		return $this->getLocalPricePerUnit()[$yearAsIndex] ?? 0;
+	}
+	public function getExportPricePerUnit():array 
+	{
+		return $this->export_price_per_unit?:[];
+	}
+	public function getExportPricePerUnitAtYearIndex(int $yearAsIndex)
+	{
+		return $this->getExportPricePerUnit()[$yearAsIndex] ?? 0;
 	}
 	public function getSalesTargetValuesAtYearIndex(int $yearAsIndex)
 	{
@@ -261,21 +320,40 @@ class Product extends Model
 	public function calculateMonthlySalesTargetValue(bool $isSensitivity = false ):array
 	{
 		$sensitivityPriceRate = $this->getSensitivityPricePerUnitRate();
-		$monthlySalesTargetValue=[];
 		$seasonalityArray = $this->calculateSeasonality();
+		$localMonthlySalesTargetValue=[];
+		$localMonthlySalesTargetQuantities = [];
 		$targetSellingArray = $this->getTargetQuantity();	
-		$pricePerUnit = $this->getPricePerUnit();
+
+		$localTargetSellingArray = $this->getLocalTargetQuantity();	
+		$localPricePerUnit = $this->getLocalPricePerUnit();
+		
+		$exportMonthlySalesTargetValue=[];
+		$exportMonthlySalesTargetQuantities = [];
+		$exportTargetSellingArray = $this->getExportTargetQuantity();	
+		$exportPricePerUnit = $this->getExportPricePerUnit();
+		
 		$datesIndexWithYearIndex = $this->project->getDatesIndexWithYearIndex();
 		foreach($seasonalityArray as $dateAsIndex => $seasonalityValue){
 			$currentYearIndex = $datesIndexWithYearIndex[$dateAsIndex];
-			$targetSellingQuantityForThisYear = $targetSellingArray[$currentYearIndex];
-			$pricePerUnitForThisYear = $pricePerUnit[$currentYearIndex];
-			$pricePerUnitForThisYear = $isSensitivity ? ($pricePerUnitForThisYear*(1+$sensitivityPriceRate / 100)) : $pricePerUnitForThisYear;
-			// dump($seasonalityValue , $targetSellingQuantityForThisYear);
-			$monthlySalesTargetQuantity = $seasonalityValue * $targetSellingQuantityForThisYear ; 
-			$monthlySalesTargetQuantities[$dateAsIndex] = $monthlySalesTargetQuantity;
-			$monthlySalesTargetValue[$dateAsIndex] = $monthlySalesTargetQuantity *$pricePerUnitForThisYear ;
+			$localTargetSellingQuantityForThisYear = $localTargetSellingArray[$currentYearIndex] ;
+			$localPricePerUnitForThisYear = $localPricePerUnit[$currentYearIndex];
+			$localPricePerUnitForThisYear = $isSensitivity ? ($localPricePerUnitForThisYear*(1+$sensitivityPriceRate / 100)) : $localPricePerUnitForThisYear;
+			$localMonthlySalesTargetQuantity = $seasonalityValue * $localTargetSellingQuantityForThisYear ; 
+			$localMonthlySalesTargetQuantities[$dateAsIndex] = $localMonthlySalesTargetQuantity;
+			$localMonthlySalesTargetValue[$dateAsIndex] = $localMonthlySalesTargetQuantity *$localPricePerUnitForThisYear ;
 		}
+		foreach($seasonalityArray as $dateAsIndex => $seasonalityValue){
+			$currentYearIndex = $datesIndexWithYearIndex[$dateAsIndex];
+			$exportTargetSellingQuantityForThisYear = $exportTargetSellingArray[$currentYearIndex] ;
+			$exportPricePerUnitForThisYear = $exportPricePerUnit[$currentYearIndex];
+			$exportPricePerUnitForThisYear = $isSensitivity ? ($exportPricePerUnitForThisYear*(1+$sensitivityPriceRate / 100)) : $exportPricePerUnitForThisYear;
+			$exportMonthlySalesTargetQuantity = $seasonalityValue * $exportTargetSellingQuantityForThisYear ; 
+			$exportMonthlySalesTargetQuantities[$dateAsIndex] = $exportMonthlySalesTargetQuantity;
+			$exportMonthlySalesTargetValue[$dateAsIndex] = $exportMonthlySalesTargetQuantity *$exportPricePerUnitForThisYear ;
+		}
+		$monthlySalesTargetQuantities =HArr::sumAtDates([$localMonthlySalesTargetQuantities,$exportMonthlySalesTargetQuantities]);
+		$monthlySalesTargetValue = HArr::sumAtDates([$localMonthlySalesTargetValue,$exportMonthlySalesTargetValue]);
 		$monthlySalesTargetValueColumnName = $isSensitivity ? 'sensitivity_monthly_sales_target_values' :  'monthly_sales_target_values';
 		$monthlySalesTargetQuantityColumnName = $isSensitivity ? 'sensitivity_monthly_sales_target_quantities' :  'monthly_sales_target_quantities';
 		$beginningBalance = $this->getFgInventoryQuantity();
@@ -333,7 +411,7 @@ class Product extends Model
 	}
 	public function getFgBeginningInventoryBreakdowns():array
 	{
-		return $this->fg_beginning_inventory_breakdowns;
+		return $this->fg_beginning_inventory_breakdowns?:[];
 	}
 	public function getFgBeginningInventoryBreakdownPercentageForType(string $inventoryType)
 	{

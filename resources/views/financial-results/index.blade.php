@@ -12,9 +12,9 @@
     <h1 class="bread-crumbs">
         {{ __('ZAVERO Manufacturing') }} > {{ $project->name }} > {{ __($step_data['route_name']) }}
     </h1>
-	
-	
-	 <div class="kt-portlet__body">
+
+
+    <div class="kt-portlet__body">
         <div class="tab-content  kt-margin-t-20">
 
             @php
@@ -28,11 +28,11 @@
 
 
 
-                   <x-tables.repeater-table :tableClasses="'table-condensed table-row-spacing income-class-table'" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden scrollable-table'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="'food'" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
+                    <x-tables.repeater-table :tableClasses="'table-condensed table-row-spacing income-class-table'" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden scrollable-table'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="'food'" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
                         <x-slot name="ths">
                             <x-tables.repeater-table-th class="  header-border-down first-column-th-class" :title="__('+/-')"></x-tables.repeater-table-th>
                             <x-tables.repeater-table-th class="  header-border-down first-column-th-class" :title="__('Name')"></x-tables.repeater-table-th>
-                            <x-tables.repeater-table-th class=" interval-class header-border-down " :title="__('Add')"></x-tables.repeater-table-th>
+                            <x-tables.repeater-table-th class=" interval-class header-border-down " :title="__('')"></x-tables.repeater-table-th>
                             @foreach($studyMonthsForViews as $dateAsIndex=>$dateAsString)
                             @php
                             $currentMonthNumber = explode('-',$dateAsString)[1];
@@ -89,7 +89,7 @@
                                 <td>
                                     @if($hasSubItems)
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <a data-toggle="modal" data-target="#add-new-cost-of-good" href="#" class="btn btn-2-bg btn-sm btn-brand btn-pill">{{ __('+') }}</a>
+                                        {{-- <a data-toggle="modal" data-target="#add-new-cost-of-good" href="#" class="btn btn-2-bg btn-sm btn-brand btn-pill">{{ __('+') }}</a> --}}
 
 
                                     </div>
@@ -170,8 +170,8 @@
                                                 <div class="input-hidden-parent">
                                                     <input disabled data-number-of-decimals="0" readonly="" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
 
-							  expandable-amount-input 			  repeat-to-right-input-formatted  exclude-from-collapse repeat-group-year " type="text" value="{{ number_format($mainItemArr['total'][$dateAsIndex]??0,0) }}" data-column-index="{{ $dateAsIndex }}">
-                                                    <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  year-repeater-index-{{ $currentYearRepeaterIndex }}  exclude-from-collapse" value="{{ $mainItemArr['total'][$dateAsIndex]??0 }}" data-column-index="{{ $dateAsIndex }}">
+							  expandable-amount-input 			  repeat-to-right-input-formatted  exclude-from-collapse repeat-group-year " type="text" value="{{ number_format($mainItemArr['year_total'][$dateAsIndex]??0,0) }}" data-column-index="{{ $dateAsIndex }}">
+                                                    <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  year-repeater-index-{{ $currentYearRepeaterIndex }}  exclude-from-collapse" value="{{ $mainItemArr['year_total'][$dateAsIndex]??0 }}" data-column-index="{{ $dateAsIndex }}">
                                                 </div>
 
                                                 <span class="ml-2 currency-class">
@@ -197,8 +197,8 @@
                                                 <div class="input-hidden-parent">
                                                     <input disabled data-number-of-decimals="0" readonly="" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
 
-								  expandable-percentage-input  			  repeat-to-right-input-formatted  exclude-from-collapse repeat-group-year " type="text" value="{{ number_format($mainItemArr['total'][$dateAsIndex]??0,2) }}" data-column-index="{{ $dateAsIndex }}">
-                                                    <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  year-repeater-index-{{ $currentYearRepeaterIndex }}  exclude-from-collapse" value="{{ $mainItemArr['total'][$dateAsIndex]??0 }}" data-column-index="{{ $dateAsIndex }}">
+								  expandable-percentage-input  			  repeat-to-right-input-formatted  exclude-from-collapse repeat-group-year " type="text" value="{{ number_format($mainItemArr['year_total'][$dateAsIndex]??0,2) }}" data-column-index="{{ $dateAsIndex }}">
+                                                    <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  year-repeater-index-{{ $currentYearRepeaterIndex }}  exclude-from-collapse" value="{{ $mainItemArr['year_total'][$dateAsIndex]??0 }}" data-column-index="{{ $dateAsIndex }}">
                                                 </div>
                                                 <span class="ml-2">%</span>
                                             </div>
@@ -382,7 +382,7 @@
             <!--End:: Tab Content-->
         </div>
     </div>
-   
+
 </div>
 <div class="clearfix"></div>
 @endsection
@@ -396,32 +396,32 @@
     var translations = {
         deleteConfirm: @json(__('Are you sure you want to delete this position?'))
     };
-    
-	 $(document).ready(function() {
+
+    $(document).ready(function() {
         var selector = "#fixedAssets_repeater";
         $(selector).repeater({
             initEmpty: false
             , defaultValues: {
                 'category_id': 'manufacturing-expenses'
-                , 'payment_terms': 'cash',
-				'equity_funding_rate':0,
-				'replacement_cost_rate':1,
-				'depreciation_duration':5,
-				'amount':0,
-				'tenor':60,
-				'interest_rate':0,
-				'installment_interval':'monthly',
-				'replacement_cost_interval':1
-             }
+                , 'payment_terms': 'cash'
+                , 'equity_funding_rate': 0
+                , 'replacement_cost_rate': 1
+                , 'depreciation_duration': 5
+                , 'amount': 0
+                , 'tenor': 60
+                , 'interest_rate': 0
+                , 'installment_interval': 'monthly'
+                , 'replacement_cost_interval': 1
+            }
             , show: function() {
                 $(this).slideDown();
-				$('.js-select2-with-one-selection').select2({});
-				$('.hundred-minus-number').trigger('change')
-				recalculateAllocations(this);
-				// $('.hundred-minus-number').trigger('change')
+                $('.js-select2-with-one-selection').select2({});
+                $('.hundred-minus-number').trigger('change')
+                recalculateAllocations(this);
+                // $('.hundred-minus-number').trigger('change')
             }
             , ready: function(setIndexes) {
-					
+
             }
             , hide: function(deleteElement) {
                 if (confirm(translations.deleteConfirm)) {
@@ -434,8 +434,6 @@
             , isFirstItemUndeletable: true
         });
     });
-	
-	
 
 </script>
 

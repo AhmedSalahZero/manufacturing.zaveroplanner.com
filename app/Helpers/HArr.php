@@ -47,7 +47,19 @@ class HArr
 
 		return $total;
 	}
-
+	public static function sumTwoIntervalArrays(array $items1 , array $items2):array 
+	{
+		$result = [];
+		foreach($items1 as $intervalName => $item1Details){
+			foreach($item1Details as $keyName => $itemArr){
+				foreach($itemArr as $dateAsIndex => $value){
+					$item2Value = $items2[$intervalName][$keyName][$dateAsIndex]?? 0 ;
+					$result[$intervalName][$keyName][$dateAsIndex] = $value + $item2Value ;
+				}
+			}
+		}
+		return $result;
+	}
 	public static function subtractAtDates(array $items, array $dates)
 	{
 		$itemsCount = count($items);
@@ -626,7 +638,7 @@ return $result;
 		}
 		return $result;
 	}
-	protected static function calculatePercentageOf(array $salesRevenues , array $items):array {
+	public static function calculatePercentageOf(array $salesRevenues , array $items):array {
 		$result = [];
 		foreach($salesRevenues as $dateIndex => $salesValue){
 			$currenItemVal = $items[$dateIndex]??0 ;
@@ -754,6 +766,21 @@ public static function multipleTwoArrAtSameIndex(array $firstArr , array $second
 		$result[$index] = $value * $secondAtValue ;
 	}
 	return $result ; 
+}
+public static function sumPerYearIndex(array $itemsAsDateIndexAndValue ,  array $yearWithItsMonths):array{
+	$result = [];
+	foreach($yearWithItsMonths as $yearIndex => $itsMonths){
+		$currentYearTotal = 0;
+		foreach($itsMonths as $dateAsIndex => $dateAsString){
+			$currentValue = $itemsAsDateIndexAndValue[$dateAsIndex]??0 ;
+			$currentYearTotal +=  $currentValue;
+		}
+		/**
+		 * * هنحط النتيجه بتاعتك كل سنه عند اخر شهر في السنه دي
+		 */
+		$result[$dateAsIndex] = $currentYearTotal;
+	}
+	return $result ;
 }
 
 }

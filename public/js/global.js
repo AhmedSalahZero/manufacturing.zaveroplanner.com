@@ -7,6 +7,24 @@ $(document).on('change', '.percentage_field,.number_field', function () {
 	const result = number * percentage / 100
 	$(parent).find('.number_multiple_percentage' + appendColumnIndex).val(result).trigger('change')
 })
+$(document).on('change', '.percentage_field2,.number_field2', function () {
+	const parent = $(this).closest('.closest-parent')
+	const columnIndex = $(this).attr('data-column-index')
+	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
+	const number = number_unformat($(parent).find('.number_field2' + appendColumnIndex).val())
+	const percentage = number_unformat($(parent).find('.percentage_field2' + appendColumnIndex).val())
+	const result = number * percentage / 100
+	$(parent).find('.number_multiple_percentage2' + appendColumnIndex).val(result).trigger('change')
+})
+$(document).on('change', '.percentage_field3,.number_field3', function () {
+	const parent = $(this).closest('.closest-parent')
+	const columnIndex = $(this).attr('data-column-index')
+	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
+	const number = number_unformat($(parent).find('.number_field3' + appendColumnIndex).val())
+	const percentage = number_unformat($(parent).find('.percentage_field3' + appendColumnIndex).val())
+	const result = number * percentage / 100
+	$(parent).find('.number_multiple_percentage3' + appendColumnIndex).val(result).trigger('change')
+})
 $(document).on('change', '.number_field_1,.number_field_2', function () {
 	const parent = $(this).closest('.closest-parent')
 	const columnIndex = $(this).attr('data-column-index')
@@ -610,7 +628,6 @@ $(document).on('change', '.current-growth-rate-result-value-formatted', function
 		console.log("Input was changed programmatically.")
 
 	}
-	//$('.recalculate-gr[data-column-index="'+nextColumnIndex+'"]').trigger('change');
 })
 $(document).on('change', '.is-fully-funded-checkbox', function () {
 	const value = parseInt($(this).val())
@@ -819,10 +836,11 @@ $(document).on('change', 'select.expense-category-class', function () {
 
 $(document).on('change', '.hundred-minus-number', function () {
 	let parent = $(this).closest('.closest-parent')
-	console.log(parent)
-	let equityFundingPercentage = number_unformat($(parent).find('.hundred-minus-number').val())
+	const columnIndex = $(this).attr('data-column-index')
+	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
+	let equityFundingPercentage = number_unformat($(parent).find('.hundred-minus-number'+appendColumnIndex).val())
 	let debtFunding = 100 - equityFundingPercentage
-	$(parent).find('.hundred-minus-number-result').val(number_format(debtFunding, 1)).trigger('change')
+	$(parent).find('.hundred-minus-number-result'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
 })
 
 
@@ -917,3 +935,53 @@ function replaceRepeaterIndex(element) {
 		$(element).attr('name', newName)
 	})
 }
+
+
+$(document).on('change', '.recalculate-gr2', function () {
+	const columnIndex = parseInt($(this).attr('data-column-index'))
+	const previousColumnIndex = columnIndex - 1
+	const nextColumnIndex = columnIndex + 1
+	const growthRateOfCurrentYear = $('.gr-field2[data-column-index="' + columnIndex + '"]').val()
+
+	allElements = $('.current-growth-rate-result-value-formatted2[data-column-index="' + columnIndex + '"]')
+	allElements.each(function (index, element) {
+		const loanAmount = $(element).closest('tr').find('.current-growth-rate-result-value2[data-column-index="' + previousColumnIndex + '"]').val()
+		if (loanAmount != undefined) {
+			currentAmount = (1 + (growthRateOfCurrentYear / 100)) * loanAmount
+			$(element).val(number_format(currentAmount)).trigger('change')
+		}
+
+	})
+	$('.recalculate-gr2[data-column-index="' + nextColumnIndex + '"]').trigger('change')
+})
+$(document).on('change', '.current-growth-rate-result-value-formatted2', function (event) {
+	const columnIndex = parseInt($(this).attr('data-column-index'))
+	const nextColumnIndex = columnIndex + 1
+	if (event.originalEvent && event.originalEvent.isTrusted) {
+		$('.recalculate-gr2[data-column-index="' + nextColumnIndex + '"]').trigger('change')
+	} else {
+		console.log("Input was changed programmatically.")
+
+	}
+})
+
+$(document).on('change','.sum_product_value_1,.sum_product_quantity_1,.sum_product_value_2,.sum_product_quantity_2',function(){
+	
+	
+	const parent = $(this).closest('.closest-parent')
+	const columnIndex = $(this).attr('data-column-index')
+	const appendQuery = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
+	const number1 = number_unformat($(parent).find('.sum_product_value_1' + appendQuery).val())
+	const number2 = number_unformat($(parent).find('.sum_product_quantity_1' + appendQuery).val())
+		const number3 = number_unformat($(parent).find('.sum_product_value_2' + appendQuery).val())
+	const number4 = number_unformat($(parent).find('.sum_product_quantity_2' + appendQuery).val())
+	
+	let result = ( number1 * number2) + (number3*number4);
+	const resultQuery = $(parent).find('.two_sum_product_result' + appendQuery)
+	const numberFormat = resultQuery.attr('data-number-format')
+	if (numberFormat != undefined) {
+		result = number_format(result, numberFormat)
+	}
+	resultQuery.val(result).trigger('change')
+	
+})

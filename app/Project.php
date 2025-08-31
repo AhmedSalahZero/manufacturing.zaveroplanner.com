@@ -345,18 +345,25 @@ class Project extends Model
             'product_overheads_allocation'=>null
         ]);
         $result = [];
-        $productExpenseAllocations = DB::table('product_expense_allocations')->where('project_id', $this->id)->pluck('payload', 'product_id')->toArray();
+        $productExpenseAllocations = DB::table('product_expense_allocations')->where('project_id', $this->id)->get()->toArray();
         $result = [];
-        foreach ($productExpenseAllocations as $productId => $payload) {
+        $depreciationResult = [];
+        foreach ($productExpenseAllocations as $index => $productExpenseAllocation) {
+			$productId = $productExpenseAllocation->product_id;
+			$payload = $productExpenseAllocation->payload;
+			$isDepreciation = $productExpenseAllocation->is_depreciation || $productExpenseAllocation->is_opening_depreciation;
             $payload = json_decode($payload);
             foreach ($payload as $dateAsIndex => $value) {
                 $result[$productId][$dateAsIndex] = isset($result[$productId][$dateAsIndex]) ? $result[$productId][$dateAsIndex] + $value : $value ;
+				if($isDepreciation){
+					                $depreciationResult[$productId][$dateAsIndex] = isset($depreciationResult[$productId][$dateAsIndex]) ? $depreciationResult[$productId][$dateAsIndex] + $value : $value ;
+				}
             }
         }
-    
         foreach ($result as $productId => $totals) {
             DB::table('products')->where('id', $productId)->update([
-                'product_overheads_allocation'=>json_encode($totals)
+                'product_overheads_allocation'=>json_encode($totals),
+				'product_depreciation_allocation'=>json_encode($depreciationResult[$productId])
             ]);
         }
         
@@ -382,19 +389,20 @@ class Project extends Model
             'direct_labor_value'=>'product_manpower_allocation',
             'raw_material_value'=>'product_raw_material_consumed',
             'manufacturing_overheads_value'=>'product_overheads_allocation',
+			'product_depreciation_allocation'=>'product_depreciation_allocation'
         ];
         foreach ($products as $product) {
             $productId = $product->id ;
-            $quantityStatement = $product->product_inventory_qt_statement;
+            $quantityStatement = $product->product_inventory_qt_statement; 
             $totalAvailableQuantity = $quantityStatement['total_quantity_available']??[];
             $salesQuantity = $quantityStatement['sales_quantity']??[];
             $fgBeginningInventoryBreakdowns = $product->getFgBeginningInventoryBreakdowns() ;
+			$fgBeginningInventoryBreakdowns['product_depreciation_allocation'] = [];
             foreach ($fgBeginningInventoryBreakdowns as $inventoryItemType => $inventoryItemValues) {
-                $fgBeginningInventoryBreakdownValue = 	$product->getFgBeginningInventoryBreakdownValueForType($inventoryItemType);
+                $fgBeginningInventoryBreakdownValue =  $inventoryItemValues['value']??0	;
                 $currentColumnMapping = $columnNameMapping[$inventoryItemType];
                 $fgStatementValues[$productId][$inventoryItemType]['beginning_value'] = $fgBeginningInventoryBreakdownValue;
-                $currentManufacturingExpenseArr = $currentColumnMapping == 'product_raw_material_consumed' ?  $product->{$currentColumnMapping}['total'] :   $product->{$currentColumnMapping} ;
-                
+                $currentManufacturingExpenseArr = $currentColumnMapping == 'product_raw_material_consumed' ?  $product->{$currentColumnMapping}['total'] :   (array)$product->{$currentColumnMapping} ;
                 foreach ($currentManufacturingExpenseArr as $dateAsIndex => $currentManufacturingExpenseVal) {
                     $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex] = $currentManufacturingExpenseVal+$fgBeginningInventoryBreakdownValue;
                     $totalAvailableValueAtCurrentDateIndex = $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex];
@@ -409,16 +417,15 @@ class Project extends Model
                     $currentEndBalanceAtDate = $fgStatementValues[$productId][$inventoryItemType]['end_balance'][$dateAsIndex] ?? [];
                     $fgBeginningInventoryBreakdowns = $currentEndBalanceAtDate;
                     
-                    
+                    if($inventoryItemType =='product_depreciation_allocation'){
+						$currentCogsAtDate = 0 ;
+						$currentEndBalanceAtDate = 0 ;
+					}
+					
                     $fgValueStatement[$productId]['cogs'][$dateAsIndex] = isset($fgValueStatement[$productId]['cogs'][$dateAsIndex]) ? $fgValueStatement[$productId]['cogs'][$dateAsIndex] +  $currentCogsAtDate : $currentCogsAtDate ;
                     $fgValueStatement[$productId]['end_balance'][$dateAsIndex] = isset($fgValueStatement[$productId]['end_balance'][$dateAsIndex]) ? $fgValueStatement[$productId]['end_balance'][$dateAsIndex] +  $currentCogsAtDate : $currentEndBalanceAtDate;
                     
-                    // $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex] / $totalAvailableAtDate
-                    
-                    // $fgStatementValues[$productId][$inventoryItemType]['manufacturing_expenses_per_unit'] =  $this->calculateManufacturingExpensesPerUnit(,)  ;
-                
-                    //  =  HArr::subtractAtDates($fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'] , $fgStatementValues[$productId][$inventoryItemType]['cogs']) ;
-                
+              
                     
                 }
                 
@@ -429,6 +436,7 @@ class Project extends Model
                 'product_manpower_statement'=>$fgStatementValues[$productId]['direct_labor_value']??[],
                 'raw_material_statement'=>$fgStatementValues[$productId]['raw_material_value']??[],
                 'product_overheads_statement'=>$fgStatementValues[$productId]['manufacturing_overheads_value']??[],
+				'product_depreciation_statement'=>$fgStatementValues[$productId]['product_depreciation_allocation']??[],
                 'product_inventory_value_statement'=>$fgValueStatement
             ]);
         }
@@ -440,7 +448,6 @@ class Project extends Model
             
             
         // }
-        // dd('lol',$fgStatementValues);
     }
     public function getFinancialYearEndMonthNumber():int
     {
@@ -493,7 +500,7 @@ class Project extends Model
         $fixedAssetOpeningBalances  = $this->fixedAssetOpeningBalances;
         $operationDates  = array_values($this->getOperationDatesAsDateAndDateAsIndex());
 		 DB::table('product_expense_allocations')->where('is_opening_depreciation', 1)->where('project_id', $this->id)->delete();
-	$productExpensesForAllFixedAssets = [];
+		$productExpensesForAllFixedAssets = [];
         foreach ($fixedAssetOpeningBalances as $fixedAssetOpeningBalance) {
             $openingId  = $fixedAssetOpeningBalance->id ;
             $monthlyDepreciation = $fixedAssetOpeningBalance->getMonthlyDepreciation();
@@ -521,18 +528,14 @@ class Project extends Model
                     }
                 }
             }
-            // foreach($productExpenses as $openingId => $productIdWithArr){
-			// 	foreach($productIdWithArr as $productId => $dateAsIndexWithValue){
-			// 		foreach($dateAsIndexWithValue as $dateAsIndex => $value){
-			// 			$productExpensesForAllFixedAssets[][$productId][$dateIndex] = isset($productExpensesForAllFixedAssets[$dateIndex]) ? $productExpensesForAllFixedAssets[$dateIndex] + $value : $value;
-			// 		}
-			// 	}
-			// }
 			
         }
 		$finalResult =[];
 		foreach($productExpenses as $fixedAssetOpeningBalanceId => $hisProductAllocations){
 			$fixedAssetOpeningBalance  = FixedAssetOpeningBalance::find($fixedAssetOpeningBalanceId);
+			$fixedAssetOpeningBalance->update([
+				'admin_depreciations'=>$adminAllocationPercentages[$fixedAssetOpeningBalanceId]??[]	
+			]);
 			foreach($hisProductAllocations as $productId => $dateAndValues){
 				$finalResult[] = [
 					'product_id'=>$productId,

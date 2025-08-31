@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+	echo phpinfo();
 		// dd(RawMaterial::calculateInventoryQuantityStatement(133));		
     }
 }

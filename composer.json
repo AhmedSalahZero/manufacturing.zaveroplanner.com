@@ -23,7 +23,8 @@
         "mcamara/laravel-localization": "^1.6",
         "nesbot/carbon": "^2.43",
         "phpoffice/phpspreadsheet": "^5.0",
-        "spatie/browsershot": "^3.61"
+        "spatie/browsershot": "^3.61",
+		"doctrine/dbal": "^3.0"
     },
     "require-dev": {
         "nunomaduro/collision": "^4.1"

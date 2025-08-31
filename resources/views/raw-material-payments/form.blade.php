@@ -82,7 +82,7 @@
 
                                     $currentFieldName = "rawMaterials[$rawMaterialId][collection_policy_value][$index][cash_payment]";
                                     $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
-                                    $currentVal = $rawMaterial->getCollectionDownPaymentAtIndex($index);
+                                    $currentVal = $rawMaterial->getCollectionDownPaymentAtIndex($index,null);
                                     // $currentVal = $product->getCollectionDownPaymentAtIndex($index);
 
                                     @endphp
@@ -102,7 +102,7 @@
                                         @php
                                         $currentFieldName = "rawMaterials[$rawMaterialId][collection_policy_value][$index][rate][$numberOfCollections]";
                                         $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
-                                        $currentVal = $rawMaterial->getCollectionRateAtIndex($index,$numberOfCollections);
+                                        $currentVal = $rawMaterial->getCollectionRateAtIndex($index,$numberOfCollections,null);
                                         @endphp
                                         <input type="number" step="any" class="form-control @error($nameToOld) is-invalid @enderror" value="{{$currentVal}}" name="{{ $currentFieldName }}" id="{{ $nameToOld }}">
 
@@ -111,7 +111,7 @@
                                         @php
                                         $currentFieldName = "rawMaterials[$rawMaterialId][collection_policy_value][$index][due_in_days][$numberOfCollections]";
                                         $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
-                                        $currentVal =$rawMaterial->getCollectionDueDaysAtIndex($index,$numberOfCollections);
+                                        $currentVal =$rawMaterial->getCollectionDueDaysAtIndex($index,$numberOfCollections,null);
                                         @endphp
 
                                         <td>

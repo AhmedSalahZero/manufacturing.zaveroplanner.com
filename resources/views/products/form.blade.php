@@ -120,7 +120,7 @@
                                     @endphp
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <x-repeat-right-dot-inputs :name="'target_quantities['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="1" :currentVal="$currentVal" :classes="' only-greater-than-or-equal-zero-allowed number_field_2 number_multiple_percentage '" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                            <x-repeat-right-dot-inputs :name="'target_quantities['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="1" :currentVal="$currentVal" :classes="' only-greater-than-or-equal-zero-allowed number_multiple_percentage number_field2'" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
                                         </div>
                                     </td>
                                     @php
@@ -132,21 +132,79 @@
 
                                 </tr>
 
+
+
+
                                 <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Selling Price Growth %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Local Selling Quantity %') }}" disabled class="form-control text-left max-w-200" type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
                                     @endphp
                                     @foreach($years as $yearAsIndex=>$yearAsString)
                                     @php
-                                    $currentVal = $product->getGrowthRateAtYearIndex($yearAsIndex);
+                                    $currentVal = $product->getLocalTargetQuantityPercentagesAtYearIndex($yearAsIndex);
                                     @endphp
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <x-repeat-right-dot-inputs :formattedInputClasses="'expandable-percentage-input  text-center'" :classes="' only-greater-than-or-equal-zero-allowed gr-field recalculate-gr'" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="2" :currentVal="$currentVal" :is-percentage="true" :mark="' %'" :name="'growth_rates['.($yearAsIndex).']'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                            <x-repeat-right-dot-inputs :name="'local_target_quantity_percentages['.($yearAsIndex).']'" :formattedInputClasses="'expandable-percentage-input   text-center'" :readonly="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="2" :currentVal="$currentVal" :classes="' only-percentage-allowed  percentage_field2 hundred-minus-number'" :is-percentage="true" :mark="' %'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                        </div>
+                                    </td>
+                                    @php
+                                    $columnIndex++ ;
+                                    @endphp
+
+                                    @endforeach
+
+
+                                </tr>
+
+
+
+                                <tr data-repeat-formatting-decimals="1" data-repeater-style>
+
+                                    <td>
+                                        <input value="{{ __('Local Target Selling Quantity') }}" disabled class="form-control text-left max-w-200" type="text">
+                                    </td>
+                                    @php
+                                    $columnIndex = 0 ;
+                                    @endphp
+                                    @foreach($years as $yearAsIndex=>$yearAsString)
+                                    @php
+                                    $currentVal = $product->getLocalTargetQuantityAtYearIndex($yearAsIndex);
+                                    @endphp
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <x-repeat-right-dot-inputs :name="'local_target_quantities['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="1" :currentVal="$currentVal" :classes="' only-greater-than-or-equal-zero-allowed number_multiple_percentage2 number_field3 sum_product_quantity_1'" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                        </div>
+                                    </td>
+                                    @php
+                                    $columnIndex++ ;
+                                    @endphp
+
+                                    @endforeach
+
+
+                                </tr>
+
+
+                                <tr data-repeat-formatting-decimals="2" data-repeater-style>
+
+                                    <td>
+                                        <input value="{{ __('Local Selling Price Growth %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                    </td>
+                                    @php
+                                    $columnIndex = 0 ;
+                                    @endphp
+                                    @foreach($years as $yearAsIndex=>$yearAsString)
+                                    @php
+                                    $currentVal = $product->getLocalGrowthRateAtYearIndex($yearAsIndex);
+                                    @endphp
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <x-repeat-right-dot-inputs :formattedInputClasses="'expandable-percentage-input  text-center'" :classes="' only-greater-than-or-equal-zero-allowed gr-field recalculate-gr'" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="2" :currentVal="$currentVal" :is-percentage="true" :mark="' %'" :name="'local_growth_rates['.($yearAsIndex).']'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
                                         </div>
                                     </td>
                                     @php
@@ -162,18 +220,18 @@
                                 <tr data-repeat-formatting-decimals="1" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Selling Price / Unit') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Local Selling Price / Unit') }}" disabled class="form-control text-left max-w-200" type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
                                     @endphp
                                     @foreach($years as $yearAsIndex=>$yearAsString)
                                     @php
-                                    $currentVal = $product->getPricePerUnitAtYearIndex($yearAsIndex);
+                                    $currentVal = $product->getLocalPricePerUnitAtYearIndex($yearAsIndex);
                                     @endphp
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <x-repeat-right-dot-inputs :classes="'only-greater-than-or-equal-zero-allowed number_field_1 current-growth-rate-result-value '" :formattedInputClasses="'max-w-100 text-center current-growth-rate-result-value-formatted'" :name="'price_per_unit['.($yearAsIndex).']'" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="1" :currentVal="$currentVal" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                            <x-repeat-right-dot-inputs :classes="'only-greater-than-or-equal-zero-allowed number_field_1 current-growth-rate-result-value sum_product_value_1'" :formattedInputClasses="'max-w-100 text-center current-growth-rate-result-value-formatted'" :name="'local_price_per_unit['.($yearAsIndex).']'" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="1" :currentVal="$currentVal" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
                                         </div>
                                     </td>
                                     @php
@@ -184,6 +242,119 @@
 
 
                                 </tr>
+
+
+                                <tr data-repeat-formatting-decimals="2" data-repeater-style>
+
+                                    <td>
+                                        <input value="{{ __('Export Selling Quantity %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                    </td>
+                                    @php
+                                    $columnIndex = 0 ;
+                                    @endphp
+                                    @foreach($years as $yearAsIndex=>$yearAsString)
+                                    @php
+                                    $currentVal = $product->getExportTargetQuantityPercentagesAtYearIndex($yearAsIndex);
+                                    @endphp
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <x-repeat-right-dot-inputs :name="'export_target_quantity_percentages['.($yearAsIndex).']'" :formattedInputClasses="'expandable-percentage-input   text-center'" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="2" :currentVal="$currentVal" :classes="' only-greater-than-or-equal-zero-allowed hundred-minus-number-result  percentage_field3 '" :is-percentage="true" :mark="' %'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                        </div>
+                                    </td>
+                                    @php
+                                    $columnIndex++ ;
+                                    @endphp
+
+                                    @endforeach
+
+
+                                </tr>
+
+
+
+
+
+                                <tr data-repeat-formatting-decimals="1" data-repeater-style>
+
+                                    <td>
+                                        <input value="{{ __('Export Target Selling Quantity') }}" disabled class="form-control text-left max-w-200" type="text">
+                                    </td>
+                                    @php
+                                    $columnIndex = 0 ;
+                                    @endphp
+                                    @foreach($years as $yearAsIndex=>$yearAsString)
+                                    @php
+                                    $currentVal = $product->getExportTargetQuantityAtYearIndex($yearAsIndex);
+                                    @endphp
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <x-repeat-right-dot-inputs :name="'export_target_quantities['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="1" :currentVal="$currentVal" :classes="' only-greater-than-or-equal-zero-allowed number_multiple_percentage3 sum_product_quantity_2'" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                        </div>
+                                    </td>
+                                    @php
+                                    $columnIndex++ ;
+                                    @endphp
+
+                                    @endforeach
+
+
+                                </tr>
+
+
+
+                                <tr data-repeat-formatting-decimals="2" data-repeater-style>
+
+                                    <td>
+                                        <input value="{{ __('Export Selling Price Growth %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                    </td>
+                                    @php
+                                    $columnIndex = 0 ;
+                                    @endphp
+                                    @foreach($years as $yearAsIndex=>$yearAsString)
+                                    @php
+                                    $currentVal = $product->getExportGrowthRateAtYearIndex($yearAsIndex);
+                                    @endphp
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <x-repeat-right-dot-inputs :formattedInputClasses="'expandable-percentage-input  text-center'" :classes="' only-greater-than-or-equal-zero-allowed gr-field2 recalculate-gr2'" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="2" :currentVal="$currentVal" :is-percentage="true" :mark="' %'" :name="'export_growth_rates['.($yearAsIndex).']'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                        </div>
+                                    </td>
+                                    @php
+                                    $columnIndex++ ;
+                                    @endphp
+
+                                    @endforeach
+
+
+                                </tr>
+
+
+                                <tr data-repeat-formatting-decimals="1" data-repeater-style>
+
+                                    <td>
+                                        <input value="{{ __('Export Selling Price / Unit') }}" disabled class="form-control text-left max-w-200" type="text">
+                                    </td>
+                                    @php
+                                    $columnIndex = 0 ;
+                                    @endphp
+                                    @foreach($years as $yearAsIndex=>$yearAsString)
+                                    @php
+                                    $currentVal = $product->getExportPricePerUnitAtYearIndex($yearAsIndex);
+                                    @endphp
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <x-repeat-right-dot-inputs :classes="'only-greater-than-or-equal-zero-allowed current-growth-rate-result-value2 sum_product_value_2'" :formattedInputClasses="'max-w-100 text-center current-growth-rate-result-value-formatted2'" :name="'export_price_per_unit['.($yearAsIndex).']'" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="1" :currentVal="$currentVal" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                        </div>
+                                    </td>
+                                    @php
+                                    $columnIndex++ ;
+                                    @endphp
+
+                                    @endforeach
+
+
+                                </tr>
+
 
 
 
@@ -202,7 +373,7 @@
                                     @endphp
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <x-repeat-right-dot-inputs :classes="' only-greater-than-or-equal-zero-allowed number_multiple_number '" :name="'sales_target_values['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="$currentVal" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                            <x-repeat-right-dot-inputs :classes="' only-greater-than-or-equal-zero-allowed two_sum_product_result '" :name="'sales_target_values['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="$currentVal" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
                                         </div>
                                     </td>
                                     @php
@@ -258,7 +429,7 @@
 
             </div>
 
-           
+
             {{-- Sales Seasonality --}}
             <div class="div-title">
                 {{__('Sales Seasonality')}}
@@ -358,7 +529,7 @@
                                 <div class="form-group">
                                     <label>{{__($monthName ." %")}}</label>
                                     <input type="number" step="any" class="form-control total_input monthly" placeholder="{{__($monthName." %")}}" value="{{$currentVal}}" name="{{$currentFieldName}}" id="{{$nameToOld}}">
-                                    <input type="hidden"  class="form-control total_input flat"  value="{{ (1/12)*100 }}" name="seasonality[flat][{{ $index }}]" id="{{$nameToOld}}">
+                                    <input type="hidden" class="form-control total_input flat" value="{{ (1/12)*100 }}" name="seasonality[flat][{{ $index }}]" id="{{$nameToOld}}">
                                 </div>
                             </div>
 
@@ -559,10 +730,10 @@
     <div class="col-12">
         <div class="row">
             @if ($project->new_company == 0)
-			<div class="col-3">
+            <div class="col-3">
                 <div class="form-group">
                     <label>{{__('Finished Goods Beginning Inventory Quantity')}}</label>
-                    <input type="text"  class="form-control  only-greater-than-or-equal-zero-allowed @error('fg_inventory_quantity') is-invalid @enderror"  value="{{isset($product->fg_inventory_quantity) ? number_format(number_unformat($product->fg_inventory_quantity),2) :old('fg_inventory_quantity')}}" name="fg_inventory_quantity" id="fg_inventory_quantity">
+                    <input type="text" class="form-control  only-greater-than-or-equal-zero-allowed @error('fg_inventory_quantity') is-invalid @enderror" value="{{isset($product->fg_inventory_quantity) ? number_format(number_unformat($product->fg_inventory_quantity),2) :old('fg_inventory_quantity')}}" name="fg_inventory_quantity" id="fg_inventory_quantity">
                     @error('fg_inventory_value')
                     <div class="alert alert-danger" role="alert">
                         {{$message}}
@@ -573,7 +744,7 @@
             <div class="col-3">
                 <div class="form-group">
                     <label>{{__('Finished Goods Beginning Inventory Value')}}</label>
-                    <input type="text"  class="form-control fg-beginning-inventory-original-value-class only-greater-than-or-equal-zero-allowed @error('fg_inventory_value') is-invalid @enderror"  value="{{isset($product->fg_inventory_value) ? $product->fg_inventory_value :old('fg_inventory_value')}}" name="fg_inventory_value" id="fg_inventory_value">
+                    <input type="text" class="form-control fg-beginning-inventory-original-value-class only-greater-than-or-equal-zero-allowed @error('fg_inventory_value') is-invalid @enderror" value="{{isset($product->fg_inventory_value) ? $product->fg_inventory_value :old('fg_inventory_value')}}" name="fg_inventory_value" id="fg_inventory_value">
                     @error('fg_inventory_value')
                     <div class="alert alert-danger" role="alert">
                         {{$message}}
@@ -581,72 +752,72 @@
                     @enderror
                 </div>
             </div>
-			<div class="col-md-2">
-			<div class="form-group">
+            <div class="col-md-2">
+                <div class="form-group">
                     <label>{{__('Breakdown')}}</label>
-				 <div>
-				   <button class="btn bg-green btn-md text-nowrap " type="button" data-toggle="modal" data-target="#modal-allocate-finished-goods">{{ __('FG Inventory Breakdown ') }}</button>
-				   
-				     <div class="modal fade" id="modal-allocate-finished-goods" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header header-border">
-                            <h5 class="modal-title font-size-1rem" >{{ __('Breakdown') }}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                    <div>
+                        <button class="btn bg-green btn-md text-nowrap " type="button" data-toggle="modal" data-target="#modal-allocate-finished-goods">{{ __('FG Inventory Breakdown ') }}</button>
+
+                        <div class="modal fade" id="modal-allocate-finished-goods" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header header-border">
+                                        <h5 class="modal-title font-size-1rem">{{ __('Breakdown') }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table w-full">
+                                            <tbody>
+                                                @php
+                                                $allocations = [] ;
+                                                @endphp
+                                                @foreach( getFgInventoryBreakdownTypes() as $fgInventoryType => $fgInventoryTitle)
+                                                @php
+                                                $percentage = 0;
+                                                @endphp
+                                                <tr>
+
+                                                    <td>
+                                                        <div class="form-group d-flex closest-parent   text-center">
+                                                            <input type="hidden" value="{{ $product->getFgBeginningInventoryBreakdownValueForType($fgInventoryType) }}" class="number_field fg-beginning-inventory-value-class">
+                                                            <div class="col-6 text-left">
+                                                                <label>{{ __('Item') }}</label>
+                                                                <input readonly class="form-control" name="fg_beginning_inventory_breakdowns[{{ $fgInventoryType }}][name]" type="text" value="{{ $fgInventoryTitle }}">
+
+
+                                                            </div>
+                                                            <div class="col-2 text-left">
+                                                                <label>{{ __('Percentage %') }}</label>
+                                                                <input class="form-control  percentage_field input-border" name="fg_beginning_inventory_breakdowns[{{ $fgInventoryType }}][percentage]" value="{{ $product->getFgBeginningInventoryBreakdownPercentageForType($fgInventoryType) }}">
+                                                            </div>
+                                                            <div class="col-4 text-left">
+                                                                <label>{{ __('Value') }}</label>
+                                                                <input class="form-control  number_multiple_percentage input-border" name="fg_beginning_inventory_breakdowns[{{ $fgInventoryType }}][value]" value="{{ $product->getFgBeginningInventoryBreakdownValueForType($fgInventoryType) }}">
+                                                            </div>
+
+
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                                @endforeach
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">{{ __('Save') }}</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            <table class="table w-full">
-                                <tbody>
-                                    @php
-                                    $allocations = [] ;
-                                    @endphp
-                                    @foreach( getFgInventoryBreakdownTypes() as $fgInventoryType => $fgInventoryTitle)
-                                    @php
-                                    $percentage = 0;
-                                    @endphp
-                                    <tr>
 
-                                        <td>
-                                            <div class="form-group d-flex closest-parent   text-center">
-											<input type="hidden" value="{{ $product->getFgBeginningInventoryBreakdownValueForType($fgInventoryType) }}" class="number_field fg-beginning-inventory-value-class" >
-                                                <div class="col-6 text-left">
-                                                    <label>{{ __('Item') }}</label>
-                                                    <input readonly class="form-control" name="fg_beginning_inventory_breakdowns[{{ $fgInventoryType }}][name]" type="text" value="{{ $fgInventoryTitle }}">
-                                                    
-
-                                                </div>
-                                                <div class="col-2 text-left">
-                                                    <label>{{ __('Percentage %') }}</label>
-                                                    <input class="form-control  percentage_field input-border" name="fg_beginning_inventory_breakdowns[{{ $fgInventoryType }}][percentage]" value="{{ $product->getFgBeginningInventoryBreakdownPercentageForType($fgInventoryType) }}">
-                                                </div>
-												  <div class="col-4 text-left">
-                                                    <label>{{ __('Value') }}</label>
-                                                    <input class="form-control  number_multiple_percentage input-border" name="fg_beginning_inventory_breakdowns[{{ $fgInventoryType }}][value]" value="{{ $product->getFgBeginningInventoryBreakdownValueForType($fgInventoryType) }}">
-                                                </div>
-
-
-                                            </div>
-                                        </td>
-
-                                    </tr>
-                                    @endforeach
-
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">{{ __('Save') }}</button>
-                        </div>
                     </div>
+
                 </div>
             </div>
-			
-				 </div>
-				
-			</div>
-			</div>
             @endif
             <?php $fg_inventory_coverage_days = isset($product->fg_inventory_coverage_days) ? $product->fg_inventory_coverage_days :old('fg_inventory_coverage_days'); ?>
             <div class="col-md-3">
@@ -671,18 +842,18 @@
                         {{$message}}
                     </div>
                     @enderror
-					
-					
-				
-					   
+
+
+
+
                 </div>
 
             </div>
         </div>
 
-    
 
-</div>
+
+    </div>
 </div>
 
 
@@ -690,13 +861,17 @@
 <div class="div-title">
     {{__('Collections Plan ')}}<span class="red">*</span>
 </div>
-<div class="formItem">
-    <div class="col-12">
+<div class="formItem ">
+	<div class="row">
+	
+
+	@foreach(['local'=>__('Local') , 'export'=>__('Export')]  as $localOrExport => $localOrExportTitle )
+    <div class="col-6 pl-5">
         @foreach($product->project->getFirstYearUntilLast($product->getSellingStartDateAsIndex()) as $index=>$title)
         @php
-        $currentFieldName = "collection_policy_value[$index][cash_payment]";
+        $currentFieldName = "collection_policy_value[$localOrExport][$index][cash_payment]";
         $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
-        $currentVal = $product->getCollectionDownPaymentAtIndex($index);
+        $currentVal = $product->getCollectionDownPaymentAtIndex($index,$localOrExport);
 
         @endphp
         <div class="row">
@@ -727,14 +902,15 @@
 
             <input type="hidden" name="collection_policy_type" value="customize">
             <input type="hidden" name="collection_policy_interval" value="monthly">
-            @for($numberOfCollections = 0 ; $numberOfCollections<= 1 ; $numberOfCollections++) <div class="col-md-2">
+            @for($numberOfCollections = 0 ; $numberOfCollections<= 1 ; $numberOfCollections++) 
+			<div class="col-md-2">
 
                 <div class="form-group">
                     <label>{{__('Collection Rate %')}} </label>
                     @php
-                    $currentFieldName = "collection_policy_value[$index][rate][$numberOfCollections]";
+                    $currentFieldName = "collection_policy_value[$localOrExport][$index][rate][$numberOfCollections]";
                     $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
-                    $currentVal = $product->getCollectionRateAtIndex($index,$numberOfCollections);
+                    $currentVal = $product->getCollectionRateAtIndex($index,$numberOfCollections,$localOrExport);
                     @endphp
 
                     <input type="number" step="any" class="form-control @error($nameToOld) is-invalid @enderror" value="{{$currentVal}}" name="{{ $currentFieldName }}" id="{{ $nameToOld }}">
@@ -745,13 +921,13 @@
                     @enderror
                 </div>
 
-        </div>
+    	    </div>
 
 
         @php
-        $currentFieldName = "collection_policy_value[$index][due_in_days][$numberOfCollections]";
+        $currentFieldName = "collection_policy_value[$localOrExport][$index][due_in_days][$numberOfCollections]";
         $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
-        $currentVal = $product->getCollectionDueDaysAtIndex($index,$numberOfCollections);
+        $currentVal = $product->getCollectionDueDaysAtIndex($index,$numberOfCollections,$localOrExport);
         @endphp
 
         <div class="col-2">
@@ -759,7 +935,6 @@
             <div class="form-group">
                 <label>{{__('Due In (Days)')}} </label>
                 <select class="form-control  @error($nameToOld) is-invalid @enderror" name="{{ $currentFieldName }}" id="{{ $nameToOld }}">
-                    {{-- <option selected value="">{{__('Select')}}</option> --}}
                     @foreach(collectionDueDays() as $dueDay => $formattedDueDay )
                     <option value="{{ $dueDay }}" {{$currentVal == $dueDay  ?'selected' : '' }}>{{ $formattedDueDay }}</option>
                     @endforeach
@@ -783,33 +958,31 @@
 
 
 
+				</div>
+				@endforeach
+	</div>
+	
+	@endforeach
+					</div>
+			</div>
+
+<div class="div-title toggle-show-hide position-relative" data-query=".comment-for-sales-class">
+
+    {{__('Insert Comment')}}
+
+</div>
+<div id="myCard" class="formItem comment-for-sales-class">
+    <div class="row justify-content-center">
+        <div class="col-md-11">
+            <div class="form-group ">
+                <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn" class="fullscreen-btn">⛶</button>
+                <textarea data-is-ck-editor name="comment_for_sales">{!! $product->comment_for_sales !!}</textarea>
+            </div>
+        </div>
+
     </div>
-    @endforeach
-
-
-
-
 
 </div>
-</div>
-
- <div class="div-title toggle-show-hide position-relative" data-query=".comment-for-sales-class">
-			
-				{{__('Insert Comment')}}
-				
-            </div>
-            <div id="myCard"  class="formItem comment-for-sales-class">
-                <div class="row justify-content-center">
-                    <div class="col-md-11">
-                        <div class="form-group ">
-							 <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn" class="fullscreen-btn">⛶</button>
-                            <textarea data-is-ck-editor name="comment_for_sales">{!! $product->comment_for_sales !!}</textarea>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
 
 
 

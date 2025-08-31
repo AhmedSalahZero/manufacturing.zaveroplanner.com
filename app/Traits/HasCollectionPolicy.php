@@ -8,24 +8,42 @@ use App\Product;
 
 trait HasCollectionPolicy
 {
-	public function getCollectionDownPaymentAtIndex($index)
+	public function getCollectionDownPaymentAtIndex($index,?string $localOrExport)
 	{
+		if(!is_null($localOrExport)){
+			return $this->collection_policy_value[$index]['cash_payment'] ?? 0;
+		}
 		return $this->collection_policy_value[$index]['cash_payment'] ?? 0;
 	}
-	public function getCollectionRateAtIndex( int $index,int $numberOfCollection)
+	public function getCollectionRateAtIndex( int $index,int $numberOfCollection,?string $localOrExport)
 	{
+		if(!is_null($localOrExport)){
+			
+			return $this->collection_policy_value[$localOrExport][$index]['rate'][$numberOfCollection] ?? 0;
+		}
 		return $this->collection_policy_value[$index]['rate'][$numberOfCollection] ?? 0;
 	}
 	/**
 	 * * $index is 0 for first collection and 1 for second collection
 	 * * $numberOfCollection 0  for first one and 1 for second one
 	 */
-	public function getCollectionDueDaysAtIndex(int $index,int $numberOfCollection)
+	public function getCollectionDueDaysAtIndex(int $index,int $numberOfCollection,?string $localOrExport)
 	{
+		if(!is_null($localOrExport)){
+			return $this->collection_policy_value[$localOrExport][$index]['due_in_days'][$numberOfCollection] ?? 0;
+		}
 		return $this->collection_policy_value[$index]['due_in_days'][$numberOfCollection] ?? 0;
 	}
-	public function getDueDayWithRates(int $index):array 
+	public function getDueDayWithRates(int $index,$localOrExport):array 
 	{
+		if(!is_null($localOrExport)){
+			$dueDayAndRatesAtIndex = $this->collection_policy_value[$localOrExport][$index] ;
+				return  [
+					0 => $dueDayAndRatesAtIndex['cash_payment']??0 , 
+					$dueDayAndRatesAtIndex['due_in_days'][0] => $dueDayAndRatesAtIndex['rate'][0],
+					$dueDayAndRatesAtIndex['due_in_days'][1] => $dueDayAndRatesAtIndex['rate'][1],
+				];
+		}
 		$dueDayAndRatesAtIndex = $this->collection_policy_value[$index] ;
 		return  [
 			0 => $dueDayAndRatesAtIndex['cash_payment']??0 , 
@@ -33,11 +51,15 @@ trait HasCollectionPolicy
 			$dueDayAndRatesAtIndex['due_in_days'][1] => $dueDayAndRatesAtIndex['rate'][1],
 		];
 	}
-	
-	public function calculateMultiYearsCollectionPolicy($monthlySalesTargetValueBeforeVat)
+	/**
+	 * * $localOrExport خاص بالسيستم دا بس 
+	 * * في الحالات ما عدا ذالك ممكن تشيله او تمررة بنال
+	 */
+	public function calculateMultiYearsCollectionPolicy($monthlySalesTargetValueBeforeVat , $localOrExport)
 	{
-		  $withholdRate = $this->getWithholdTaxRate() / 100;
-        $vatRate  = $this->getVatRate() / 100;
+		
+		$withholdRate = $localOrExport =='export' ? 0: $this->getWithholdTaxRate() / 100;
+        $vatRate  = $localOrExport =='export' ? 0 : $this->getVatRate() / 100;
         $dateIndexWithDate = $this->project->getDateIndexWithDate();
         
         $withholdAmounts = HArr::MultiplyWithNumber($monthlySalesTargetValueBeforeVat, $withholdRate);
@@ -52,28 +74,28 @@ trait HasCollectionPolicy
         $salesActiveYearsIndexWithItsMonths=  $this->getSalesActiveYearsIndexWithItsMonths();
         $hasMultiYear = array_key_exists(1, $salesActiveYearsIndexWithItsMonths) ;
         $monthlySalesTargetValueAfterVatForFirstYearMonths = array_intersect_key($monthlySalesTargetValueAfterVat, array_flip(array_keys($salesActiveYearsIndexWithItsMonths[0])));
-        $dueDayWithRates = $this->getDueDayWithRates(0);
+        $dueDayWithRates = $this->getDueDayWithRates(0,$localOrExport);
         $amountAfterVat = [];
         $amountAfterVatForFirstYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $monthlySalesTargetValueAfterVatForFirstYearMonths);
         $amountAfterVat = $amountAfterVatForFirstYear;
         if ($hasMultiYear) {
             $secondYearStartMonthIndex = array_key_last(($salesActiveYearsIndexWithItsMonths[0])) + 1 ;
             $monthlySalesTargetValueAfterVatForMultiYearMonths = array_slice($monthlySalesTargetValueAfterVat, $secondYearStartMonthIndex, null, true);
-            $dueDayWithRates = $this->getDueDayWithRates(1);
+            $dueDayWithRates = $this->getDueDayWithRates(1,$localOrExport);
             $amountAfterVatForMultiYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $monthlySalesTargetValueAfterVatForMultiYearMonths);
             $amountAfterVat = HArr::sumAtDates([$amountAfterVatForFirstYear,$amountAfterVatForMultiYear], array_keys($monthlySalesTargetValueAfterVat));
         }
         
         $salesActiveYearsIndexWithItsMonths=  $this->getSalesActiveYearsIndexWithItsMonths();
         $withholdAmountsForFirstYearMonths = array_intersect_key($withholdAmounts, array_flip(array_keys($salesActiveYearsIndexWithItsMonths[0])));
-        $dueDayWithRates = $this->getDueDayWithRates(0);
+        $dueDayWithRates = $this->getDueDayWithRates(0,$localOrExport);
     
         $withholdAmountsForFirstYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $withholdAmountsForFirstYearMonths);
         $withholdPayments = $withholdAmountsForFirstYear;
         if ($hasMultiYear) {
             $secondYearStartMonthIndex = array_key_last(($salesActiveYearsIndexWithItsMonths[0])) + 1 ;
             $withholdAmountsForMultiYearMonths = array_slice($withholdAmounts, $secondYearStartMonthIndex, null, true);
-            $dueDayWithRates = $this->getDueDayWithRates(1);
+            $dueDayWithRates = $this->getDueDayWithRates(1,$localOrExport);
             $amountAfterVatForMultiYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $withholdAmountsForMultiYearMonths);
             $withholdPayments = HArr::sumAtDates([$withholdAmountsForFirstYear,$amountAfterVatForMultiYear], array_keys($withholdAmounts));
         }

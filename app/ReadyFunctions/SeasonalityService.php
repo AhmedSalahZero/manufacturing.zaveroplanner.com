@@ -61,7 +61,7 @@ class SeasonalityService
 				$dateAsString = $dateIndexWithDate[$dateAsIndex];
 				$month = explode('-',$dateAsString)[1];
 				if(!isset($distributionPercentages[$month])){
-					dd($distributionPercentages,$month,$itsMonths);
+					$distributionPercentages = self::monthlyFlatDistribution();
 				}
 				$seasonalityAtCurrentMonth = $distributionPercentages[$month];
 				$result[$dateAsIndex] = $zeroOrOne ? $seasonalityAtCurrentMonth : 0 ;
@@ -208,5 +208,10 @@ class SeasonalityService
 			}
 			return $duration_monthes_in_years;
 		}
+	}
+	private function monthlyFlatDistribution():array 
+	{
+		return ["01"=> 0.083333333, "02"=> 0.083333333, "03"=> 0.083333333, "04"=> 0.083333333, "05"=> 0.083333333, "06"=> 0.083333333, "07"=> 0.083333333, "08"=> 0.083333333, "09"=> 0.083333333, "10"=> 0.083333333, "11"=> 0.083333333, "12"=> 0.083333333];
+			
 	}
 }
