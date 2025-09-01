@@ -314,5 +314,9 @@ class FixedAsset extends Model
 	{
 		return $this->ffe_loan_withdrawal?:[];
 	}
+	public function getFfePayment()
+	{
+		return $this->ffe_payment?:[];
+	}
 	
 }

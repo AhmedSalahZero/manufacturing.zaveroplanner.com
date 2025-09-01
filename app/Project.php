@@ -1175,7 +1175,7 @@ class Project extends Model
         }
 		
 		foreach ($project->fixedAssets as $fixedAsset) {
-			$ffePayment = $fixedAsset->ffe_payment;
+			$ffePayment = $fixedAsset->getFfePayment();
 			$currentItemId = $fixedAsset->id ;
             $tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['options'] =array_merge([
                 'title'=>$fixedAsset->getName(),
