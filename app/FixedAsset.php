@@ -22,7 +22,10 @@ class FixedAsset extends Model
 		'custom_collection_policy'=>'array',
 		'depreciation_statement'=>'array',
 		'capitalization_statement'=>'array',
-		'admin_depreciations'=>'array'
+		'admin_depreciations'=>'array',
+		'ffe_equity_payment'=>'array',
+		'ffe_loan_withdrawal'=>'array',
+		'ffe_payment'=>'array',
 		
 	];
     public function project()

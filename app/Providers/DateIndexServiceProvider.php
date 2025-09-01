@@ -2,12 +2,15 @@
 namespace App\Providers;
 
 use App\Project;
+use App\Traits\ProjectTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class DateIndexServiceProvider extends ServiceProvider
 {
+	use ProjectTrait;
 	public function register()
 	{
 		
@@ -20,7 +23,18 @@ class DateIndexServiceProvider extends ServiceProvider
 		
 		$projectId = Request()->segment(3);
 		$projectId =is_string($projectId) ? Request()->segment(2) : $projectId;
-		
+		/**
+		 * * start in case of line sharing
+		 */
+		if(!is_numeric($projectId) && $projectId != 'projects' && DB::table('sharing_links')->where('link_code',$projectId)->first()){
+			$projectId =is_string($projectId) ? $this->project(Request()->segment(2)) : null;
+			if(!is_null($projectId) && $projectId instanceof Project){
+				$projectId = $projectId->id ; 
+			}
+		}
+		/**
+		 * * end in case of line sharing
+		 */
 		if(is_numeric($projectId)){
 			$project = Project::find($projectId);
 			/**

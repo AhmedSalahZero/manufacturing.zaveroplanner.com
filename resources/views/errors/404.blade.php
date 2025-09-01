@@ -219,7 +219,7 @@
 </head>
 
 <body>
-    <a title="@lang('HOME')" class="style" href="{{route('home')}}">
+    <a title="@lang('HOME')" class="style" href="">
         <div class="background">
             <div class="ground"></div>
         </div>

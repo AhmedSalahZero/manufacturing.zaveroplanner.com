@@ -344,7 +344,7 @@ class CalculateFixedLoanAtEndService
 			$contractPayments['FFE Payment'] = $contractPaymentService->__calculate( $executionAndPayment, $ffeCollectionPolicyValue,$dateIndexWithDate, $dateWithDateIndex);
 			$ffeEquityPayment['FFE Equity Injection'] = $ffeExecutionAndPaymentService->calculateFFEEquityPayment($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
 			$ffeLoanWithdrawal['FFE Loan Withdrawal'] = $ffeExecutionAndPaymentService->calculateFFELoanWithdrawal($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
-	
+			
 			// $loanForFFECost = $ffe->getLoanForSection(FFE_COST);
 			$equityFunding = $ffe->getEquityFundingRate();
 			
@@ -380,9 +380,8 @@ class CalculateFixedLoanAtEndService
 					$ffeLoanInstallment['FFE Loan Installment'] = $ffeLoanCalculations['schedulePayment']??[];
 				}
 			}
-		
+		// dd('exee',$executionAndPayment);
 		return [
-
 			'contractPayments'=>$contractPayments,
 			'ffeEquityPayment'=>$ffeEquityPayment,
 			'ffeLoanWithdrawal'=>$ffeLoanWithdrawal,

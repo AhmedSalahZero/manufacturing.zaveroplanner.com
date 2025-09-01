@@ -83,7 +83,7 @@ trait HasCollectionOrPaymentStatement {
 	 public static function calculateSettlementStatement(array $settlements ,array $additions = [] , float $initialBeginningBalance = 0 , array $dateIndexWithDate)
     {
 		$financialYearStartMonth = 'january';
-        $additionForIntervals = [
+        $withholdForIntervals = [
             'monthly'=>$additions,
             'quarterly'=>sumIntervalsIndexes($additions, 'quarterly', $financialYearStartMonth, $dateIndexWithDate),
             'semi-annually'=>sumIntervalsIndexes($additions, 'semi-annually', $financialYearStartMonth, $dateIndexWithDate),
@@ -102,7 +102,7 @@ trait HasCollectionOrPaymentStatement {
             foreach ($settlementsForInterval[$intervalName] as $dateIndex=>$settlementAtDate) {
                 $dateIndex;
                 $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
-				$addition = $additionForIntervals[$intervalName][$dateIndex]??0;
+				$addition = $withholdForIntervals[$intervalName][$dateIndex]??0;
                 $totalDue[$dateIndex] =  $addition+$beginningBalance;
        //         $settlementAtDate = $settlementsForInterval[$intervalName][$dateIndex]??0 ;
                 $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
@@ -114,6 +114,44 @@ trait HasCollectionOrPaymentStatement {
             }
         }
 	
+        return $result;
+    
+        
+    }
+
+	
+	
+	public static function calculateWithholdStatement(array $withholds = [] , float $initialBeginningBalance = 0 , array $dateIndexWithDate)
+    {
+		$financialYearStartMonth = 'january';
+        $withholdForIntervals = [
+            'monthly'=>$withholds,
+            'quarterly'=>sumIntervalsIndexes($withholds, 'quarterly', $financialYearStartMonth, $dateIndexWithDate),
+            'semi-annually'=>sumIntervalsIndexes($withholds, 'semi-annually', $financialYearStartMonth, $dateIndexWithDate),
+            'annually'=>sumIntervalsIndexes($withholds, 'annually', $financialYearStartMonth, $dateIndexWithDate),
+        ];
+       
+     
+        $result = [];
+        foreach (getIntervalFormatted() as $intervalName=>$intervalNameFormatted) {
+            $beginningBalance = $initialBeginningBalance;
+            foreach ($withholdForIntervals[$intervalName] as $dateIndex=>$withhold) {
+				$monthNumber = explode('-',$dateIndexWithDate[$dateIndex])[01];
+                $dateIndex;
+                $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
+                $totalDue[$dateIndex] =  $withhold+$beginningBalance;
+				$settlementAtDate = 0 ;
+				if($monthNumber == 01 || $monthNumber == 04 || $monthNumber == 07 || $monthNumber == 10){
+						$settlementAtDate = $result[$intervalName]['total_due'][$dateIndex-1]??0 ;
+				}
+                $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
+                $beginningBalance = $endBalance[$dateIndex] ;
+                $result[$intervalName]['withhold'][$dateIndex] =  $withhold ;
+                $result[$intervalName]['total_due'][$dateIndex] = $totalDue[$dateIndex];
+                $result[$intervalName]['payment'][$dateIndex] = $settlementAtDate;
+                $result[$intervalName]['end_balance'][$dateIndex] =$endBalance[$dateIndex];
+            }
+        }
         return $result;
     
         

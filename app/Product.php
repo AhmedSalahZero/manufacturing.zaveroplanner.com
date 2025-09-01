@@ -421,5 +421,22 @@ class Product extends Model
 	{
 		return $this->getFgBeginningInventoryBreakdownPercentageForType($inventoryType)/100 * $this->getFgInventoryValue();
 	}
-	
+	public  function getViewVars():array 
+	{
+		$project = $this->project;
+		 $years = $this->getViewYearIndexWithYear();
+        $currentStepNumber = 2 ;
+        $totalSteps = getTotalSteps() ;
+        $rawMaterials  = $this->rawMaterials;
+        $rawMaterialNames = $project->rawMaterials;
+		return [
+            'years'=>$years ,
+            'project'=>$project ,
+            'product'=>$this,
+            'currentStepNumber'=>$currentStepNumber,
+            'totalSteps'=>$totalSteps,
+            'rawMaterials'=>$rawMaterials,
+            'rawMaterialNames'=>$rawMaterialNames
+        ];
+	}
 }

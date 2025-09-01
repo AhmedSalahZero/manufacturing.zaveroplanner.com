@@ -17,7 +17,8 @@ class RawMaterial extends Model
     protected $guarded = [];
 	protected $casts = [
 		'collection_policy_value'=>'array',
-		'collection_statement'=>'array'
+		'collection_statement'=>'array',
+		'credit_withhold_statement'=>'array'
 	];
     public function project()
     {
@@ -62,11 +63,16 @@ class RawMaterial extends Model
 	public static function calculateInventoryQuantityStatement(int $projectId)
 	{
 		$inventoryQuantityStatement = new InventoryQuantityStatement;
+		$dateIndexWithDate = Project::find($projectId)->getDateIndexWithDate();
+		
 		$rawMaterialIds = DB::table('product_raw_material')->where('project_id',$projectId)->pluck('raw_material_id','raw_material_id')->toArray();
 		$productConsumedRawMaterials = Product::where('project_id',$projectId)->where('product_raw_material_consumed','!=',null)->pluck('product_raw_material_consumed')->toArray();
 		$inventoryQuantityStatements = [];
 		foreach($rawMaterialIds as $rawMaterialId){
 			$rawMaterial = RawMaterial::find($rawMaterialId);
+			/**
+			 * @var RawMaterial $rawMaterial
+			 */
 			$totalConsumed = HArr::sumAtDates(array_column($productConsumedRawMaterials,$rawMaterialId)) ;
 			$beginningBalance = $rawMaterial->getBeginningInventoryValue();
 			$monthsToCover = $rawMaterial->getRmInventoryCoverageDays() / 30;
@@ -75,8 +81,10 @@ class RawMaterial extends Model
 			// $dueDayWithAnd
 			// (new self)->calculateCollectionOrPaymentForMultiCustomizedAmounts();
 			$collectionPolicyStatement = $rawMaterial->calculateMultiYearsCollectionPolicy($manufacturingQuantity,null);
+			$withholdAmount = $collectionPolicyStatement['monthly']['withhold_amount']??[] ;
 			$rawMaterial->update([
-				'collection_statement'=>$collectionPolicyStatement
+				'collection_statement'=>$collectionPolicyStatement,
+				'credit_withhold_statement'=>$rawMaterial->calculateWithholdStatement($withholdAmount,0,$dateIndexWithDate)
 			]);
 	//		$inventoryQuantityStatements[$rawMaterialId]=$currentInventoryQuantityStatement;
 		}

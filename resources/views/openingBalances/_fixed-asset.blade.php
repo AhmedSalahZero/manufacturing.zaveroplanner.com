@@ -25,7 +25,7 @@ common-parent
         </div>
     </div>
     <div class="col-md-1 pr-2 pl-2">
-        <label class="form-label font-weight-bold">{{ __('Accumulated Depreciation') }} </label>
+        <label class="form-label font-weight-bold"> {!! __('Accumulated <br> Depreciation') !!} </label>
         <div class="kt-input-icon">
             <div class="input-group">
                 <input type="number" class="form-control  number_minus_field_2 only-greater-than-or-equal-zero-allowed " name="accumulated_depreciation" value="{{ isset($model) ? $model->getAccumulatedDepreciation() : old('accumulated_depreciation') }}" step="0.5">
@@ -160,7 +160,7 @@ common-parent
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">{{ __('Save') }}</button>
+                        <button type="button" class="btn save-modal btn-primary" data-dismiss="modal">{{ __('Save') }}</button>
                     </div>
 
                 </div>

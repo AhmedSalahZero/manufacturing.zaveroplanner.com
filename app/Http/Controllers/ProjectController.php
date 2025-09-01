@@ -58,23 +58,8 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-		
-        $step_data =(new Redirects)->steps($project,'edit');
-        $project->month = isset($project->start_date) ? date("m",strtotime($project->start_date)) : null;
-        $project->year = isset($project->start_date) ? date("Y",strtotime($project->start_date)) : null;
-		$products  = $project->products ; 
-		$rawMaterials  = $project->rawMaterials ; 
-        // $project->selling_start_month = isset($project->selling_start_date) ? date("m",strtotime($project->selling_start_date)) : null;
-        // $project->selling_start_year = isset($project->selling_start_date) ? date("Y",strtotime($project->selling_start_date)) : null;
-        // $products_selling_dates_fields = ['product_first_selling_'=>'product_first_selling_date','product_second_selling_'=>'product_second_selling_date','product_third_selling_'=>'product_third_selling_date','product_fourth_selling_'=>'product_fourth_selling_date','product_fifth_selling_'=>'product_fifth_selling_date'];
-        // foreach ($products_selling_dates_fields as $main_field_name => $field) {
-        //     $name_of_new_field_month = $main_field_name.'month';
-        //     $name_of_new_field_year = $main_field_name.'year';
-        //     $project->$name_of_new_field_month = isset($project->$field) ? date("m",strtotime($project->$field)) : null;
-        //     $project->$name_of_new_field_year = isset($project->$field) ? date("Y",strtotime($project->$field)) : null;
-        // }
-        $sectors = BusinessSector::all();
-        return view('projects.edit',compact('project' , 'sectors','step_data','products','rawMaterials'));
+        $project->getViewVars();
+        return view('projects.edit',$project->getViewVars());
     }
 
     /**

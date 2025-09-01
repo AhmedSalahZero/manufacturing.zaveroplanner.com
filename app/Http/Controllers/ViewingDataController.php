@@ -14,14 +14,17 @@ class ViewingDataController extends Controller
     public function viewStudy(Request $request ,$slug)
     {
         $project = $this->project($slug);
-        $products = (new Redirects)->completedproducts($project);
+        // $products = (new Redirects)->completedproducts($project);
+		// $products = $project->products;
         $user_ip = $request->ip() ;
 
         $found_user = SharingLinkVisitor::where('link_code',$slug)->where('ip',$user_ip)->first();
         if ($found_user === null) {
             SharingLinkVisitor::create(['link_code'=>$slug,'ip'=>$user_ip]);
         }
-        return view('viewing.study_info',compact('project','products','slug'));
+		// dd($project);
+		return view('view-study-info',['project'=>$project]);
+        // return view('viewing.study_info',compact('project','products','slug'));
     }
 
     public function viewManpowerPlan($slug)

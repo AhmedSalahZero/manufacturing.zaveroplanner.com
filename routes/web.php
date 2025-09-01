@@ -120,6 +120,7 @@ Route::group(
 					
 					 # Assets
 					 Route::get('/financial-results', 'RedirectionController@financialResultsGet')->name('financial.result');
+					 Route::get('/cash-in-out-flow', 'RedirectionController@cashInOutFlowGet')->name('cash.in.out.flow.result');
                     // Route::get('/assets', 'RedirectionController@assetsGet')->name('assets.form');
                     // Route::post('/assets', 'RedirectionController@assetsPost')->name('assets.submit');
            

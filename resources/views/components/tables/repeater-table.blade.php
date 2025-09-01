@@ -96,7 +96,7 @@
         margin-left: -60px;
     }
 	[data-repeater-create]{
-		display:flex !important;
+		display:flex ;
 		align-items:center !important;
 		justify-content:center !important;
 	}

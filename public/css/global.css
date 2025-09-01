@@ -1,3 +1,6 @@
+.hidden-important{
+	display:none !important;
+}
 .ck.ck-toolbar .ck-icon {
 width: 16px !important;
 height: 16px !important;
