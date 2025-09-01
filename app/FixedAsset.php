@@ -306,5 +306,13 @@ class FixedAsset extends Model
 	{
 		return $this->getMarginRate();
 	}
+	public function getFfeEquityPayment()
+	{
+		return $this->ffe_equity_payment?:[];
+	}
+	public function getFfeLoanWithdrawal()
+	{
+		return $this->ffe_loan_withdrawal?:[];
+	}
 	
 }

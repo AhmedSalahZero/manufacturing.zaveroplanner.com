@@ -1075,8 +1075,8 @@ class Project extends Model
 		$totalFixedAssetLoanWithdrawal = [];
 		foreach($project->fixedAssets as $fixedAsset)
 			{
-				$totalFixedAssetEquity = HArr::sumAtDates([$fixedAsset->ffe_equity_payment,$totalFixedAssetEquity],$sumKeys);
-				$totalFixedAssetLoanWithdrawal = HArr::sumAtDates([$fixedAsset->ffe_loan_withdrawal,$totalFixedAssetLoanWithdrawal],$sumKeys);
+				$totalFixedAssetEquity = HArr::sumAtDates([$fixedAsset->getFfeEquityPayment(),$totalFixedAssetEquity],$sumKeys);
+				$totalFixedAssetLoanWithdrawal = HArr::sumAtDates([$fixedAsset->getFfeLoanWithdrawal(),$totalFixedAssetLoanWithdrawal],$sumKeys);
 			}
 			$otherDebtorsOpeningBalances = DB::table('other_debtors_opening_balances')->where('project_id',$project->id)->pluck('payload');
 			$totalOtherDebtorsOpeningBalances = [];
