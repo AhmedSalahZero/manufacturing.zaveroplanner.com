@@ -145,6 +145,7 @@ return array(
     'App\\Traits\\ProjectTrait' => $baseDir . '/app/Traits/ProjectTrait.php',
     'App\\Traits\\Redirects' => $baseDir . '/app/Traits/Redirects.php',
     'App\\User' => $baseDir . '/app/User.php',
+    'App\\VatAndCreditWithholdTaxOpeningBalance' => $baseDir . '/app/VatAndCreditWithholdTaxOpeningBalance.php',
     'Asm89\\Stack\\Cors' => $vendorDir . '/asm89/stack-cors/src/Asm89/Stack/Cors.php',
     'Asm89\\Stack\\CorsService' => $vendorDir . '/asm89/stack-cors/src/Asm89/Stack/CorsService.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',

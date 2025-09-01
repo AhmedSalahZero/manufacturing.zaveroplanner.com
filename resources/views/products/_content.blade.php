@@ -767,7 +767,7 @@
 
 
                     @foreach(['local'=>__('Local') , 'export'=>__('Export')] as $localOrExport => $localOrExportTitle )
-                    <div class="col-6 pl-5">
+                    <div class="col-6 pl-5 @if($localOrExport == 'export') border-left-export @endif ">
                         @foreach($product->project->getFirstYearUntilLast($product->getSellingStartDateAsIndex()) as $index=>$title)
                         @php
                         $currentFieldName = "collection_policy_value[$localOrExport][$index][cash_payment]";
@@ -776,8 +776,8 @@
 
                         @endphp
                         <div class="row">
-                            <div class="col-12">
-                                {{ $title }}
+                            <div class="col-12 ">
+                                {{ $title }} {{ $localOrExportTitle }} {{ __('Sales') }}
                                 @include('hr')
                             </div>
 

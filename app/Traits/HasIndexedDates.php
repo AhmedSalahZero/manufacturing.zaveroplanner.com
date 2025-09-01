@@ -52,6 +52,25 @@ trait HasIndexedDates
 
         return array_keys($studyDurationPerMonth);
     }
+	public function getExtendedStudyDurationPerYears(){
+		
+		$datesAndIndexesHelpers = $this->datesAndIndexesHelpers();
+			$datesIndexWithYearIndex=$datesAndIndexesHelpers['datesIndexWithYearIndex']; 
+			$yearIndexWithYear=$datesAndIndexesHelpers['yearIndexWithYear']; 
+			$dateIndexWithDate=$datesAndIndexesHelpers['dateIndexWithDate']; 
+			$dateWithMonthNumber=$datesAndIndexesHelpers['dateWithMonthNumber']; 
+				$datesAsStringAndIndex = $this->getDatesAsStringAndIndex();
+				
+		 $studyDurationPerMonth = [];
+        $studyDurationPerYear = $this->getExtendedStudyDurationPerYear($datesAsStringAndIndex, $datesIndexWithYearIndex, $yearIndexWithYear, $dateIndexWithDate, $dateWithMonthNumber, false, true, true);
+        foreach ($studyDurationPerYear as $year => $values) {
+            foreach ($values as $date => $value) {
+                $studyDurationPerMonth[$date] = $value;
+            }
+        }
+        return array_keys($studyDurationPerMonth);
+		
+	}
     public function getExtendedStudyDurationPerMonth(array $datesAsStringAndIndex, array $datesIndexWithYearIndex, array $yearIndexWithYear, array $dateIndexWithDate, array $dateWithMonthNumber, $maxYearIsStudyEndDate = true, $repeatIndexes = true)
     {
         $studyDurationPerMonth = [];

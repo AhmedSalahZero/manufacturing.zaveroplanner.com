@@ -157,5 +157,95 @@ trait HasCollectionOrPaymentStatement {
         
     }
 	
+	 public static function calculateVatStatement(array $additions  , float $initialBeginningBalance = 0 , array $dateIndexWithDate)
+    {
+		$financialYearStartMonth = 'january';
+        $additionsForIntervals = [
+            'monthly'=>$additions,
+            'quarterly'=>sumIntervalsIndexes($additions, 'quarterly', $financialYearStartMonth, $dateIndexWithDate),
+            'semi-annually'=>sumIntervalsIndexes($additions, 'semi-annually', $financialYearStartMonth, $dateIndexWithDate),
+            'annually'=>sumIntervalsIndexes($additions, 'annually', $financialYearStartMonth, $dateIndexWithDate),
+        ];
+        $result = [];
+        foreach (getIntervalFormatted() as $intervalName=>$intervalNameFormatted) {
+            $beginningBalance = $initialBeginningBalance;
+			$settlements = [];
+			$isFirstMonth = true ;
+            foreach ($additionsForIntervals[$intervalName] as $dateIndex=>$additionAtDate) {
+                $dateIndex;
+                $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
+			//	$addition = $withholdForIntervals[$intervalName][$dateIndex]??0;
+                $totalDue[$dateIndex] =  $additionAtDate+$beginningBalance;
+				$settlements[$dateIndex+1] = $totalDue[$dateIndex] < 0 ? 0 : $totalDue[$dateIndex];
+				if($initialBeginningBalance > 0 && $isFirstMonth){
+					$settlements[$dateIndex] = $initialBeginningBalance;
+				}
+				$settlementAtDate = $settlements[$dateIndex]??0;
+       //         $settlementAtDate = $settlementsForInterval[$intervalName][$dateIndex]??0 ;
+                $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
+                $beginningBalance = $endBalance[$dateIndex] ;
+                $result[$intervalName]['addition'][$dateIndex] =  $additionAtDate ;
+                $result[$intervalName]['total_due'][$dateIndex] = $totalDue[$dateIndex];
+                $result[$intervalName]['payment'][$dateIndex] = $settlementAtDate;
+                $result[$intervalName]['end_balance'][$dateIndex] =$endBalance[$dateIndex];
+				$isFirstMonth=false;
+            }
+        }
+	
+        return $result;
+    
+        
+    }
+	
+	 public static function calculateCorporateTaxesStatement(array $additions  ,array $calculatedCorporateTaxesPerYear , float $initialBeginningBalance = 0 , array $dateIndexWithDate)
+    {
+		$financialYearStartMonth = 'january';
+        $additionsForIntervals = [
+            'monthly'=>$additions,
+            'quarterly'=>sumIntervalsIndexes($additions, 'quarterly', $financialYearStartMonth, $dateIndexWithDate),
+            'semi-annually'=>sumIntervalsIndexes($additions, 'semi-annually', $financialYearStartMonth, $dateIndexWithDate),
+            'annually'=>sumIntervalsIndexes($additions, 'annually', $financialYearStartMonth, $dateIndexWithDate),
+        ];
+		$corporateTaxesForIntervals = [
+            'monthly'=>$calculatedCorporateTaxesPerYear,
+            'quarterly'=>sumIntervalsIndexes($calculatedCorporateTaxesPerYear, 'quarterly', $financialYearStartMonth, $dateIndexWithDate),
+            'semi-annually'=>sumIntervalsIndexes($calculatedCorporateTaxesPerYear, 'semi-annually', $financialYearStartMonth, $dateIndexWithDate),
+            'annually'=>sumIntervalsIndexes($calculatedCorporateTaxesPerYear, 'annually', $financialYearStartMonth, $dateIndexWithDate),
+        ];
+        $result = [];
+		$lastMonthsInYearKeys = array_keys($calculatedCorporateTaxesPerYear);
+        foreach (getIntervalFormatted() as $intervalName=>$intervalNameFormatted) {
+            $beginningBalance = $initialBeginningBalance;
+			$settlements = [];
+            foreach ($additionsForIntervals[$intervalName] as $dateIndex=>$additionAtDate) {
+                $dateIndex;
+                $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
+				$corporateTaxesAtDate = $corporateTaxesForIntervals[$intervalName][$dateIndex]??0;
+				$isLastMonthInYear = in_array($dateIndex,$lastMonthsInYearKeys);
+				
+                $totalDue[$dateIndex] =  $beginningBalance-$additionAtDate + $corporateTaxesAtDate;
+			//	$settlements[$dateIndex] = 0 ;
+				if($isLastMonthInYear){
+					if($totalDue[$dateIndex] <0 ){
+						$settlements[$dateIndex+4]=0;
+					}else{
+						$settlements[$dateIndex+4]= $totalDue[$dateIndex];
+					}
+				}
+				$settlementAtDate = $settlements[$dateIndex]??0;
+                $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
+                $beginningBalance = $endBalance[$dateIndex] ;
+                $result[$intervalName]['addition'][$dateIndex] =  $additionAtDate ;
+                $result[$intervalName]['total_due'][$dateIndex] = $totalDue[$dateIndex];
+                $result[$intervalName]['payment'][$dateIndex] = $settlementAtDate;
+                $result[$intervalName]['end_balance'][$dateIndex] =$endBalance[$dateIndex];
+            }
+        }
+        return $result;
+    
+        
+    }
+	
+	
 	
 }

@@ -94,6 +94,9 @@ class RawMaterial extends Model
 	{
 		return $this->project->getOperationDurationPerYearFromIndexes();
 	}
-	
+	public function getCollectionStatement():array
+	{
+		return $this->collection_statement?:[];
+	}
 	
 }

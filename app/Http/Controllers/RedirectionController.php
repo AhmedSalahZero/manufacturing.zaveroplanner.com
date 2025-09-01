@@ -79,6 +79,7 @@ class RedirectionController extends Controller
             $product->rawMaterials()->attach($rawMaterialId, $rawMaterialArr);
         }
         $project->recalculateFgInventoryValueStatement();
+		$project->recalculateVatStatements();
         $nextProduct = $product->getNextProduct();
         
         if ($request->get('submit_button') != 'next') {
@@ -427,7 +428,7 @@ class RedirectionController extends Controller
 
     public function openingBalancesPost(StoreOpeningBalancesRequest $request, Project $project)
     {
-        $project->storeRepeaterRelations($request, ['fixedAssetOpeningBalances','cashAndBankOpeningBalances','otherDebtorsOpeningBalances'
+        $project->storeRepeaterRelations($request, ['fixedAssetOpeningBalances','cashAndBankOpeningBalances','otherDebtorsOpeningBalances','vatAndCreditWithholdTaxesOpeningBalances'
         ,'supplierPayableOpeningBalances','otherCreditorsOpeningBalances','otherLongTermLiabilitiesOpeningBalances','equityOpeningBalances','longTermLoanOpeningBalances'
     ], ['project_id'=>$project->id]);
 	

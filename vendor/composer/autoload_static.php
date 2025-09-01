@@ -756,6 +756,7 @@ class ComposerStaticInite97a568dc59bb3b2403c43c21046be64
         'App\\Traits\\ProjectTrait' => __DIR__ . '/../..' . '/app/Traits/ProjectTrait.php',
         'App\\Traits\\Redirects' => __DIR__ . '/../..' . '/app/Traits/Redirects.php',
         'App\\User' => __DIR__ . '/../..' . '/app/User.php',
+        'App\\VatAndCreditWithholdTaxOpeningBalance' => __DIR__ . '/../..' . '/app/VatAndCreditWithholdTaxOpeningBalance.php',
         'Asm89\\Stack\\Cors' => __DIR__ . '/..' . '/asm89/stack-cors/src/Asm89/Stack/Cors.php',
         'Asm89\\Stack\\CorsService' => __DIR__ . '/..' . '/asm89/stack-cors/src/Asm89/Stack/CorsService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',

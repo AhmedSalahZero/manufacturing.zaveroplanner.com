@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\HArr;
 use App\Services\IntervalSummationOperations;
 use Carbon\Carbon;
 
@@ -439,4 +440,46 @@ function getDifferenceBetweenTwoDatesInDays(Carbon $firstDate, Carbon $secondDat
 	{
 		return $secondDate->diffInDays($firstDate);
 	}
+
 	
+// function eachIndexMinusPreviousIfNegative(array $items,$debug = false  )
+// {
+// 	$result = [];
+// 	foreach($items as $dateAsIndex=>$value)
+// 	{
+// 		$previousIndex = $dateAsIndex-1;
+// 		$previousValue  = $items[$previousIndex] ?? 0;
+// 		$newValue = 0 ;
+// 		if($value < 0){
+// 			$newValue = ($value - $previousValue) * -1;
+// 			if($newValue <0){
+// 				$newValue = 0;	
+// 			}
+// 		}
+// 		$result[$dateAsIndex] = $newValue ;
+// 	}
+// 	return $result ; 
+// }
+
+// function getMinAtEveryIndex(array $keyAndValues)
+// {
+// 	$result = [];
+// 	foreach($keyAndValues as $index=>$values)
+// 	{
+// 		$result[$index] = min($values);
+// 	}
+// 	return $result;
+// }
+function getValueFromArrayStringAndIndex(array $items  , $dateAsString , $dateAsIndex,$defaultValue = 0)
+{
+	if(isset($items[$dateAsString])){
+		return $items[$dateAsString];
+	}
+	if(isset($items[$dateAsIndex])){
+		return $items[$dateAsIndex];
+	}
+	return $defaultValue ;
+}
+function sumIntervals(array $dateValues, string $intervalName,string $financialYearStartMonth,array $dateIndexWithDate ){
+	return (new IntervalSummationOperations())->sumForInterval( $dateValues, $intervalName,$financialYearStartMonth,$dateIndexWithDate);
+}

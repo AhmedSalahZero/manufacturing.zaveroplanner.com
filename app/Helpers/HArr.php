@@ -782,5 +782,32 @@ public static function sumPerYearIndex(array $itemsAsDateIndexAndValue ,  array 
 	}
 	return $result ;
 }
-
+public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAsDateIndexAndValue , $totalCashOutAsDateIndexAndValue , $sumKeys)
+{
+	$openingBalance = $cashAndBankAmount ; 
+	$statements = [];
+	foreach($sumKeys as $dateAsIndex){
+		$statements['beginning_balance'][$dateAsIndex] = $openingBalance;
+		$currentTotalCashIn = $totalCashInAsDateIndexAndValue[$dateAsIndex]??0;
+		$statements['total_cash_in'][$dateAsIndex] = $currentTotalCashIn;
+		$currentTotalCashOut = $totalCashOutAsDateIndexAndValue[$dateAsIndex]??0;
+		$statements['total_cashout'][$dateAsIndex] = $currentTotalCashOut;
+		$netCashBeforeWorkingCapital = $openingBalance + $currentTotalCashIn - $currentTotalCashOut ;
+		$statements['net_cash_before_working_capital'][$dateAsIndex] =$netCashBeforeWorkingCapital; 
+		$workingCapitalInjection = 0 ;
+		if($netCashBeforeWorkingCapital < 0){
+			$workingCapitalInjection = $netCashBeforeWorkingCapital * -1 ;
+		}
+		$statements['working_capital_injection'][$dateAsIndex] =$workingCapitalInjection; 
+		$endCashBalance = $netCashBeforeWorkingCapital + $workingCapitalInjection;
+		$statements['cash_end_balance'][$dateAsIndex] = $endCashBalance;
+		$openingBalance = $endCashBalance ;
+	}
+	return $statements;
+	// dd($statements);
+	
+	
+	
+	
+}
 }

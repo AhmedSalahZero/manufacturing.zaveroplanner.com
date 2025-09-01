@@ -26,6 +26,9 @@ class FixedAsset extends Model
 		'ffe_equity_payment'=>'array',
 		'ffe_loan_withdrawal'=>'array',
 		'ffe_payment'=>'array',
+		'statement'=>'array',
+		'ffe_execution_and_payment'=>'array',
+		'ffe_payable'=>'array'
 		
 	];
     public function project()
@@ -318,5 +321,12 @@ class FixedAsset extends Model
 	{
 		return $this->ffe_payment?:[];
 	}
-	
+	public function getReplaceCost():array 
+	{
+		return $this->statement['replacement_cost']?:[];
+	}
+	public function getFfeExecutionAndPayment():array
+	{
+		return $this->ffe_execution_and_payment?:[];
+	}
 }

@@ -1,25 +1,24 @@
 <?php 
 namespace App\ReadyFunctions;
 
-use App\Models\HospitalitySector;
-
 class FixedAssetsPayableEndBalance  
 {
 	
-	public function calculateEndBalance(array $purchase , array $collection , array $dateIndexWithDate,HospitalitySector $hospitalitySector )
+	public function calculateEndBalance(array $purchase , array $collection , array $dateIndexWithDate )
 	{
+		$financialYearStartMonth = 12 ;
 		$purchasesForIntervals = [
 			'monthly'=>$purchase,
-			'quarterly'=>sumIntervals($purchase,'quarterly' , $hospitalitySector->financialYearStartMonth(),$dateIndexWithDate),
-			'semi-annually'=>sumIntervals($purchase,'semi-annually' , $hospitalitySector->financialYearStartMonth(),$dateIndexWithDate),
-			'annually'=>sumIntervals($purchase,'annually' , $hospitalitySector->financialYearStartMonth(),$dateIndexWithDate),
+			'quarterly'=>sumIntervals($purchase,'quarterly' , $financialYearStartMonth,$dateIndexWithDate),
+			'semi-annually'=>sumIntervals($purchase,'semi-annually' , $financialYearStartMonth,$dateIndexWithDate),
+			'annually'=>sumIntervals($purchase,'annually' , $financialYearStartMonth,$dateIndexWithDate),
 		];
 		
 		$collectionForInterval = [
 			'monthly'=>$collection,
-			'quarterly'=>sumIntervals($collection,'quarterly' , $hospitalitySector->financialYearStartMonth(),$dateIndexWithDate),
-			'semi-annually'=>sumIntervals($collection,'semi-annually' , $hospitalitySector->financialYearStartMonth(),$dateIndexWithDate),
-			'annually'=>sumIntervals($collection,'annually' , $hospitalitySector->financialYearStartMonth(),$dateIndexWithDate),
+			'quarterly'=>sumIntervals($collection,'quarterly' , $financialYearStartMonth,$dateIndexWithDate),
+			'semi-annually'=>sumIntervals($collection,'semi-annually' , $financialYearStartMonth,$dateIndexWithDate),
+			'annually'=>sumIntervals($collection,'annually' , $financialYearStartMonth,$dateIndexWithDate),
 		];
 		
 		

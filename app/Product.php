@@ -439,4 +439,8 @@ class Product extends Model
             'rawMaterialNames'=>$rawMaterialNames
         ];
 	}
+	public function getCollectionStatement():array
+	{
+		return $this->collection_statement ?:[];
+	}
 }

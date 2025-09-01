@@ -403,7 +403,8 @@ class CalculateFixedLoanAtEndService
 			
 			
 			
-			'ffeLoanCalculations'=>$ffeLoanCalculations??[]
+			'ffeLoanCalculations'=>$ffeLoanCalculations??[],
+			'ffePayment'=>$contractPayments['FFE Payment']
 			
 
 		];
