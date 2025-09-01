@@ -843,7 +843,7 @@ class Project extends Model
 		$depreciationCogs =DB::table('products')->where('project_id',$project->id)->pluck('product_depreciation_statement')->toArray();
 		$formattedDepreciationCogs = [];
 		foreach($depreciationCogs as $index => $depreciationCogArr){
-			$formattedDepreciationCogs[$index] = (array)json_decode($depreciationCogArr)->cogs;
+			$formattedDepreciationCogs[$index] = ((array)json_decode($depreciationCogArr))['cogs']??[];
 		}
 		$formattedDepreciationCogs = HArr::sumAtDates($formattedDepreciationCogs,$sumKeys);
 		$fixedAssetAdminDepreciations = DB::table('fixed_assets')->where('project_id',$project->id)->pluck('admin_depreciations')->toArray();
