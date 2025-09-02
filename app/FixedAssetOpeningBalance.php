@@ -22,17 +22,17 @@ class FixedAssetOpeningBalance extends Model
 	{
 		return '';
 	}
-		public static function booted()
-	{
-			parent::boot();
-			static::saving(function(self $model){
-				dd($model);
-				$openingBalance = $model->{self::getOpeningBalanceColumnName()};
-				$statementPayload = $model->{self::getPayloadStatementColumn()};
-				$dateIndexWithDate = $model->project->getDateIndexWithDatE();
-				$model->statement = self::calculateSettlementStatement($statementPayload,[],$openingBalance,$dateIndexWithDate);
-			});
-	}
+	// 	public static function booted()
+	// {
+	// 		parent::boot();
+	// 		static::saving(function(self $model){
+	// 			dd($model);
+	// 			$openingBalance = $model->{self::getOpeningBalanceColumnName()};
+	// 			$statementPayload = $model->{self::getPayloadStatementColumn()};
+	// 			$dateIndexWithDate = $model->project->getDateIndexWithDatE();
+	// 			$model->statement = self::calculateSettlementStatement($statementPayload,[],$openingBalance,$dateIndexWithDate);
+	// 		});
+	// }
 	
     public function project():BelongsTo
     {
