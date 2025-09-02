@@ -23,9 +23,9 @@ trait HasSeasonality
 	{
 		return $this->seasonality && $this->seasonality->type  == 'monthly';
 	}
-		public function getSeasonalityType():?string 
+	public function getSeasonalityType():?string 
 	{
-		return $this->seasonality ? $this->seasonality->getType() : null ;
+		return $this->seasonality ? $this->seasonality->getType() : 'flat' ;
 	}
 	/**
 	 * * دي زي ما هي متسجله في الفورمة وليكن مثلا في حاله ال

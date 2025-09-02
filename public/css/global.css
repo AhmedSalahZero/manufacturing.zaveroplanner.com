@@ -165,3 +165,13 @@ input.form-control[readonly] {
 	.border-left-export{
 		border-left:1px solid #3b368c;
 	}
+.plus-max-width-class{
+	max-width:25px !important;
+	width:25px !important;
+	min-width:25px !important;
+}
+.name-max-width-class{
+	max-width:220px !important;
+	width:220px !important;
+	min-width:220px !important;
+}

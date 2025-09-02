@@ -268,24 +268,7 @@ class Product extends Model
 		}
 		return Carbon::make($dateAsString)->format('Y-m');
 	}
-	// public function prepareForSeasonalityService()
-	// {
-	// 	$items = [];
-	// 	$seasonalityType = $this->getSeasonalityType();
-	// 	$items['seasonality'] = $seasonalityType;
-	// 	if($seasonalityType == 'flat'){
-		
-	// 	}
-	// 	elseif($seasonalityType == 'quarterly'){
-	// 		// convert to dates 
-	// 		$items['quarters'] = $this->quarterly_seasonality;
-	// 	}else{
-	// 		// convert to dates 
-	// 		$items['distribution_months_values'] = $this->monthly_seasonality ;
-	// 	}
-	// 	return $items; 
-		
-	// }
+	
 	public function getSalesActiveYearsIndexWithItsMonths()
 	{
 		$project = $this->project;
@@ -399,7 +382,7 @@ class Product extends Model
 	}	
 		public function getFgInventoryValue()
 	{
-		return $this->fg_inventory_value;
+		return $this->fg_inventory_value?:0;
 	}	
 	public function fgInventoryCoverageDays()
 	{

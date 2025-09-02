@@ -4,15 +4,15 @@
 
  repeater_item
 common-parent
- " >
+ ">
     <div class="col-md-2 pr-2 pl-4">
         <label class="form-label font-weight-bold">{{ __('Expense Category') }} </label>
-        <select  name="category_id" class="form-control expense-category-class">
+        <select name="category_id" class="form-control expense-category-class">
             @foreach( $project->getExpenseCategories() as $id => $expenseCategoryOptionArr)
-			@php
-				$title = $expenseCategoryOptionArr['title'];
-				$hasAllocation = $expenseCategoryOptionArr['has_allocation'];
-			@endphp
+            @php
+            $title = $expenseCategoryOptionArr['title'];
+            $hasAllocation = $expenseCategoryOptionArr['has_allocation'];
+            @endphp
             <option data-has-allocation="{{ $hasAllocation }}" value="{{ $id }}" {{ isset($expense) && $expense->getCategoryId() == $id ? 'selected':'' }}>{{ $title }}</option>
             @endforeach
         </select>
@@ -38,41 +38,32 @@ common-parent
 
     <div class="max-w-15 pr-2 pl-2">
         <label class="form-label font-weight-bold">{{ __('Start Date') }} </label>
-		
-		@include('components.calendar-month-year',[
-                                    'name'=>'start_date',
-                                    'value'=>$expense ? $expense->getStartDateYearAndMonth() : now()->format('Y-m')
-                                    ])
-									
-        {{-- <div class="kt-input-icon">
-            <div class="input-group">
-                <input type="date" class="form-control " name="start_date" value="{{ isset($expense) ? $expense->getStartDateAsString() : old('start_date') }}">
-            </div>
-        </div> --}}
+
+        @include('components.calendar-month-year',[
+        'name'=>'start_date',
+        'value'=>$expense ? $expense->getStartDateYearAndMonth() : $project->getDefaultStartDateAsYearAndMonth()
+        ])
+
     </div>
 
     <div class="max-w-15 pr-2 pl-2">
         <label class="form-label font-weight-bold">{{ __('End Date') }} </label>
-		@include('components.calendar-month-year',[
-                                    'name'=>'end_date',
-                                    'value'=>$expense ? $expense->getEndDateYearAndMonth() : now()->format('Y-m')
-                                    ])
-        {{-- <div class="kt-input-icon">
-            <div class="input-group">
-                <input type="date" class="form-control " name="end_date" value="{{ isset($expense) ? $expense->getEndDateAsString() : old('end_date') }}" step="0.5">
-            </div>
-        </div> --}}
+        @include('components.calendar-month-year',[
+        'name'=>'end_date',
+        'value'=>$expense ? $expense->getEndDateYearAndMonth() : $project->getDefaultEndDateAsYearAndMonth()
+        ])
+
     </div>
 
 
-     <div class="max-w-15 pr-2 pl-2 closest-parent">
-	   <label class="form-label font-weight-bold">{{ __('Payment') }} </label>
-	 <x-form.select :selectedValue="isset($expense) ? $expense->getPaymentTerm() : 'cash'" :options="getPaymentTerms()" :add-new="false" class="select2-select repeater-select payment_terms " :all="false" name="payment_terms"></x-form.select>
-                                    <x-modal.custom-collection :title="__('Custom Payment')" :subModel="isset($expense) ? $expense : null "   ></x-modal.custom-collection>
-									
-	 </div>
-   
-    <div class="col-md-1 pr-2 pl-2 allocate-parent" >
+    <div class="max-w-15 pr-2 pl-2 closest-parent">
+        <label class="form-label font-weight-bold">{{ __('Payment') }} </label>
+        <x-form.select :selectedValue="isset($expense) ? $expense->getPaymentTerm() : 'cash'" :options="getPaymentTerms()" :add-new="false" class="select2-select repeater-select payment_terms " :all="false" name="payment_terms"></x-form.select>
+        <x-modal.custom-collection :title="__('Custom Payment')" :subModel="isset($expense) ? $expense : null "></x-modal.custom-collection>
+
+    </div>
+
+    <div class="col-md-1 pr-2 pl-2 allocate-parent">
         <label class="form-label  font-weight-bold">{{ __('Allocate') }} </label>
         <div class="kt-input-icon ">
             <div class="input-group ">
@@ -81,11 +72,11 @@ common-parent
         </div>
 
 
-        <div class="modal fade allocate-parent-modal"  tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}" aria-hidden="true">
+        <div class="modal fade allocate-parent-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header header-border">
-                        <h5 class="modal-title font-size-1rem" >{{ __('Allocate') }}</h5>
+                        <h5 class="modal-title font-size-1rem">{{ __('Allocate') }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -97,18 +88,18 @@ common-parent
                                 @foreach($products as $product)
                                 @php
                                 $percentage = $expense ? $expense->getProductAllocationPercentageForTypeAndProduct($product->id) : null;
-								$percentage = is_null($percentage) ?  1/count($products)*100 : $percentage; 
+                                $percentage = is_null($percentage) ? 1/count($products)*100 : $percentage;
                                 @endphp
-                                <tr >
+                                <tr>
 
                                     <td>
                                         <div class="form-group d-flex   text-center">
 
                                             <div class="col-9 text-left">
                                                 <label>{{ __('Product') }}</label>
-                                                <input readonly class="form-control"  type="text" value="{{ $product->getName() }}">
-												                                            <input multiple class="form-control product-id-class" data-product-id="{{ $product->id }}" name="product_id" type="hidden" value="{{ $product->id }}">
-												
+                                                <input readonly class="form-control" type="text" value="{{ $product->getName() }}">
+                                                <input multiple class="form-control product-id-class" data-product-id="{{ $product->id }}" name="product_id" type="hidden" value="{{ $product->id }}">
+
                                             </div>
                                             <div class="col-3 text-left">
                                                 <label>{{ __('Perc.%') }}</label>

@@ -1,3 +1,4 @@
+
 <div class="kt-portlet__body">
         <div class="tab-content  kt-margin-t-20">
 
@@ -14,26 +15,26 @@
 
                     <x-tables.repeater-table :tableClasses="'table-condensed table-row-spacing income-class-table'" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden scrollable-table'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="'food'" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
                         <x-slot name="ths">
-                            <x-tables.repeater-table-th class="  header-border-down first-column-th-class" :title="__('+/-')"></x-tables.repeater-table-th>
-                            <x-tables.repeater-table-th class="  header-border-down first-column-th-class" :title="__('Name')"></x-tables.repeater-table-th>
-                            <x-tables.repeater-table-th class=" interval-class header-border-down " :title="__('')"></x-tables.repeater-table-th>
+                            <x-tables.repeater-table-th :subParentClass="'plus-max-width-class'" class="  header-border-down plus-max-width-class" :title="__('+/-')"></x-tables.repeater-table-th>
+                            <x-tables.repeater-table-th :subParentClass="'name-max-width-class'" class="  header-border-down name-max-width-class" :title="__('Name')"></x-tables.repeater-table-th>
+                            {{-- <x-tables.repeater-table-th class=" interval-class header-border-down " :title="__('')"></x-tables.repeater-table-th> --}}
                             @foreach($studyMonthsForViews as $dateAsIndex=>$dateAsString)
                             @php
                             $currentMonthNumber = explode('-',$dateAsString)[1];
                             $currentYear= explode('-',$dateAsString)[0];
                             $currentYearRepeaterIndex = 0 ;
                             @endphp
-                            <x-tables.repeater-table-th data-column-index="{{ $dateAsIndex }}" class=" interval-class header-border-down " :title="dateFormatting($dateAsString, 'M\' Y')"></x-tables.repeater-table-th>
+                            <x-tables.repeater-table-th data-column-index="{{ $dateAsIndex }}" class=" header-border-down " :title="dateFormatting($dateAsString, 'M\' Y')"></x-tables.repeater-table-th>
 
                             @if($financialYearEndMonthNumber == $currentMonthNumber || $loop->last)
-                            <x-tables.repeater-table-th :icon="true" data-column-index="{{ $dateAsIndex }}" :font-size-class="'font-14px'" class=" interval-class header-border-down {{ 'year-repeater-index-'.$currentYearRepeaterIndex }} collapse-before-me exclude-from-collapse " :title="__('Total Yr.').' <br> '. $currentYear"></x-tables.repeater-table-th>
+                            <x-tables.repeater-table-th :icon="true" data-column-index="{{ $dateAsIndex }}" :font-size-class="'font-14px'" class=" header-border-down {{ 'year-repeater-index-'.$currentYearRepeaterIndex }} collapse-before-me exclude-from-collapse " :title="__('Total Yr.').' <br> '. $currentYear"></x-tables.repeater-table-th>
                             @php
                             $currentYearRepeaterIndex ++;
                             @endphp
                             @endif
 
                             @endforeach
-                            <x-tables.repeater-table-th class=" interval-class header-border-down " :title="__('Total')"></x-tables.repeater-table-th>
+                            {{-- <x-tables.repeater-table-th class=" interval-class header-border-down " :title="__('Total')"></x-tables.repeater-table-th> --}}
                         </x-slot>
                         <x-slot name="trs">
 
@@ -53,15 +54,15 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="d-flex align-items-center justify-content-center flex-column " style="gap:10px">
+                                    <div class="d-flex align-items-center justify-content-center flex-column name-max-width-class" style="gap:10px">
                                         @php
                                         $currentIndex = 0 ;
                                         @endphp
                                         @foreach($currentTableData['main_items'] as $mainItemId => $mainItemArr)
                                         <div class="input-hidden-parent">
-                                            <input data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
+                                            <input data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control text-left copy-value-to-his-input-hidden 
 
-						  expandable-amount-input 			  repeat-to-right-input-formatted  custom-input-string-width input-text-left  " type="text" value="{{ $mainItemArr['options']['title']??$mainItemId }}" data-column-index="-1">
+						 						  			  repeat-to-right-input-formatted  custom-input-string-width input-text-left  text-left" type="text" value="{{ $mainItemArr['options']['title']??$mainItemId }}" data-column-index="-1">
                                         </div>
                                         @php
                                         $currentIndex++;
@@ -70,15 +71,7 @@
 
                                     </div>
                                 </td>
-                                <td>
-                                    @if($hasSubItems)
-                                    <div class="d-flex align-items-center justify-content-center">
-                                        {{-- <a data-toggle="modal" data-target="#add-new-cost-of-good" href="#" class="btn btn-2-bg btn-sm btn-brand btn-pill">{{ __('+') }}</a> --}}
-
-
-                                    </div>
-                                    @endif
-                                </td>
+                              
                                 @php
                                 $currentYearRepeaterIndex = 0 ;
                                 @endphp
@@ -209,24 +202,23 @@
                                 @endif
 
                                 @endforeach
-                                <td>
+                                {{-- <td>
                                     <div class="d-flex align-items-center justify-content-center">
                                         <div class="">
                                             <div class="input-group input-group-sm align-items-center justify-content-center flex-nowrap">
                                                 <div class="input-hidden-parent">
-                                                    <input disabled readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
+                                                    <input disabled readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control total-td-formatted copy-value-to-his-input-hidden 
 
 								  expandable-amount-input 			  repeat-to-right-input-formatted   " type="text" value="0" data-column-index="-1">
-                                                    <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  total-td" value="0" data-column-index="-1">
+                                                    <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  total-td " value="0" data-column-index="-1">
                                                 </div>
                                                 <span class="ml-2 currency-class"> </span>
                                             </div>
 
                                         </div>
 
-                                        {{-- <x-repeat-right-dot-inputs :removeThreeDots="true" :removeCurrency="true" :mark="' '" :is-number="true" :removeThreeDotsClass="true" :number-format-decimals="0" :currentVal="0" :classes="'total-td'" :is-percentage="false" :name="''" :columnIndex="0"></x-repeat-right-dot-inputs> --}}
                                     </div>
-                                </td>
+                                </td> --}}
                             </tr>
                             @foreach($subItems as $subItemId => $subItemArr)
                             <tr class="hidden" data-is-sub-row data-repeat-formatting-decimals="0">
@@ -254,9 +246,7 @@
 
                                     </div>
                                 </td>
-                                <td>
-
-                                </td>
+                              
 
                                 @foreach($studyMonthsForViews as $dateAsIndex=>$dateAsString)
                                 <td data-column-index="{{ $dateAsIndex }}">
@@ -293,7 +283,7 @@
 							">
                                             <div class="input-group input-group-sm align-items-center justify-content-center flex-nowrap">
                                                 <div class="input-hidden-parent">
-                                                    <input disabled readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
+                                                    <input disabled readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control total-td-formatted copy-value-to-his-input-hidden 
 
 										  expandable-amount-input 			  repeat-to-right-input-formatted   " type="text" value="{{ number_format($subItemArr['year_total'][$dateAsIndex]??0) }}" data-column-index="{{ $dateAsIndex }}">
                                                     <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  total-td" value="{{ $subItemArr['year_total'][$dateAsIndex]??0 }}" data-column-index="{{ $dateAsIndex }}">
@@ -313,7 +303,7 @@
 
                                 @endforeach
 
-                                <td>
+                                {{-- <td>
                                     <div class="d-flex align-items-center justify-content-center">
 
                                         <div class="
@@ -323,19 +313,17 @@
 												">
                                             <div class="input-group input-group-sm align-items-center justify-content-center flex-nowrap">
                                                 <div class="input-hidden-parent">
-                                                    <input disabled readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
+                                                    <input disabled readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control total-td-formatted copy-value-to-his-input-hidden 
 
-							  expandable-amount-input 			  repeat-to-right-input-formatted   " type="text" value="0" data-column-index="-1">
+									  expandable-amount-input 			  repeat-to-right-input-formatted   " type="text" value="0" data-column-index="-1">
                                                     <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  total-td" value="0" data-column-index="-1">
                                                 </div>
                                                 <span class="ml-2 currency-class"> </span>
                                             </div>
 
                                         </div>
-
-                                        {{-- <x-repeat-right-dot-inputs :removeThreeDots="true" :removeCurrency="true" :mark="' '" :is-number="true" :removeThreeDotsClass="true" :number-format-decimals="0" :currentVal="0" :classes="'total-td'" :is-percentage="false" :name="''" :columnIndex="-1"></x-repeat-right-dot-inputs> --}}
                                     </div>
-                                </td>
+                                </td> --}}
                             </tr>
 
 
@@ -356,9 +344,16 @@
 				
 				
             </div>
-				<div class="text-right mt-4 cash-flow-btn">
+			
+			<div class="mt-3">
+			<a href="{{ $nextRoute }}" type="submit" class="btn btn-rev float-right" name="submit_button" value="next">{{ __('Next') }}</a>
+            <a href="{{ route('main.project.page',['project'=>$project->id]) }}" type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{ __('Go To Main Page') }}</a>
+
+			</div>
+
+				{{-- <div class="text-right mt-4 cash-flow-btn">
 					<a href="{{ route('cash.in.out.flow.result',['project'=>$project->id]) }}" class="btn btn-primary ">Cash Flow</a>
-				</div>
+				</div> --}}
 
 
 

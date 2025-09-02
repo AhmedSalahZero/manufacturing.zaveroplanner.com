@@ -23,7 +23,7 @@ class AddStatementsColumnToCashAndBankOpeningBalancesTable extends Migration
 			'supplier_payable_opening_balances'
 		] as $tableName){
 			Schema::table($tableName, function (Blueprint $table) {
-				$table->json('statement');;
+				$table->json('statement')->nullable()->change();
 			});
 		}
     }

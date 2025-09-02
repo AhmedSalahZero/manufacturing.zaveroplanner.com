@@ -22,9 +22,7 @@ class ViewingDataController extends Controller
         if ($found_user === null) {
             SharingLinkVisitor::create(['link_code'=>$slug,'ip'=>$user_ip]);
         }
-		// dd($project);
 		return view('view-study-info',['project'=>$project]);
-        // return view('viewing.study_info',compact('project','products','slug'));
     }
 
     public function viewManpowerPlan($slug)

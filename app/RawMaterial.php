@@ -58,7 +58,7 @@ class RawMaterial extends Model
 	}
 	public function getBeginningInventoryValue()
 	{
-		return $this->beginning_inventory_value;
+		return $this->beginning_inventory_value?:0;
 	}
 	public static function calculateInventoryQuantityStatement(int $projectId)
 	{

@@ -41,7 +41,7 @@ common-parent
 
         @include('components.calendar-month-year',[
         'name'=>'start_date',
-        'value'=>$expense ? $expense->getStartDateYearAndMonth() : now()->format('Y-m')
+        'value'=>$expense ? $expense->getStartDateYearAndMonth() : $project->getDefaultStartDateAsYearAndMonth()
         ])
 
         {{-- <div class="kt-input-icon">

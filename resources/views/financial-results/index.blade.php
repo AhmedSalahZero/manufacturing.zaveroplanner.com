@@ -1,16 +1,22 @@
 @extends('layouts.app')
 @section('content')
 <style>
+input.form-control[type="text"][readonly] {
+    background-color: white !important;
+    color: black !important;
+    font-weight: 400 !important;
+}
 </style>
 <div class="col-12">
 
     <h1 class="d-flex justify-content-between steps-span">
-        <span><a href="{{ url()->previous() }}" style="color: white">
+        {{-- <span><a href="{{ url()->previous() }}" style="color: white">
                 < {{ __('Back') }}</a></span>
-        <span>{{ __('Step ') . $step_data['place_num'] . '/' . $step_data['count'] }}</span>
+        <span>{{ __('Step ') . $step_data['place_num'] . '/' . $step_data['count'] }}</span> --}}
+		
     </h1>
     <h1 class="bread-crumbs">
-        {{ __('ZAVERO Manufacturing') }} > {{ $project->name }} > {{ __($step_data['route_name']) }}
+        {{ __('ZAVERO Manufacturing') }} > {{ $project->name }} > {{ $title }}
     </h1>
 
 

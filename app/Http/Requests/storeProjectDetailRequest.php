@@ -24,10 +24,42 @@ class storeProjectDetailRequest extends FormRequest
      */
     public function rules()
     {
+		$isNewCompany = $this->new_company;
+		$operationStartDateValidation = 'date_equals:start_date';
+		if($isNewCompany){
+			$operationStartDateValidation ='after_or_equal:start_date';
+		}
         return [
-            //
+            'operation_start_date'=>['required',$operationStartDateValidation,'before:end_date'],
+			'products.*.selling_start_date'=>['required','after_or_equal:operation_start_date','before:end_date'],
+			'products.*.name'=>['required'],
+			'rawMaterials.*.name'=>['required'],
+			'return_rate'=>['required','gt:0'], 
+			'perpetual_growth_rate'=>['required','gt:0'], 
         ];
     }
+	public function messages()
+	{
+		return [
+			'operation_start_date.required'=>__('Please Enter Operation Start Date'),
+			'operation_start_date.date_equals'=>__('Operation Start Date Must Be Equal To Study Start Date'),
+			'operation_start_date.after_or_equal'=>__('Operation Start Date Must Be Greater Than Or Equal Study Start Date'),
+			'operation_start_date.before'=>__('Operation Start Date Must Be Less Than Study End Date'),
+			
+			'products.*.name.required'=>__('Please Enter Product Name'),
+			'products.*.selling_start_date.required'=>__('Please Enter Selling Start Date'),
+			'products.*.selling_start_date.after_or_equal'=>__('Selling Start Date Must Be Greater Than Or Equal Study Start Date'),
+			'products.*.selling_start_date.before'=>__('Selling Start Date Must Be Less Than Study End Date'),
+			
+				'rawMaterials.*.name.required'=>__('Please Enter Raw Material Name'),
+				
+				'return_rate.required'=>__('Please Enter Required Investment Return %'),
+				'return_rate.gt'=>__('Required Investment Return Must Be Greater Than Zero'),		
+				
+				'perpetual_growth_rate.required'=>__('Please Enter Perpetual Growth Rate %'),
+				'perpetual_growth_rate.gt'=>__('Perpetual Growth Rate Must Be Greater Than Zero'),
+		];
+	}
 	public function prepareForValidation()
 	{
 		$endDate = $this->get('end_date');

@@ -51,7 +51,7 @@ common-parent
 
         @include('components.calendar-month-year',[
         'name'=>'start_date',
-        'value'=>$expense ? $expense->getStartDateYearAndMonth() : now()->format('Y-m')
+        'value'=>$expense ? $expense->getStartDateYearAndMonth() : $project->getDefaultStartDateAsYearAndMonth()
         ])
 
         {{-- <div class="kt-input-icon">
@@ -65,7 +65,7 @@ common-parent
     <label class="form-label font-weight-bold">{{ __('End Date') }} </label>
     @include('components.calendar-month-year',[
     'name'=>'end_date',
-    'value'=>$expense ? $expense->getEndDateYearAndMonth() : now()->format('Y-m')
+    'value'=>$expense ? $expense->getEndDateYearAndMonth() : $project->getDefaultEndDateAsYearAndMonth()
     ])
     {{-- <div class="kt-input-icon">
             <div class="input-group">

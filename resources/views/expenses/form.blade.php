@@ -49,7 +49,7 @@
             , defaultValues: {
                 'category_id': 'manufacturing-expenses'
                 , 'payment_terms': 'cash'
-            , }
+		 }
             , show: function() {
                 $(this).slideDown();
 				$('.js-select2-with-one-selection').select2({});
@@ -75,63 +75,4 @@
 
 </script>
 @endforeach
-{{-- <script>
-   $(document).ready(function() {
-        var selector = "#fixed_monthly_repeating_amount_repeater";
-        $(selector).repeater({
-            initEmpty: false
-            , defaultValues: {
-                'category_id': 'manufacturing-expenses'
-                , 'payment_terms': 'cash'
-            , }
-            , show: function() {
-                $(this).slideDown();
-
-            }
-            , ready: function(setIndexes) {
-
-            }
-            , hide: function(deleteElement) {
-                if (confirm(translations.deleteConfirm)) {
-
-                    $(this).slideUp(deleteElement);
-
-
-                }
-
-            }
-            , isFirstItemUndeletable: true
-        });
-    });
-
-
-    $(document).ready(function() {
-        var selector = "#one_time_expense_repeater";
-        $(selector).repeater({
-            initEmpty: false
-            , defaultValues: {
-                'category_id': 'manufacturing-expenses'
-                , 'payment_terms': 'cash'
-            , }
-            , show: function() {
-                $(this).slideDown();
-
-            }
-            , ready: function(setIndexes) {
-
-            }
-            , hide: function(deleteElement) {
-                if (confirm(translations.deleteConfirm)) {
-
-                    $(this).slideUp(deleteElement);
-
-
-                }
-
-            }
-            , isFirstItemUndeletable: true
-        });
-    });
-</script> --}}
-
 @endsection

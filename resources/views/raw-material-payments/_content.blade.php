@@ -55,7 +55,7 @@
 
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <input class="form-control" type="text" name="rawMaterials[{{ $rawMaterialId }}][beginning_inventory_value]" value="0">
+                                            <input class="form-control" type="text" name="rawMaterials[{{ $rawMaterialId }}][beginning_inventory_value]" value="{{ $rawMaterial->beginning_inventory_value }}">
                                         </div>
                                     </td>
 

@@ -46,11 +46,14 @@ class CashAndBankOpeningBalance extends Model
     {
         return $this->customer_receivable_amount ;
     }
-	
-	    public function getInventoryAmount():float 
-    {
-        return $this->inventory_amount ;
-    }
+	public function getInventoryAmount()
+	{
+		return $this->project->getInventoryAmount();
+	}
+	public function getInventoryAmountFormatted()
+	{
+		return number_format($this->getInventoryAmount(),0);
+	}
 	public function getPayload():array 
 	{
 		return $this->payload ;

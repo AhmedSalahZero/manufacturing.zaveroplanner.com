@@ -13,33 +13,9 @@
             <h1  class="bread-crumbs" >
                 {{ __("ZAVERO Manufacturing") }}   >     {{$project->name}} > {{__("Study Main Page")}}
             </h1>
-            {{-- <div class="projectItem hoverProject " >
-                {{__("Study Main Page")}}
-                <button  class="btn btn-rev float-right main_share_button" data-toggle="modal" data-target="#shareModal{{$project->id}}"><i class="fas fa-share"></i></button>
-            </div> --}}
-            <?php $project_complete = 0 ; ?>
-            @if (($project->start_date == null || $project->duration  == null || $project->end_date == null )
-                    || ($project->product_first == null && $project->product_second == null && $project->product_third == null && $project->product_fourth == null && $project->product_fifth == null )
-                    || (($project->product_first !== null && $project->product_first_selling_date === null )
-                    || ($project->product_first_selling_date !== null &&( strtotime($project->product_first_selling_date) < strtotime($project->start_date) || strtotime($project->product_first_selling_date) > strtotime($project->end_date)))
-
-                    || ($project->product_second !== null && $project->product_second_selling_date === null )
-                    || ($project->product_second_selling_date !== null &&( strtotime($project->product_second_selling_date) < strtotime($project->start_date) || strtotime($project->product_second_selling_date) > strtotime($project->end_date)))
-
-                    || ($project->product_third !== null && $project->product_third_selling_date === null )
-                    || ($project->product_third_selling_date !== null &&( strtotime($project->product_third_selling_date) < strtotime($project->start_date) || strtotime($project->product_third_selling_date) > strtotime($project->end_date)))
-
-                    || ($project->product_fourth !== null && $project->product_fourth_selling_date === null )
-                    || ($project->product_fourth_selling_date !== null &&( strtotime($project->product_fourth_selling_date) < strtotime($project->start_date) || strtotime($project->product_fourth_selling_date) > strtotime($project->end_date)))
-
-                    || ($project->product_fifth !== null && $project->product_fifth_selling_date === null )
-                    || ($project->product_fifth_selling_date !== null &&( strtotime($project->product_fifth_selling_date) < strtotime($project->start_date) || strtotime($project->product_fifth_selling_date) > strtotime($project->end_date)))
-
-                    ))
-                <?php $project_complete = 0 ; ?>
-            @else
-                <?php $project_complete = 1 ; ?>
-            @endif
+          @php
+			$project_complete = $project->isCompleted();
+		  @endphp
 
             <a href="{{route('projects.edit',[$project->id])}}">
                 <div class="projectItem" >

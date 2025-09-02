@@ -338,110 +338,110 @@ function dueInDays()
         [
             'value'=> 180 ,
             'title'=>180 . ' ' . __('Days')
-		],
-		[
+        ],
+        [
             'value'=> 210 ,
             'title'=>210 . ' ' . __('Days')
-		],
-		[
+        ],
+        [
             'value'=>240 ,
             'title'=>240 . ' ' . __('Days')
-		],
-		[
+        ],
+        [
             'value'=>270 ,
             'title'=>270 . ' ' . __('Days')
-		],
+        ],
 
-		[
+        [
             'value'=>300 ,
             'title'=>300 . ' ' . __('Days')
-		],
-		[
+        ],
+        [
             'value'=>330 ,
             'title'=>330 . ' ' . __('Days')
-		],
-		[
+        ],
+        [
             'value'=> 360 ,
             'title'=>360 . ' ' . __('Days')
-		],
+        ],
     ];
 }
-function getExpensesTypes():array 
+function getExpensesTypes():array
 {
-	return [
-			'expense_as_percentage',
-			'fixed_monthly_repeating_amount',
-			'one_time_expense'
-	];
+    return [
+            'expense_as_percentage',
+            'fixed_monthly_repeating_amount',
+            'one_time_expense'
+    ];
 }
-function sumTwoArray(array $first , array $second)
+function sumTwoArray(array $first, array $second)
 {
-	$result  =[];
-	$dates = array_values(array_unique(array_merge(array_keys($first),array_keys($second))));
-	foreach($dates as $date)
-	{
-			$secondVal = $second[$date] ?? 0;
-			$value = $first[$date] ?? 0;
-			$result[$date] = $value  + $secondVal ;
-	}
-	return $result ; 
+    $result  =[];
+    $dates = array_values(array_unique(array_merge(array_keys($first), array_keys($second))));
+    foreach ($dates as $date) {
+        $secondVal = $second[$date] ?? 0;
+        $value = $first[$date] ?? 0;
+        $result[$date] = $value  + $secondVal ;
+    }
+    return $result ;
 }
 function getNextDate(?array $array, ?string $date, $datesExistsAsKeys = true)
 {
 
-	$searched = array_search($date, $datesExistsAsKeys ? array_keys($array) : $array);
-	$arrayPlusOne = $datesExistsAsKeys ? @array_keys($array)[$searched +1] : @($array)[$searched +1];
-	if ($searched !== null &&  isset($arrayPlusOne)) {
-		return $datesExistsAsKeys ? array_keys($array)[$searched +1] : ($array)[$searched +1];
-	}
-	return null;
+    $searched = array_search($date, $datesExistsAsKeys ? array_keys($array) : $array);
+    $arrayPlusOne = $datesExistsAsKeys ? @array_keys($array)[$searched +1] : @($array)[$searched +1];
+    if ($searched !== null &&  isset($arrayPlusOne)) {
+        return $datesExistsAsKeys ? array_keys($array)[$searched +1] : ($array)[$searched +1];
+    }
+    return null;
 }
 function getPreviousDate(?array $array, ?string $date, $datesExistsAsKeys = true)
 {
 
-	$searched = array_search($date, $datesExistsAsKeys ? array_keys($array) : $array);
-	$arrayPlusOne = $datesExistsAsKeys ? @array_keys($array)[$searched - 1] : @($array)[$searched - 1];
-	if ($searched !== null &&  isset($arrayPlusOne)) {
-		return $datesExistsAsKeys ? array_keys($array)[$searched - 1] : ($array)[$searched - 1];
-	}
-	return null;
+    $searched = array_search($date, $datesExistsAsKeys ? array_keys($array) : $array);
+    $arrayPlusOne = $datesExistsAsKeys ? @array_keys($array)[$searched - 1] : @($array)[$searched - 1];
+    if ($searched !== null &&  isset($arrayPlusOne)) {
+        return $datesExistsAsKeys ? array_keys($array)[$searched - 1] : ($array)[$searched - 1];
+    }
+    return null;
 }
-	
-	function calculateReplacementDates(array $studyDates , int $operationStartDateAsIndex , int $studyEndDateAsIndex ,int $propertyReplacementIntervalInMonths)
-	{
-		$replacementDates = [];
-		foreach($studyDates as $studyDateAsString=>$studyDateAsIndex){
-			if($operationStartDateAsIndex > $studyEndDateAsIndex){
-				break ;	
-			}
-			$replacementDates[$studyDateAsIndex] = $operationStartDateAsIndex+ $propertyReplacementIntervalInMonths;
-			$operationStartDateAsIndex = $replacementDates[$studyDateAsIndex] ;
-		}
-		return $replacementDates ;
-	}
-	function calculateAccumulatedDepreciation(array $totalMonthlyDepreciation,array $studyDates)
-	{
-		$result = [];
-		foreach ($studyDates  as $dateIndex){
-			$value = $totalMonthlyDepreciation[$dateIndex] ?? 0; 
-			$previousDateAsIndex = $dateIndex-1;
-			$result[$dateIndex] = $previousDateAsIndex >=0 ?  $result[$previousDateAsIndex] + $value : $value;
-		}
-		return $result;
-	}
-	function generateDatesBetweenTwoIndexedDates(int $startDateAsIndex , int $endDateAsIndex):array {
-	$result = [];
-	for($i =$startDateAsIndex ; $i <=$endDateAsIndex ; $i++  ){
-		$result[] = $i;
-	}
-	return $result;
+    
+function calculateReplacementDates(array $studyDates, int $operationStartDateAsIndex, int $studyEndDateAsIndex, int $propertyReplacementIntervalInMonths)
+{
+    $replacementDates = [];
+    foreach ($studyDates as $studyDateAsString=>$studyDateAsIndex) {
+        if ($operationStartDateAsIndex > $studyEndDateAsIndex) {
+            break ;
+        }
+        $replacementDates[$studyDateAsIndex] = $operationStartDateAsIndex+ $propertyReplacementIntervalInMonths;
+        $operationStartDateAsIndex = $replacementDates[$studyDateAsIndex] ;
+    }
+    return $replacementDates ;
+}
+function calculateAccumulatedDepreciation(array $totalMonthlyDepreciation, array $studyDates)
+{
+    $result = [];
+    foreach ($studyDates as $dateIndex) {
+        $value = $totalMonthlyDepreciation[$dateIndex] ?? 0;
+        $previousDateAsIndex = $dateIndex-1;
+        $result[$dateIndex] = $previousDateAsIndex >=0 ?  $result[$previousDateAsIndex] + $value : $value;
+    }
+    return $result;
+}
+function generateDatesBetweenTwoIndexedDates(int $startDateAsIndex, int $endDateAsIndex):array
+{
+    $result = [];
+    for ($i =$startDateAsIndex ; $i <=$endDateAsIndex ; $i++) {
+        $result[] = $i;
+    }
+    return $result;
 }
 function getDifferenceBetweenTwoDatesInDays(Carbon $firstDate, Carbon $secondDate)
-	{
-		return $secondDate->diffInDays($firstDate);
-	}
+{
+    return $secondDate->diffInDays($firstDate);
+}
 
-	
+
 // function eachIndexMinusPreviousIfNegative(array $items,$debug = false  )
 // {
 // 	$result = [];
@@ -453,12 +453,12 @@ function getDifferenceBetweenTwoDatesInDays(Carbon $firstDate, Carbon $secondDat
 // 		if($value < 0){
 // 			$newValue = ($value - $previousValue) * -1;
 // 			if($newValue <0){
-// 				$newValue = 0;	
+// 				$newValue = 0;
 // 			}
 // 		}
 // 		$result[$dateAsIndex] = $newValue ;
 // 	}
-// 	return $result ; 
+// 	return $result ;
 // }
 
 // function getMinAtEveryIndex(array $keyAndValues)
@@ -470,16 +470,47 @@ function getDifferenceBetweenTwoDatesInDays(Carbon $firstDate, Carbon $secondDat
 // 	}
 // 	return $result;
 // }
-function getValueFromArrayStringAndIndex(array $items  , $dateAsString , $dateAsIndex,$defaultValue = 0)
+function getValueFromArrayStringAndIndex(array $items, $dateAsString, $dateAsIndex, $defaultValue = 0)
 {
-	if(isset($items[$dateAsString])){
-		return $items[$dateAsString];
-	}
-	if(isset($items[$dateAsIndex])){
-		return $items[$dateAsIndex];
-	}
-	return $defaultValue ;
+    if (isset($items[$dateAsString])) {
+        return $items[$dateAsString];
+    }
+    if (isset($items[$dateAsIndex])) {
+        return $items[$dateAsIndex];
+    }
+    return $defaultValue ;
 }
-function sumIntervals(array $dateValues, string $intervalName,string $financialYearStartMonth,array $dateIndexWithDate ){
-	return (new IntervalSummationOperations())->sumForInterval( $dateValues, $intervalName,$financialYearStartMonth,$dateIndexWithDate);
+function sumIntervals(array $dateValues, string $intervalName, string $financialYearStartMonth, array $dateIndexWithDate)
+{
+    return (new IntervalSummationOperations())->sumForInterval($dateValues, $intervalName, $financialYearStartMonth, $dateIndexWithDate);
+}
+function getBusinessSectors()
+{
+	return  [
+        'Textiles & Garments',
+		'Automotive',
+		'Food & Beverage',
+		'Pharmaceuticals',
+		'Fertilizers',
+		'Plastics',
+		'Chemicals',
+		'Cement',
+		'Steel',
+		'Glass',
+		'Sanitary Products',
+		'Ceramics',
+		'Other Construction Materials',
+		'Wood & Furniture',
+		'Home Appliance',
+		'Printing & Packaging',
+		'Heavy Machinery',
+		'Metal Industries & Fabrication',
+		'Ready Made Concrete',
+		'Medical Disposables & Devices',
+		'Electronics',
+		'Others',
+		'Leather Products',
+		'Agro-Processing'
+    ] ;
+
 }

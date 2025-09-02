@@ -62,11 +62,9 @@ trait HasBasicStoreRequest
          * * $additionRelationData لو حابب تضيف داتا اضافيه وليكن مثلا company_id
 		 */
 		$connectionName =$this->$relationName()->getModel()->getConnectionName();
-        $relationDataArray = $request->get($relationName);
+        $relationDataArray = $request->get($relationName)?:[];
 		$oldIdsFromDatabase = is_null($oldIdsFromDatabase) ? $this->{$relationName}->pluck('id')->toArray() : $oldIdsFromDatabase;
-		if(is_null($relationDataArray)){
-			dd($relationName,$request->all());
-		}
+	
 		$idsFromRequest =array_column($relationDataArray,'id') ;
 		
 		$elementsToDelete = array_diff($oldIdsFromDatabase,$idsFromRequest);

@@ -23,14 +23,7 @@
                     <th class="tr-color">{{__('Study Start Date')}}</th>
                     <td class="h5 text-dark td-style">{{isset($project->start_date) ?date('M-Y',strtotime($project->start_date)) : '-' }}</td>
                 </tr>
-                {{-- <tr class="tr-color">
-                    <th class="tr-color">{{__('Study End Date')}}</th>
-                    <td class="h5 text-dark td-style">{{isset($project->end_date) ?date('M-Y',strtotime($project->end_date)): '-' }}</td>
-                </tr> --}}
-                {{-- <tr class="tr-color">
-                    <th class="tr-color">{{__('Selling Start Date')}}</th>
-                    <td class="h5 text-dark td-style">{{isset($project->selling_start_date) ?date('M-Y',strtotime($project->selling_start_date)): '-' }}</td>
-                </tr> --}}
+           
 
                 @if (isset($project->business_sector_id))
                     <?php $name =  "name_".app()->getLocale();?>

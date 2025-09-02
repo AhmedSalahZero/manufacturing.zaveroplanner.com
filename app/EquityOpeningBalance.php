@@ -30,14 +30,4 @@ class EquityOpeningBalance extends Model
     {
         return $this->retained_earnings ;
     }
-	// public function getPayload():array 
-	// {
-	// 	return $this->payload ;
-	// }
-	// public function getPayloadAtDateIndex(int $dateAsIndex):float 
-	// {
-	// 	return $this->getPayload()[$dateAsIndex]??0;
-	// }
-	
-	
 }

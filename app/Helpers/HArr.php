@@ -804,9 +804,6 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 		$openingBalance = $endCashBalance ;
 	}
 	return $statements;
-	// dd($statements);
-	
-	
 	
 	
 }

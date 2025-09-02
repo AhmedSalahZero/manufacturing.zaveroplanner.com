@@ -422,7 +422,6 @@
                     <div class="form-group">
                         <label>{{__('Choose Seasonality')}}</label><span class="red">*</span>
                         <select name="seasonality[type]" id="seasonality" class="form-control @error('seasonality_type') is-invalid @enderror">
-                            <option value="">{{__('Select')}}</option>
                             <option value="flat" {{$seasonalityType == 'flat' ?'selected' : '' }}>{{__('Flat Monthly')}}</option>
                             <option value="quarterly" {{$seasonalityType == 'quarterly' ?'selected' : '' }}>{{__('Distribute Quarterly')}}</option>
                             <option value="monthly" {{$seasonalityType == 'monthly' ?'selected' : '' }}>{{__('Distribute Monthly')}}</option>
@@ -720,13 +719,12 @@
                             </div>
                         </div>
                         @endif
-                        <?php $fg_inventory_coverage_days = isset($product->fg_inventory_coverage_days) ? $product->fg_inventory_coverage_days :old('fg_inventory_coverage_days'); ?>
+                        <?php $fg_inventory_coverage_days = isset($product->fg_inventory_coverage_days) ? $product->fg_inventory_coverage_days :old('fg_inventory_coverage_days',30); ?>
                         <div class="col-md-3">
 
                             <div class="form-group">
                                 <label>{{__('Finished Goods Inventory Coverage Days')}} <span class="red">*</span></label>
-                                <select class="form-control  @error('fg_inventory_coverage_days') is-invalid @enderror" name="fg_inventory_coverage_days" id="fg_inventory_coverage_days">
-                                    <option selected value="">{{__('Select')}}</option>
+                                <select required class="form-control  @error('fg_inventory_coverage_days') is-invalid @enderror" name="fg_inventory_coverage_days" id="fg_inventory_coverage_days">
                                     <option value="0" {{$fg_inventory_coverage_days == '0'   ?'selected' : '' }}>0</option>
                                     <option value="15" {{$fg_inventory_coverage_days == '15'  ?'selected' : '' }}>15</option>
                                     <option value="30" {{$fg_inventory_coverage_days == '30'  ?'selected' : '' }}>30</option>
@@ -828,6 +826,7 @@
                         $currentFieldName = "collection_policy_value[$localOrExport][$index][due_in_days][$numberOfCollections]";
                         $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
                         $currentVal = $product->getCollectionDueDaysAtIndex($index,$numberOfCollections,$localOrExport);
+
                         @endphp
 
                         <div class="col-2">

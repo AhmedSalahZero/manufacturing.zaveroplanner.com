@@ -12,6 +12,8 @@ use App\Http\Requests\StoreExpensesRequest;
 use App\Http\Requests\StoreFixedAssetsRequest;
 use App\Http\Requests\StoreManpowerRequest;
 use App\Http\Requests\StoreOpeningBalancesRequest;
+use App\Http\Requests\StoreProductsRequest;
+use App\Http\Requests\StoreProdudctsRequest;
 use App\ManPower;
 use App\OpeningBalance;
 use App\Product;
@@ -33,7 +35,7 @@ class RedirectionController extends Controller
         return view('products.form',$product->getViewVars() );
     }
 
-    public function productsPost(Request $request, Project $project, Product $product)
+    public function productsPost(StoreProductsRequest $request, Project $project, Product $product)
     {
 		$request->merge([
 			'fg_inventory_quantity'=>number_unformat($request->get('fg_inventory_quantity')),
@@ -294,8 +296,8 @@ class RedirectionController extends Controller
                  * $begiinign = $endBalance
 
                  */
-                if ($tableId =='expense_as_percentage') {
-                    
+                if ($tableId =='expense_as_percentage' && $name) {
+         
                     $expenseAsPercentageResult = $expenseAsPercentageEquation->calculate($expenseCategoryId, $expenseType, $name, $project->products, $productAllocations, $tableDataArr['start_date'], $loopEndDate, $tableDataArr['monthly_percentage'], $vatRate, $isDeductible, $tableDataArr['withhold_tax_rate']) ;
                     $expenseAmounts = $expenseAsPercentageResult['expense_amounts'];
                     $expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
@@ -322,7 +324,7 @@ class RedirectionController extends Controller
                 */
                 if ($tableId == 'one_time_expense') {
                     $startDateAsIndex = $tableDataArr['start_date'] ;
-                    $amountBeforeVat = $tableDataArr['amount'] ;
+                    $amountBeforeVat = $tableDataArr['amount']??0 ;
                     $withholdAmount = $tableDataArr['withhold_tax_rate'] / 100 * $amountBeforeVat ;
                     $oneTimeExpenses = $oneTimeExpenseEquation->calculate($amountBeforeVat, $startDateAsIndex, $isDeductible, $vatRate);
                     $tableDataArr['payload']  = $oneTimeExpenses ;
@@ -455,7 +457,6 @@ class RedirectionController extends Controller
             'financial-results.index',
             $project->calculateIncomeStatement()
         );
-        // return view('assets.form',compact('assets','project','step_data','years'));
     }
 	
 	
@@ -464,7 +465,17 @@ class RedirectionController extends Controller
         
         
         return view(
-            'cash-in-out-flow-results.index',
+            'financial-results.index',
+			$project->getCashInOutFlowViewVars()
+        );
+        // return view('assets.form',compact('assets','project','step_data','years'));
+    } 
+	public function balanceSheetGet(Project $project)
+    {
+        dd('balance sheet');
+        
+        return view(
+            'financial-results.index',
 			$project->getCashInOutFlowViewVars()
         );
         // return view('assets.form',compact('assets','project','step_data','years'));

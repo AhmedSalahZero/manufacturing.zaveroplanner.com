@@ -78,20 +78,9 @@ class ProjectController extends Controller
         $inputs = $request->all();
         $inputs['user_id'] = auth()->user()->id;
         $request['slug'] =  Str::slug($request->name, '-');
-        //Start date
-      //  $request->year == null || $request->month == null ? null : $request['start_date'] = $request->year."-".$request->month."-01";
-        // Selling Start date
-        // $request->selling_start_year == null || $request->selling_start_month == null ? null : $request['selling_start_date'] = $request->selling_start_year."-".$request->selling_start_month."-01";
-        // $products_selling_dates_fields = ['product_first_selling_'=>'product_first_selling_date','product_second_selling_'=>'product_second_selling_date','product_third_selling_'=>'product_third_selling_date','product_fourth_selling_'=>'product_fourth_selling_date','product_fifth_selling_'=>'product_fifth_selling_date'];
-        $except = ['products','rawMaterials','submit_button','selling_start_date'];
-        // foreach ($products_selling_dates_fields as $main_field_name => $field) {
-			//     $name_of_new_field_month = $main_field_name.'month';
-			//     $name_of_new_field_year = $main_field_name.'year';
-			//     array_push($except,$name_of_new_field_month);
-			//     array_push($except,$name_of_new_field_year);
-			//     $request->$name_of_new_field_year == null || $request->$name_of_new_field_month == null ? null : $request[$field] = $request->$name_of_new_field_year."-".$request->$name_of_new_field_month."-01";
-			// }
-			// 'selling_start_month'  ,'selling_start_year'
+        $request['is_completed'] =  1;
+         $except = ['products','rawMaterials','submit_button','selling_start_date'];
+        
 			$project->update($request->except($except));
 			
 			$datesAsStringAndIndex = $project->getDatesAsStringAndIndex();
@@ -128,73 +117,11 @@ class ProjectController extends Controller
 			if($request->get('submit_button') != 'next'){
 			return redirect()->route('main.project.page',['project'=>$project->id]);
 		}
-			// (new Redirects)->foundedProducts($project);
-			// if(isset($result['redirect_route'])){
-			// 	return $result['redirect_route'] ;
-			// }
+		
 			return redirect()->route('products.form',['project'=>$project->id,'product'=>$project->products->first()->id]);
 			
 	
     }
-    // public function years($project,$requested_from=null,$type=null)
-    // {
-    //     $start_date = $project->start_date;
-
-    //     $duration = date("m", strtotime($project->start_date)) == 1 ?  $project->duration : $project->duration+1;
-    //     $duration = $duration - (date("Y", strtotime($start_date))-date("Y", strtotime($project->start_date)));
-
-
-    //     $type = str_replace('product_','',$type);
-
-    //     $years = [];
-    //     $counter= ['first','second','third','fourth','fifth','sixth'];
-
-    //     $count = ($type !== null) ?array_search($type,$counter) : 0;
-    //     $name_selling_start_date = ($type !== null) ? "product_".$counter[$count]."_selling_date" :'';
-
-    //     $duration_year = date("Y",strtotime(date("Y-m-d", strtotime($start_date)) . "+ ".($duration-1) ."  year"));
-    //     if ($requested_from == "Dashboard"  ) {
-    //         $start_date = $project->start_date;
-    //     }elseif ($requested_from == 'min_selling_date' || $requested_from == 'full_min_selling_date') {
-    //         $dates = [];
-    //         foreach ($counter as $value) {
-    //             $field = "product_".$value."_selling_date"  ;
-    //             $date = $project->$field;
-
-    //             $date === null ?:$dates[$value] = strtotime($date);
-    //         }
-
-    //         $start_date = date('Y-m-d',min($dates));
-
-    //     }elseif ($requested_from == 'project') {
-    //         $start_date = $project->start_date;
-
-    //     }
-    //     else {
-    //         $start_date = $project->$name_selling_start_date;
-    //     }
-
-    //     $key = 0;
-    //     if ($requested_from == 'full_min_selling_date') {
-    //         return $start_date;
-    //     }
-    //     for ($year=0; $year < $duration ; $year++) {
-
-
-    //         $date =  date("Y",strtotime(date("Y-m-d", strtotime($start_date)) . "+$year  year"));
-    //         if (strtotime($date) <= strtotime($duration_year)) {
-    //             if($requested_from == "Dashboard" || $requested_from == "Dashboard_sales" ){
-    //                 $years[$date] = $counter[$key];
-    //             }else{
-    //                 $years[$key] = [$counter[$key]=>$date];
-    //             }
-    //             $key++;
-    //         }
-    //     }
-
-    //     return $years;
-
-    // }
 
 
     public function durationYear(Request $request)

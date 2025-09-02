@@ -256,9 +256,10 @@ trait HasIndexedDates
             foreach ($datesAndZeros as $date => $zeroOrOne) {
                 if (isset($datesAsStringAndIndex[$date])) {
                     $dateIndex = $datesAsStringAndIndex[$date];
-                    $yearIndex = $datesIndexWithYearIndex[$dateIndex];
-                    $result[$yearIndex][$dateIndex] = $zeroOrOne;
-                    
+                    $yearIndex = $datesIndexWithYearIndex[$dateIndex]??null;
+					if(!is_null($yearIndex)){
+						$result[$yearIndex][$dateIndex] = $zeroOrOne;
+					}
                 }
             }
         }

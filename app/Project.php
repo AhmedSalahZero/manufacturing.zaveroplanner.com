@@ -25,6 +25,15 @@ class Project extends Model
 {
     protected $connection = 'mysql';
     use SoftDeletes,HasBasicStoreRequest,HasIndexedDates,HasManpowerExpense,HasFixedAsset,HasCollectionOrPaymentStatement;
+	
+	 public function setMonthAttribute($value)
+    {
+		return ;
+    }
+	 public function setYearAttribute($value)
+    {
+		return ;
+    }
     protected $casts = [
         'manpower_allocations'=>'array',
         'extended_study_dates'=>'array',
@@ -309,7 +318,6 @@ class Project extends Model
 			
 			$fixedAssetAddition = $ffeAssetItems['additions']??[];
 			
-            // dd($ffePayment,$fixedAssetAddition);
             $totalMonthlyDepreciation = $ffeAssetItems['total_monthly_depreciation'] ?? [];
             $adminDepreciationPercentage = $fixedAsset->getAdminDepreciationPercentage() /100;
             $manufacturingDepreciationPercentage = $fixedAsset->getManufacturingDepreciationPercentage() /100;
@@ -391,7 +399,7 @@ class Project extends Model
         foreach ($result as $productId => $totals) {
             DB::table('products')->where('id', $productId)->update([
                 'product_overheads_allocation'=>json_encode($totals),
-				'product_depreciation_allocation'=>json_encode($depreciationResult[$productId])
+				'product_depreciation_allocation'=> isset($depreciationResult[$productId]) ? json_encode($depreciationResult[$productId]) : null
             ]);
         }
         
@@ -430,7 +438,7 @@ class Project extends Model
                 $fgBeginningInventoryBreakdownValue =  $inventoryItemValues['value']??0	;
                 $currentColumnMapping = $columnNameMapping[$inventoryItemType];
                 $fgStatementValues[$productId][$inventoryItemType]['beginning_value'] = $fgBeginningInventoryBreakdownValue;
-                $currentManufacturingExpenseArr = $currentColumnMapping == 'product_raw_material_consumed' ?  $product->{$currentColumnMapping}['total'] :   (array)$product->{$currentColumnMapping} ;
+                $currentManufacturingExpenseArr = $currentColumnMapping == 'product_raw_material_consumed' ?  ($product->{$currentColumnMapping}['total']??[]) :   (array)$product->{$currentColumnMapping} ;
                 foreach ($currentManufacturingExpenseArr as $dateAsIndex => $currentManufacturingExpenseVal) {
                     $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex] = $currentManufacturingExpenseVal+$fgBeginningInventoryBreakdownValue;
                     $totalAvailableValueAtCurrentDateIndex = $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex];
@@ -576,7 +584,8 @@ class Project extends Model
 		foreach($productExpenses as $fixedAssetOpeningBalanceId => $hisProductAllocations){
 			$fixedAssetOpeningBalance  = FixedAssetOpeningBalance::find($fixedAssetOpeningBalanceId);
 			$fixedAssetOpeningBalance->update([
-				'admin_depreciations'=>$adminAllocationPercentages[$fixedAssetOpeningBalanceId]??[]	
+				'admin_depreciations'=>$adminAllocationPercentages[$fixedAssetOpeningBalanceId]??[]	,
+				'manufacturing_depreciations'=>$manufacturingAllocationPercentages[$fixedAssetOpeningBalanceId]??[]
 			]);
 			foreach($hisProductAllocations as $productId => $dateAndValues){
 				$finalResult[] = [
@@ -881,7 +890,8 @@ class Project extends Model
 		$depreciationCogs =DB::table('products')->where('project_id',$project->id)->pluck('product_depreciation_statement')->toArray();
 		$formattedDepreciationCogs = [];
 		foreach($depreciationCogs as $index => $depreciationCogArr){
-			$formattedDepreciationCogs[$index] = ((array)json_decode($depreciationCogArr))['cogs']??[];
+		
+			$formattedDepreciationCogs[$index] = isset(json_decode($depreciationCogArr)->cogs) ?  (array)json_decode($depreciationCogArr)->cogs : [];
 		}
 		$formattedDepreciationCogs = HArr::sumAtDates($formattedDepreciationCogs,$sumKeys);
 		$fixedAssetAdminDepreciations = DB::table('fixed_assets')->where('project_id',$project->id)->pluck('admin_depreciations')->toArray();
@@ -1006,8 +1016,8 @@ class Project extends Model
 				$value =0 ;
 			}
 		}
-		// dd($totalProductsWithholdAmounts);
 		$corporateTaxesStatement  = Project::calculateCorporateTaxesStatement($totalProductsWithholdAmounts,$calculatedCorporateTaxesPerYear,0,$dateIndexWithDate);
+
 		$this->update([
 			'corporate_taxes_statement'=>$corporateTaxesStatement
 		]);
@@ -1034,8 +1044,9 @@ class Project extends Model
             'years','studyMonthsForViews'=>$studyMonthsForViews,
             'project'=>$this,
             'tableDataFormatted'=>$tableDataFormatted,
-            'defaultClasses'=>$defaultClasses
-            
+            'defaultClasses'=>$defaultClasses,
+			'title'=>__('Income Statement'),
+            'nextRoute'=>route('cash.in.out.flow.result',['project'=>$project->id]),
 		];
 		/**
 		 * * End  Sixth Item 
@@ -1353,8 +1364,10 @@ class Project extends Model
             'years','studyMonthsForViews'=>$studyMonthsForViews,
             'project'=>$project,
             'tableDataFormatted'=>$tableDataFormatted,
-            'defaultClasses'=>$defaultClasses
-            
+            'defaultClasses'=>$defaultClasses,
+            'title'=>__('Cash In Out Flow'),
+			'nextRoute'=>route('balance.sheet.result',['project'=>$project->id]),
+			
 		];
 	}
 	public function recalculateVatStatements():void
@@ -1440,4 +1453,30 @@ class Project extends Model
 
 		return $newItems;
 	}
+	public function isCompleted():bool
+	{
+		return $this->is_completed;
+	}
+	public function getDefaultStartDateAsYearAndMonth()
+	{
+		$operationStartDate = $this->getOperationStartDate() ; 
+		return Carbon::make($operationStartDate)->format('Y-m');
+	}
+	public function getDefaultEndDateAsYearAndMonth()
+	{
+		$operationEndDate = $this->end_date; 
+		return Carbon::make($operationEndDate)->format('Y-m');
+	}
+		public function getInventoryAmount():float 
+    {
+		$inventoryAmount = 0 ;
+		foreach($this->products as $product){
+			$inventoryAmount+=$product->getFgInventoryValue();
+		}
+		foreach($this->rawMaterials as $rawMaterial){
+			$inventoryAmount+= $rawMaterial->getBeginningInventoryValue();
+		}
+        return $inventoryAmount ;
+    }
+	
 }

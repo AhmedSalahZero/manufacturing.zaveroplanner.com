@@ -71,7 +71,7 @@
 
                             <div class="col-2">
                                 <label>{{ __('Inventory') }}</label>
-                                <input type="text" name="inventory_amount" class="form-control only-greater-than-or-equal-zero-allowed" value="{{ $cashAndBank ? $cashAndBank->getInventoryAmount() : 0 }}">
+                                <input type="text" readonly class="form-control only-greater-than-or-equal-zero-allowed" value="{{ $cashAndBank ? $cashAndBank->getInventoryAmountFormatted() : 0 }}">
                             </div>
 
 

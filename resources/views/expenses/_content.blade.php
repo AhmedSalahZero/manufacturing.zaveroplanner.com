@@ -13,10 +13,7 @@
                     <div id="{{ $repeaterId }}_repeater" class="rooms-repeater">
                         <div class="form-group  m-form__group row">
                             <div data-repeater-list="{{ $repeaterId }}" class="col-lg-12">
-
                                 @include('expenses._percentage_repeater',['repeaterId'=>$repeaterId,'expenseType'=>$repeaterId,'expenses'=>$expenses->where('relation_name',$repeaterId)])
-
-
                             </div>
                         </div>
                         <input data-repeater-create type="button" class="btn btn-success btn-sm " value="{{ __('Add Expense') }}">

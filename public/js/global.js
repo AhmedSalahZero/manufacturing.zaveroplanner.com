@@ -572,7 +572,7 @@ $(document).on('click', '.collapse-before-me', function () {
 			}
 		}
 
-		$(this).closest('table').find('[data-column-index="' + columnIndex + '"]:not(.exclude-from-collapse)').toggle()
+		$(this).closest('table').find('[data-column-index="' + columnIndex + '"]:not(.exclude-from-collapse):not(.total-td):not(.total-td-formatted)').toggle()
 
 		columnIndex--
 		counter++
@@ -984,4 +984,7 @@ $(document).on('change','.sum_product_value_1,.sum_product_quantity_1,.sum_produ
 	}
 	resultQuery.val(result).trigger('change')
 	
+})
+$(function(){
+	$('.collapse-before-me').trigger('click')
 })

@@ -11,7 +11,7 @@ trait HasCollectionPolicy
 	public function getCollectionDownPaymentAtIndex($index,?string $localOrExport)
 	{
 		if(!is_null($localOrExport)){
-			return $this->collection_policy_value[$index]['cash_payment'] ?? 0;
+			return $this->collection_policy_value[$localOrExport][$index]['cash_payment'] ?? 0;
 		}
 		return $this->collection_policy_value[$index]['cash_payment'] ?? 0;
 	}
@@ -29,10 +29,11 @@ trait HasCollectionPolicy
 	 */
 	public function getCollectionDueDaysAtIndex(int $index,int $numberOfCollection,?string $localOrExport)
 	{
+		$defaultValue  = $index ==0 ? 30 : 60 ;
 		if(!is_null($localOrExport)){
-			return $this->collection_policy_value[$localOrExport][$index]['due_in_days'][$numberOfCollection] ?? 0;
+			return $this->collection_policy_value[$localOrExport][$index]['due_in_days'][$numberOfCollection] ?? $defaultValue;
 		}
-		return $this->collection_policy_value[$index]['due_in_days'][$numberOfCollection] ?? 0;
+		return $this->collection_policy_value[$index]['due_in_days'][$numberOfCollection] ?? $defaultValue;
 	}
 	public function getDueDayWithRates(int $index,$localOrExport):array 
 	{
