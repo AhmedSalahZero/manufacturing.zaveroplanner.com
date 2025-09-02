@@ -622,6 +622,7 @@ class ComposerStaticInite97a568dc59bb3b2403c43c21046be64
         'App\\Assets' => __DIR__ . '/../..' . '/app/Assets.php',
         'App\\BusinessSector' => __DIR__ . '/../..' . '/app/BusinessSector.php',
         'App\\CashAndBankOpeningBalance' => __DIR__ . '/../..' . '/app/CashAndBankOpeningBalance.php',
+        'App\\CashInOutStatement' => __DIR__ . '/../..' . '/app/CashInOutStatement.php',
         'App\\Console\\Commands\\TestCommand' => __DIR__ . '/../..' . '/app/Console/Commands/TestCommand.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Equations\\ExpenseAsPercentageEquation' => __DIR__ . '/../..' . '/app/Equations/ExpenseAsPercentageEquation.php',

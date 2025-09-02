@@ -782,6 +782,21 @@ public static function sumPerYearIndex(array $itemsAsDateIndexAndValue ,  array 
 	}
 	return $result ;
 }
+public static function getPerYearIndexForEndBalance(array $itemsAsDateIndexAndValue ,  array $yearWithItsMonths):array{
+	$result = [];
+	foreach($yearWithItsMonths as $yearIndex => $itsMonths){
+		$currentYearTotal = 0;
+		foreach($itsMonths as $dateAsIndex => $dateAsString){
+			$currentValue = $itemsAsDateIndexAndValue[$dateAsIndex]??0 ;
+			$currentYearTotal =  $currentValue;
+		}
+		/**
+		 * * هنحط النتيجه بتاعتك كل سنه عند اخر شهر في السنه دي
+		 */
+		$result[$dateAsIndex] = $currentYearTotal;
+	}
+	return $result ;
+}
 public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAsDateIndexAndValue , $totalCashOutAsDateIndexAndValue , $sumKeys)
 {
 	$openingBalance = $cashAndBankAmount ; 

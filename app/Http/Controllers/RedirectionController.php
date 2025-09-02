@@ -472,11 +472,10 @@ class RedirectionController extends Controller
     } 
 	public function balanceSheetGet(Project $project)
     {
-        dd('balance sheet');
         
         return view(
             'financial-results.index',
-			$project->getCashInOutFlowViewVars()
+			$project->getBalanceSheetViewVars()
         );
         // return view('assets.form',compact('assets','project','step_data','years'));
     }

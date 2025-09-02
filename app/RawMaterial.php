@@ -18,7 +18,8 @@ class RawMaterial extends Model
 	protected $casts = [
 		'collection_policy_value'=>'array',
 		'collection_statement'=>'array',
-		'credit_withhold_statement'=>'array'
+		'credit_withhold_statement'=>'array',
+		'inventory_value_statement'=>'array'
 	];
     public function project()
     {
@@ -67,7 +68,7 @@ class RawMaterial extends Model
 		
 		$rawMaterialIds = DB::table('product_raw_material')->where('project_id',$projectId)->pluck('raw_material_id','raw_material_id')->toArray();
 		$productConsumedRawMaterials = Product::where('project_id',$projectId)->where('product_raw_material_consumed','!=',null)->pluck('product_raw_material_consumed')->toArray();
-		$inventoryQuantityStatements = [];
+	
 		foreach($rawMaterialIds as $rawMaterialId){
 			$rawMaterial = RawMaterial::find($rawMaterialId);
 			/**
@@ -84,7 +85,8 @@ class RawMaterial extends Model
 			$withholdAmount = $collectionPolicyStatement['monthly']['withhold_amount']??[] ;
 			$rawMaterial->update([
 				'collection_statement'=>$collectionPolicyStatement,
-				'credit_withhold_statement'=>$rawMaterial->calculateWithholdStatement($withholdAmount,0,$dateIndexWithDate)
+				'credit_withhold_statement'=>$rawMaterial->calculateWithholdStatement($withholdAmount,0,$dateIndexWithDate),
+				'inventory_value_statement'=>$currentInventoryQuantityStatement
 			]);
 	//		$inventoryQuantityStatements[$rawMaterialId]=$currentInventoryQuantityStatement;
 		}

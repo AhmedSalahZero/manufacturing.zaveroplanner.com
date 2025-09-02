@@ -2,37 +2,40 @@
 
 namespace App;
 
+use App\Traits\HasCollectionOrPaymentStatement;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FixedAssetOpeningBalance extends Model
 {
+	use HasCollectionOrPaymentStatement;
     protected $guarded = ['id'];
-
 	protected $casts = [
 		'product_allocations'=>'array',
-		'admin_depreciations'=>'array'
-		
+		'admin_depreciations'=>'array',
+		'manufacturing_depreciations'=>'array',
+		'monthly_accumulated_depreciations'=>'array'
 	];
+	
 	public static function getOpeningBalanceColumnName():string
 	{
 		return 'gross_amount';
 	}
-	public static function getPayloadStatementColumn():string  
+	public static function getPayloadStatementColumn():string 
 	{
-		return '';
+		return 'monthly_accumulated_depreciations';
 	}
-	// 	public static function booted()
-	// {
-	// 		parent::boot();
-	// 		static::saving(function(self $model){
-	// 			dd($model);
-	// 			$openingBalance = $model->{self::getOpeningBalanceColumnName()};
-	// 			$statementPayload = $model->{self::getPayloadStatementColumn()};
-	// 			$dateIndexWithDate = $model->project->getDateIndexWithDatE();
-	// 			$model->statement = self::calculateSettlementStatement($statementPayload,[],$openingBalance,$dateIndexWithDate);
-	// 		});
-	// }
+	public static function booted()
+	{
+			parent::boot();
+			static::saving(function(self $model){
+				$statementPayload = $model->{self::getPayloadStatementColumn()};
+				$openingBalance = $model->{self::getOpeningBalanceColumnName()};
+				$dateIndexWithDate = $model->project->getDateIndexWithDatE();
+				$model->statement = self::calculateSettlementStatement($statementPayload,[],$openingBalance,$dateIndexWithDate,true);
+			});
+	}
+	
 	
     public function project():BelongsTo
     {
@@ -54,7 +57,7 @@ class FixedAssetOpeningBalance extends Model
 	}
 	public function getAccumulatedDepreciation():float
 	{
-		return $this->accumulated_depreciation;
+		return $this->accumulated_depreciation?:0;
 	}
 	public function getNetAmount():float
 	{

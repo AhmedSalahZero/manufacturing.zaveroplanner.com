@@ -11,6 +11,7 @@ return array(
     'App\\Assets' => $baseDir . '/app/Assets.php',
     'App\\BusinessSector' => $baseDir . '/app/BusinessSector.php',
     'App\\CashAndBankOpeningBalance' => $baseDir . '/app/CashAndBankOpeningBalance.php',
+    'App\\CashInOutStatement' => $baseDir . '/app/CashInOutStatement.php',
     'App\\Console\\Commands\\TestCommand' => $baseDir . '/app/Console/Commands/TestCommand.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Equations\\ExpenseAsPercentageEquation' => $baseDir . '/app/Equations/ExpenseAsPercentageEquation.php',
