@@ -82,6 +82,7 @@ trait HasBasicStoreRequest
 		foreach($relationDataArray as $data){
 			if(!isset($data['id']) || $data['id'] == 0){
 				unset($data['id']);
+				
 				$this->$relationName()->create($this->filterTableColumnThatExistsOnly($connectionName,$relationTableName,array_merge($data,$additionRelationData)));
 		
 			}

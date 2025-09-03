@@ -431,13 +431,13 @@ class RedirectionController extends Controller
 
     public function openingBalancesPost(StoreOpeningBalancesRequest $request, Project $project)
     {
-        $project->storeRepeaterRelations($request, ['fixedAssetOpeningBalances','cashAndBankOpeningBalances','otherDebtorsOpeningBalances','vatAndCreditWithholdTaxesOpeningBalances'
+		$project->storeRepeaterRelations($request, ['fixedAssetOpeningBalances','cashAndBankOpeningBalances','otherDebtorsOpeningBalances','vatAndCreditWithholdTaxesOpeningBalances'
         ,'supplierPayableOpeningBalances','otherCreditorsOpeningBalances','otherLongTermLiabilitiesOpeningBalances','equityOpeningBalances','longTermLoanOpeningBalances'
     ], ['project_id'=>$project->id]);
 	
-		
-		$project->recalculateOpeningBalances();
-		
+	
+	$project->recalculateOpeningBalances();
+	
 		if($request->get('total_liabilities_and_equity_minus_total_assets') != 0){
 			$errorMessage = __('Total Assets Must Be Equal To Total Liabilities + Owners Equity') . ' [ ' . number_format($request->get('total_liabilities_and_equity_minus_total_assets'))  . ' ]';
 			return redirect()->back()->with('errors',collect([$errorMessage]));

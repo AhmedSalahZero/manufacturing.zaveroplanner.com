@@ -14,7 +14,8 @@ class FixedAssetOpeningBalance extends Model
 		'product_allocations'=>'array',
 		'admin_depreciations'=>'array',
 		'manufacturing_depreciations'=>'array',
-		'monthly_accumulated_depreciations'=>'array'
+		'monthly_accumulated_depreciations'=>'array',
+		'statement'=>'array'
 	];
 	
 	public static function getOpeningBalanceColumnName():string
