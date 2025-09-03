@@ -966,7 +966,7 @@ class Project extends Model
 			$tableDataFormatted[9]['sub_items'][__('Opening Balance Loans Interests')]['data'] = $openingLoansTotal;
 			$tableDataFormatted[9]['sub_items'][__('Opening Balance Loans Interests')]['year_total'] = HArr::sumPerYearIndex($openingLoansTotal,$yearWithItsMonths);
 		}
-		$totalFinanceExpense = HArr::sumAtDates(array_column($tableDataFormatted[9]['sub_items'],'data'),$sumKeys);
+		$totalFinanceExpense = HArr::sumAtDates(array_column($tableDataFormatted[9]['sub_items']??[],'data'),$sumKeys);
 		$tableDataFormatted[9]['main_items']['finance_exp']['data'] = $totalFinanceExpense;
 		$tableDataFormatted[9]['main_items']['finance_exp']['year_total'] = $financeExpenseTotalPerYear = HArr::sumPerYearIndex($totalFinanceExpense,$yearWithItsMonths);
         
@@ -1173,7 +1173,7 @@ class Project extends Model
 				$tableDataFormatted[0]['sub_items'][__('Loan Withdrawals')]['year_total'] = HArr::sumPerYearIndex($totalFixedAssetLoanWithdrawal,$yearWithItsMonths);
 			}
 			
-			$totalCashIn = HArr::sumAtDates(array_column($tableDataFormatted[0]['sub_items'],'data'),$sumKeys);
+			$totalCashIn = HArr::sumAtDates(array_column($tableDataFormatted[0]['sub_items']??[],'data'),$sumKeys);
 			
 		
 		$tableDataFormatted[0]['main_items']['cash-in-flow']['data'] = $totalCashIn;
@@ -1347,7 +1347,7 @@ class Project extends Model
 			
 		
 		
-		$totalCashOut = HArr::sumAtDates(array_column($tableDataFormatted[$currentTabIndex]['sub_items'],'data'),$sumKeys);
+		$totalCashOut = HArr::sumAtDates(array_column($tableDataFormatted[$currentTabIndex]['sub_items']??[],'data'),$sumKeys);
 			
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $totalCashOut;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =  HArr::sumPerYearIndex($totalCashOut,$yearWithItsMonths);

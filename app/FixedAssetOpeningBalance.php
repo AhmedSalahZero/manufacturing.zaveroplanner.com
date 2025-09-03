@@ -29,7 +29,7 @@ class FixedAssetOpeningBalance extends Model
 	{
 			parent::boot();
 			static::saving(function(self $model){
-				$statementPayload = $model->{self::getPayloadStatementColumn()};
+				$statementPayload = $model->{self::getPayloadStatementColumn()} ?: [];
 				$openingBalance = $model->{self::getOpeningBalanceColumnName()};
 				$dateIndexWithDate = $model->project->getDateIndexWithDatE();
 				$model->statement = self::calculateSettlementStatement($statementPayload,[],$openingBalance,$dateIndexWithDate,true);
