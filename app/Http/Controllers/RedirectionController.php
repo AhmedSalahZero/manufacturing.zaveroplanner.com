@@ -151,7 +151,8 @@ class RedirectionController extends Controller
         // $existingCount =
         foreach (getManpowerTypes() as $id => $manpowerOptionArr) {
             foreach ($request->get($id) as $i => $items) {
-                if ($items['position'] && $items['avg_salary'] && $items['existing_count']) {
+                if (isset($items['position']) && isset($items['avg_salary'])) {
+					$items['existing_count'] = isset($items['existing_count']) ? $items['existing_count'] : [];
                     foreach ($items as $name => $value) {
                         $manpowers['manpowers'][$index][$name] = $value ;
                     }
@@ -434,9 +435,13 @@ class RedirectionController extends Controller
         ,'supplierPayableOpeningBalances','otherCreditorsOpeningBalances','otherLongTermLiabilitiesOpeningBalances','equityOpeningBalances','longTermLoanOpeningBalances'
     ], ['project_id'=>$project->id]);
 	
-	
+		
 		$project->recalculateOpeningBalances();
-
+		
+		if($request->get('total_liabilities_and_equity_minus_total_assets') != 0){
+			$errorMessage = __('Total Assets Must Be Equal To Total Liabilities + Owners Equity') . ' [ ' . number_format($request->get('total_liabilities_and_equity_minus_total_assets'))  . ' ]';
+			return redirect()->back()->with('errors',collect([$errorMessage]));
+		}
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
         }
@@ -522,7 +527,7 @@ class RedirectionController extends Controller
         $request['project_id'] = $project->id;
         $sensitivity = $project->sensitivity;
         isset($sensitivity) ?   $sensitivity->update($request->except(['submit_button'])) : Sensitivity::create($request->except(['submit_button']));
-        return ($request->submit_button == "next") ?  redirect()->route('dashboard.index', $project->id) : redirect()->route('main.project.page', $project->id);
+        return ($request->submit_button == "next") ?  redirect()->route('view.results.dashboard', $project->id) : redirect()->route('main.project.page', $project->id);
     }
     private function calculateCollectionOrPaymentAmounts(string $paymentTerm, array $totalAfterVat, array $datesAsIndexAndString, array $customCollectionPolicy, $debug=false)
     {

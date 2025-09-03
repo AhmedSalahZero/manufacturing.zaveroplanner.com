@@ -64,7 +64,9 @@ class storeProjectDetailRequest extends FormRequest
 	{
 		$endDate = $this->get('end_date');
 		$year = explode('-',$endDate)[0];
-		
+		if(!$year){
+			return [];
+		}
 		$this->merge([
 			'start_date'=>$this->get('start_date').'-01',
 			'operation_start_date'=>$this->get('operation_start_date').'-01',

@@ -140,12 +140,12 @@
                 </div>
             </a>
 			
-            <a @if($project_complete == 0 ) data-toggle="modal" data-target="#exampleModal"  @else href="{{route('dashboard.index',[$project->id])}}" @endif >
+            <a @if($project_complete == 0 ) data-toggle="modal" data-target="#exampleModal"  @else href="{{route('view.results.dashboard',[$project->id])}}" @endif >
                 <div class="projectItem {{$project_complete == 0  ? "disabled-class" : ""}}" >
                     {{__('Study Results')}}
                 </div>
             </a>
-            @if (\Auth::user()->email == "emanmotaz@gmail.com" || \Auth::user()->email =="mahmoud.youssef@squadbcc.com" || \Auth::user()->email =="Investment@squadbcc.com"
+            {{-- @if (\Auth::user()->email == "emanmotaz@gmail.com" || \Auth::user()->email =="mahmoud.youssef@squadbcc.com" || \Auth::user()->email =="Investment@squadbcc.com"
             
             
             || \Auth()->user()->email == "samer.tawfik@squadbcc.com"
@@ -156,7 +156,7 @@
                         {{__('Table Results')}}
                     </div>
                 </a>
-            @endif
+            @endif --}}
             <a @if($project_complete == 0 ) data-toggle="modal" data-target="#exampleModal"  @else href="{{route('sensitivity.form',[$project->id])}}" @endif>
                 <div class="projectItem {{$project_complete == 0  ? "disabled-class" : ""}}">
                     {{__("Sensitivity")}}

@@ -20,6 +20,7 @@
 	<link rel="stylesheet" href="/css/select2.css">
 	
     @yield('css')
+	@stack('css')
 	{{-- <link ref="stylesheet" href="/css/"> --}}
     <title>ZAVERO Magic Sheet Application</title>
 	

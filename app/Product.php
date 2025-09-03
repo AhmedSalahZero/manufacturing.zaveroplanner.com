@@ -140,8 +140,9 @@ class Product extends Model
 	public function getViewYearIndexWithYear():array 
 	{
 		$sellingStartYearAsIndex = $this->getSellingStartYearAsIndex();
-		$studyEndYearAsIndex = $this->project->getStudyEndYearAsIndex() ;
+		$studyEndYearAsIndex = $this->project->getStudyEndYearAsIndex() -1  ;
 		$years = [];
+	
 		foreach(range($sellingStartYearAsIndex,$studyEndYearAsIndex) as $index => $yearAsIndex){
 			$years[$yearAsIndex] = $this->project->getYearFromYearIndex($yearAsIndex);
 		}
@@ -346,7 +347,7 @@ class Product extends Model
 		foreach($monthlySalesTargetValue as $dateAsIndex => $monthlySalesValue){
 			$currentYearIndex = $datesIndexWithYearIndex[$dateAsIndex];
 			foreach($this->rawMaterials as $rawMaterial ){
-				$percentagesForCurrentDateIndex = json_decode($rawMaterial->pivot->percentages)[$currentYearIndex] / 100;
+				$percentagesForCurrentDateIndex = (json_decode($rawMaterial->pivot->percentages)[$currentYearIndex]??0) / 100;
 				$productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex]  = $percentagesForCurrentDateIndex * $monthlySalesValue ;
 				$productRawMaterialConsumed['total'][$dateAsIndex] = isset($productRawMaterialConsumed['total'][$dateAsIndex]) ? $productRawMaterialConsumed['total'][$dateAsIndex] + $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex] : $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex];
 			}

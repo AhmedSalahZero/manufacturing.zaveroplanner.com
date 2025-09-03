@@ -10,6 +10,22 @@ const FFE_COST = 'ffe_cost' ;
 /**
  * * to convert product[0][name] to product.0.name
  */
+
+function sumNumberOfOnes(array $items, int $year,array $datesIndexWithYearIndex)
+{
+
+	$counter = [];
+	foreach ($items as $loopYear => $dateAndValues) {
+		foreach ($dateAndValues as $dateIndex => $value) {
+			$loopYear = $datesIndexWithYearIndex[$dateIndex];
+			if ($value == 1) {
+				$counter[$loopYear] = isset($counter[$loopYear]) ? $counter[$loopYear] + 1 : $value;
+			}
+		}
+	}
+	return $counter[$year] ?? 0;
+}
+
 function generateOldNameFromFieldName(string $str):string
 {
     $field = preg_replace('/\[([^\]]+)\]/', '.$1', $str);
@@ -511,6 +527,19 @@ function getBusinessSectors()
 		'Others',
 		'Leather Products',
 		'Agro-Processing'
-    ] ;
-
-}
+    ] ;}
+	
+	function getDivisionNumber(){
+	return 1000;
+}	
+ function calculateNetPresentValue(array $freeCashFlow , float $costOfFundRate):float 
+	{
+		$netPresentValues =   [];
+		$costOfFundRate = $costOfFundRate / 100 ; 
+		$index = 1 ;
+		foreach ($freeCashFlow  as $date => $value){
+			$netPresentValues[$date] = $value / (pow((1+$costOfFundRate) , $index));
+			$index++;
+		}
+		return array_sum($netPresentValues) ; 
+	}

@@ -27,6 +27,28 @@ class StoreOpeningBalancesRequest extends FormRequest
      */
     public function rules()
     {
+		return [];
+		// return [
+		// 	'must_be_zero_rule'=> [new MustBeEqualZeroRule($totalAssets-$totalLiabilitiesAndEquity)]  
+		// ];
+
+    }
+	
+	protected function prepareForValidation()
+    {
+        // $project = Request()->route('project');
+        $fixedAssets = Request()->get('fixedAssetOpeningBalances', []);
+        foreach ($fixedAssets as $index => &$fixedAssetOpeningArr) {
+            $productIds = $fixedAssetOpeningArr['product_id'];
+            $allocationPercentages = $fixedAssetOpeningArr['percentage'];
+            $fixedAssetOpeningArr['gross_amount'] = number_unformat($fixedAssetOpeningArr['gross_amount']);
+            $fixedAssetOpeningArr['accumulated_depreciation'] = number_unformat($fixedAssetOpeningArr['accumulated_depreciation']);
+            $fixedAssetOpeningArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
+            unset($fixedAssetOpeningArr['product_id']);
+            unset($fixedAssetOpeningArr['percentage']);
+        }
+		
+		
 		$data  = Request()->all() ;
 		$netFixedAsset = 0 ;
 		$fixedAssetsArrs  = $data['fixedAssetOpeningBalances']??[];
@@ -51,27 +73,10 @@ class StoreOpeningBalancesRequest extends FormRequest
 		$totalAssets = $netFixedAsset + $totalCashAndBanks + $totalCustomerReceivableAmount+$totalInventoryAmount+$totalOtherDebtorsAmount;
 		$totalLiabilitiesAndEquity = $totalSupplierPayableAmount+$totalCreditorPayableAmount+$totalVatAmount+$totalWithholdAmount+$totalLoanAmount+$totalOtherLongAmount+$totalPaidUpAmount+$totalLegalReserveAmount+$totalRetainedEarningsAmount;
 		
-		return [
-			'must_be_zero_rule'=> [new MustBeEqualZeroRule($totalAssets-$totalLiabilitiesAndEquity)]  
-		];
-
-    }
-	
-	protected function prepareForValidation()
-    {
-        // $project = Request()->route('project');
-        $fixedAssets = Request()->get('fixedAssetOpeningBalances', []);
-        foreach ($fixedAssets as $index => &$fixedAssetOpeningArr) {
-            $productIds = $fixedAssetOpeningArr['product_id'];
-            $allocationPercentages = $fixedAssetOpeningArr['percentage'];
-            $fixedAssetOpeningArr['gross_amount'] = number_unformat($fixedAssetOpeningArr['gross_amount']);
-            $fixedAssetOpeningArr['accumulated_depreciation'] = number_unformat($fixedAssetOpeningArr['accumulated_depreciation']);
-            $fixedAssetOpeningArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
-            unset($fixedAssetOpeningArr['product_id']);
-            unset($fixedAssetOpeningArr['percentage']);
-        }
+		
         $this->merge([
-            'fixedAssetOpeningBalances'=>$fixedAssets
+            'fixedAssetOpeningBalances'=>$fixedAssets,
+			'total_liabilities_and_equity_minus_total_assets'=>$totalLiabilitiesAndEquity-$totalAssets
         ]);
     
     }

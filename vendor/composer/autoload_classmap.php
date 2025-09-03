@@ -71,6 +71,7 @@ return array(
     'App\\Http\\Requests\\StoreProjectRequest' => $baseDir . '/app/Http/Requests/StoreProjectRequest.php',
     'App\\Http\\Requests\\UpdateProjectRequest' => $baseDir . '/app/Http/Requests/UpdateProjectRequest.php',
     'App\\Http\\Requests\\storeProjectDetailRequest' => $baseDir . '/app/Http/Requests/storeProjectDetailRequest.php',
+    'App\\IncomeStatement' => $baseDir . '/app/IncomeStatement.php',
     'App\\Loan' => $baseDir . '/app/Loan.php',
     'App\\LongTermLoanOpeningBalance' => $baseDir . '/app/LongTermLoanOpeningBalance.php',
     'App\\Mail\\ConnectWithProjectOwner' => $baseDir . '/app/Mail/ConnectWithProjectOwner.php',

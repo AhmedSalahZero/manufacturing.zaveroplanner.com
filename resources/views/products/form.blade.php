@@ -12,7 +12,7 @@
     <h1 class="bread-crumbs">
         {{ __("ZAVERO Manufacturing") }} > {{$project->name}} > {{ $product->getName() }}
     </h1>
-    <Div class="ProjectList">
+    <div class="ProjectList">
         <form action="{{route('products.submit',[$project,$product->id])}}" method="POST">
             {{ csrf_field() }}
 
@@ -25,7 +25,7 @@
     <button type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{__('Save & Go To Main Page')}}</button>
 
     </form>
-</Div>
+</div>
 </div>
 <div class="clearfix"></div>
 @endsection

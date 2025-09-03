@@ -33,7 +33,7 @@ class AllocationMustBeHundredRule implements ImplicitRule
 				$rows = Request()->get($id);
 				$totalAvgSalary = array_sum(array_column($rows,'avg_salary'));
 				if($totalAvgSalary > 0){
-					$totalAllocationPercentage = array_sum(Request()->input('manpower_allocations.'.$id.'.percentages'));
+					$totalAllocationPercentage = array_sum(Request()->input('manpower_allocations.'.$id.'.percentages',[]));
 					if($totalAllocationPercentage != 100){
 						$this->error_title = $title;
 						return false ;						

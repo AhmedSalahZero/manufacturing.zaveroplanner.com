@@ -691,5 +691,44 @@ trait HasIndexedDates
         }
         return $result;
     }
-	
+	   public function getYearOrMonthIndexes():array 
+    {
+        // if ($this->isMonthlyStudy()) {
+        //     return $this->getMonthlyIndexes();
+        // }
+        return $this->getYearlyIndexes();
+    }
+	public function getMonthlyIndexes()
+	{
+		$yearIndexWithItsActiveMonths = $this->getOperationDurationPerYearFromIndexes();
+        $datesAndIndexesHelpers = $this->getDatesIndexesHelper();
+		$dateIndexWithDate=$datesAndIndexesHelpers['dateIndexWithDate'];
+		
+		return $this->getActiveMonthlyDates($yearIndexWithItsActiveMonths,$dateIndexWithDate);
+	}
+		public function getYearlyIndexes():array 
+	{
+		        $yearIndexWithItsActiveMonths = $this->getOperationDurationPerYearFromIndexes();
+		 $datesAndIndexesHelpers = $this->getDatesIndexesHelper();
+		 $yearIndexWithYear=$datesAndIndexesHelpers['yearIndexWithYear'];
+		  $results = [];
+		  unset($yearIndexWithItsActiveMonths[array_key_last($yearIndexWithItsActiveMonths)]);
+        foreach ($yearIndexWithItsActiveMonths as $yearIndex => $monthsForThisYearArray) {
+            $results[$yearIndex] = 'Yr-'.$yearIndexWithYear[$yearIndex] ;
+        }
+        return $results;
+		
+	}
+	public function getActiveMonthlyDates($yearIndexWithItsActiveMonths,$dateIndexWithDate)
+	{
+		$results = [];
+            foreach ($yearIndexWithItsActiveMonths as $yearAsIndex => $monthsForThisYearArray) {
+                foreach ($monthsForThisYearArray as $dateAsIndex => $isActive) {
+                    $dateAsString = $dateIndexWithDate[$dateAsIndex] ;
+                    $results[$dateAsIndex] = Carbon::parse($dateAsString)->format('M`Y');
+                }
+            }
+            return $results;
+			
+	}
 }

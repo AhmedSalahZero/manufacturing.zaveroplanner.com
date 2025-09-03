@@ -1,3 +1,4 @@
+
   <div class="div-title">
                 {{ $product->getName()  }}
             </div>
@@ -25,9 +26,9 @@
 
                         <x-tables.repeater-table :table-class="$tableClass" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="''" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
                             <x-slot name="ths">
-                                <x-tables.repeater-table-th class="  header-border-down first-column-th-class" :title="__('Item')"></x-tables.repeater-table-th>
+                                <x-tables.repeater-table-th :subParentClass="'text-left '" class="  header-border-down text-left" :title="__('Item')"></x-tables.repeater-table-th>
                                 @foreach($years as $yearAsIndex=>$yearAsString)
-                                <x-tables.repeater-table-th class=" interval-class header-border-down" :title="'Yr-'.$yearAsString"></x-tables.repeater-table-th>
+                                <x-tables.repeater-table-th class=" header-border-down" :title="'Yr-'.$yearAsString"></x-tables.repeater-table-th>
                                 @endforeach
                             </x-slot>
                             <x-slot name="trs">
@@ -35,7 +36,7 @@
                                 <tr data-repeat-formatting-decimals="1" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Max Capacity') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Max Capacity') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -62,7 +63,7 @@
                                 <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Target Selling Quantity %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Target Selling Quantity %') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -90,7 +91,7 @@
                                 <tr data-repeat-formatting-decimals="1" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Target Selling Quantity') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Target Selling Quantity') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -119,7 +120,7 @@
                                 <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Local Selling Quantity %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Local Selling Quantity %') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -147,7 +148,7 @@
                                 <tr data-repeat-formatting-decimals="1" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Local Target Selling Quantity') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Local Target Selling Quantity') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -174,7 +175,7 @@
                                 <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Local Selling Price Growth %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Local Selling Price Growth %') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -201,7 +202,7 @@
                                 <tr data-repeat-formatting-decimals="1" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Local Selling Price / Unit') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Local Selling Price / Unit') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -228,7 +229,7 @@
                                 <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Export Selling Quantity %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Export Selling Quantity %') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -258,7 +259,7 @@
                                 <tr data-repeat-formatting-decimals="1" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Export Target Selling Quantity') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Export Target Selling Quantity') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -286,7 +287,7 @@
                                 <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Export Selling Price Growth %') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Export Selling Price Growth %') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -313,7 +314,7 @@
                                 <tr data-repeat-formatting-decimals="1" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Export Selling Price / Unit') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Export Selling Price / Unit') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;
@@ -343,7 +344,7 @@
                                 <tr data-repeat-formatting-decimals="0" data-repeater-style>
 
                                     <td>
-                                        <input value="{{ __('Target Sales Value') }}" disabled class="form-control text-left max-w-200" type="text">
+                                        <input value="{{ __('Target Sales Value') }}" disabled class="form-control text-left " type="text">
                                     </td>
                                     @php
                                     $columnIndex = 0 ;

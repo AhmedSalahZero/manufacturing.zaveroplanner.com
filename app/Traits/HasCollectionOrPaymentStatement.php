@@ -198,8 +198,9 @@ trait HasCollectionOrPaymentStatement {
         
     }
 	
-	 public static function calculateCorporateTaxesStatement(array $additions  ,array $calculatedCorporateTaxesPerYear , float $initialBeginningBalance = 0 , array $dateIndexWithDate)
+	 public static function calculateCorporateTaxesStatement(array $additions  ,array $calculatedCorporateTaxesPerYear , float $initialBeginningBalance  , array $dateIndexWithDate , string $studyStartDateAsMonthNumber)
     {
+	
 		$financialYearStartMonth = 'january';
         $additionsForIntervals = [
             'monthly'=>$additions,
@@ -218,6 +219,8 @@ trait HasCollectionOrPaymentStatement {
         foreach (getIntervalFormatted() as $intervalName=>$intervalNameFormatted) {
             $beginningBalance = $initialBeginningBalance;
 			$settlements = [];
+			$isFirstLoop = true ; 
+			$isStudyDateIsJan = $studyStartDateAsMonthNumber == '01';
             foreach ($additionsForIntervals[$intervalName] as $dateIndex=>$additionAtDate) {
                 $dateIndex;
                 $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
@@ -226,6 +229,9 @@ trait HasCollectionOrPaymentStatement {
 				
                 $totalDue[$dateIndex] =  $beginningBalance-$additionAtDate + $corporateTaxesAtDate;
 			//	$settlements[$dateIndex] = 0 ;
+				if($isStudyDateIsJan && $isFirstLoop){
+					$settlements[$dateIndex+4] = $initialBeginningBalance;
+				}
 				if($isLastMonthInYear){
 					if($totalDue[$dateIndex] <0 ){
 						$settlements[$dateIndex+4]=0;
@@ -240,6 +246,7 @@ trait HasCollectionOrPaymentStatement {
                 $result[$intervalName]['total_due'][$dateIndex] = $totalDue[$dateIndex];
                 $result[$intervalName]['payment'][$dateIndex] = $settlementAtDate;
                 $result[$intervalName]['end_balance'][$dateIndex] =$endBalance[$dateIndex];
+				$isFirstLoop=false ;
             }
         }
         return $result;

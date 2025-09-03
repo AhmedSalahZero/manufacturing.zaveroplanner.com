@@ -767,6 +767,14 @@ public static function multipleTwoArrAtSameIndex(array $firstArr , array $second
 	}
 	return $result ; 
 }
+public static function divideTwoArrAtSameIndex(array $firstArr , array $secondArr){
+	$result = [];
+	foreach($firstArr as $index => $value){
+		$secondAtValue = $secondArr[$index]??0;
+		$result[$index] = $secondAtValue ?  $value / $secondAtValue  : 0;
+	}
+	return $result ; 
+}
 public static function sumPerYearIndex(array $itemsAsDateIndexAndValue ,  array $yearWithItsMonths):array{
 	$result = [];
 	foreach($yearWithItsMonths as $yearIndex => $itsMonths){
@@ -789,6 +797,25 @@ public static function getPerYearIndexForEndBalance(array $itemsAsDateIndexAndVa
 		foreach($itsMonths as $dateAsIndex => $dateAsString){
 			$currentValue = $itemsAsDateIndexAndValue[$dateAsIndex]??0 ;
 			$currentYearTotal =  $currentValue;
+		}
+		/**
+		 * * هنحط النتيجه بتاعتك كل سنه عند اخر شهر في السنه دي
+		 */
+		$result[$dateAsIndex] = $currentYearTotal;
+	}
+	return $result ;
+}
+public static function getPerYearIndexForCashAndBank(array $itemsAsDateIndexAndValue ,  array $yearWithItsMonths):array{
+	$result = [];
+	foreach($yearWithItsMonths as $yearIndex => $itsMonths){
+		$currentYearTotal = 0;
+		$isFirstLoop = true ;
+		foreach($itsMonths as $dateAsIndex => $dateAsString){
+			$currentValue = $itemsAsDateIndexAndValue[$dateAsIndex]??0 ;
+			if($isFirstLoop){
+				$currentYearTotal =  $currentValue;
+				$isFirstLoop=false;
+			}
 		}
 		/**
 		 * * هنحط النتيجه بتاعتك كل سنه عند اخر شهر في السنه دي
@@ -821,5 +848,68 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 	return $statements;
 	
 	
-}
+	}
+	public static function repeatThrough(float $value , array $keys):array{
+		$result = [];
+		foreach($keys as $index){
+			$result[$index] = $value ; 
+		}
+		return $result;
+	}
+	public static function calculateRetainEarning(float $retainedEarningOpening,array $netProfit):array{
+		$retainedEarnings  = [0 => $retainedEarningOpening];
+		foreach($netProfit as $dateAsIndex => $value){
+			if($dateAsIndex == 0){
+				continue ;
+			}
+			$previousNetProfit = $netProfit[$dateAsIndex-1] ?? 0 ; 
+			$previousRetainedEarning = $retainedEarnings[$dateAsIndex-1]??0;
+			$retainedEarnings[$dateAsIndex] = $previousNetProfit + $previousRetainedEarning;
+			
+		}
+		return $retainedEarnings;
+	}
+	public static function getLastMonthOfYear(array $yearWithItsMonths){
+		$result = [];
+		foreach($yearWithItsMonths as $yearAsIndex => $itsMonths){
+			$result[$yearAsIndex]  = array_key_last($itsMonths);
+		}	
+		return $result;
+	}
+	public static function calculateChangeInAfter(array $customerReceivables , float $openingBalance ,array $yearIndexWithLastMonth){
+		
+		$isFirst = true ; 
+		$result = [];
+		foreach($yearIndexWithLastMonth as $yearIndex => $lastMonthAsDateIndex){
+			$currentCustomerReceivables = $customerReceivables[$lastMonthAsDateIndex]??0;
+			if($isFirst){
+				$currentCustomerReceivables= $openingBalance - $currentCustomerReceivables ;
+			}else{
+				$nextIndex = $lastMonthAsDateIndex + 12 ;
+				$nextYearValue = $customerReceivables[$nextIndex]??0;
+				$currentCustomerReceivables = $currentCustomerReceivables - $nextYearValue;
+			}
+			$result[$lastMonthAsDateIndex] = $currentCustomerReceivables ;
+			$isFirst = false ; 
+		}
+		return $result;
+	}
+	public static function calculateChangeInBefore(array $customerReceivables , float $openingBalance ,array $yearIndexWithLastMonth){
+		
+		$isFirst = true ; 
+		$result = [];
+		foreach($yearIndexWithLastMonth as $yearIndex => $lastMonthAsDateIndex){
+			$currentCustomerReceivables = $customerReceivables[$lastMonthAsDateIndex]??0;
+			if($isFirst){
+				$currentCustomerReceivables= $currentCustomerReceivables-$openingBalance ;
+			}else{
+				$beforeIndex = $lastMonthAsDateIndex-12 ;
+				$beforeYearValue = $customerReceivables[$beforeIndex]??0;
+				$currentCustomerReceivables = $currentCustomerReceivables-$beforeYearValue  ;
+			}
+			$result[$lastMonthAsDateIndex] = $currentCustomerReceivables ;
+			$isFirst = false ; 
+		}
+		return $result;
+	}
 }

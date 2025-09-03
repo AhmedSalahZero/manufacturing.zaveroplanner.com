@@ -122,6 +122,9 @@ Route::group(
 					 Route::get('/financial-results', 'RedirectionController@financialResultsGet')->name('financial.result');
 					 Route::get('/cash-in-out-flow', 'RedirectionController@cashInOutFlowGet')->name('cash.in.out.flow.result');
 					 Route::get('/balance-sheet', 'RedirectionController@balanceSheetGet')->name('balance.sheet.result');
+					 route::get('dashboard','DashboardController@view')->name('view.results.dashboard');
+					 route::get('dashboard-with-sensitivity','DashboardController@view')->name('view.results.dashboard.with.sensitivity');
+						 
                     // Route::get('/assets', 'RedirectionController@assetsGet')->name('assets.form');
                     // Route::post('/assets', 'RedirectionController@assetsPost')->name('assets.submit');
            
@@ -132,8 +135,8 @@ Route::group(
                     Route::get('/sensitivity', 'RedirectionController@sensitivityGet')->name('sensitivity.form');
                     Route::post('/sensitivity/store', 'RedirectionController@sensitivityPost')->name('sensitivity.submit');
                     # Dashboards
-                    Route::get('/dashboard', 'DashboardController@index')->name('dashboard.index');
-                    Route::get('/table_dashboard', 'DashboardController@index')->name('table.index');
+                    // Route::get('/dashboard', 'DashboardController@index')->name('dashboard.index');
+                    // Route::get('/table_dashboard', 'DashboardController@index')->name('table.index');
               //      Route::get('/RecurringDashboard', 'RecurringProductDashboardController@index')->name('recurring.dashboard.index');
                     Route::get('/ExpensesDashboard', 'ExpensesDashboardController@index')->name('expenses.dashboard.index');
                     Route::group(['prefix' => '/products/{product}'], function () {

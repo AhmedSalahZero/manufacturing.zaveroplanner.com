@@ -380,7 +380,7 @@
 
 
  <div class="div-title">
-                {{ __('Vat & Credit Withhold Taxes') }}
+                {{ __('Taxes Payable') }}
             </div>
             @php
             $repeaterId = 'vatAndCreditWithholdTaxesOpeningBalances';
@@ -401,6 +401,12 @@
                                 <label>{{ __('Credit Withhold Taxes') }}</label>
                                 <input type="text" name="credit_withhold_taxes" class="form-control " value="{{ $model ? $model->getCreditWithholdTaxes() : 0 }}">
                             </div>
+							
+							<div class="col-2">
+                                <label>{{ __('Corporate Taxes Payable') }}</label>
+                                <input type="text" name="corporate_taxes_payable" class="form-control " value="{{ $model ? $model->getCorporateTaxesPayableAmount() : 0 }}">
+                            </div>
+							
 
                             
 

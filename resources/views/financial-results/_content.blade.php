@@ -60,7 +60,7 @@
                                         @endphp
                                         @foreach($currentTableData['main_items'] as $mainItemId => $mainItemArr)
                                         <div class="input-hidden-parent">
-                                            <input data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control text-left copy-value-to-his-input-hidden 
+                                            <input readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control text-left copy-value-to-his-input-hidden 
 
 						 						  			  repeat-to-right-input-formatted  custom-input-string-width input-text-left  text-left" type="text" value="{{ $mainItemArr['options']['title']??$mainItemId }}" data-column-index="-1">
                                         </div>
@@ -234,9 +234,9 @@
 									">
                                             <div class="input-group input-group-sm align-items-center justify-content-center flex-nowrap">
                                                 <div class="input-hidden-parent">
-                                                    <input disabled data-number-of-decimals="0" readonly="" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
+                                                    <input style="text-align:left !important;" readonly data-number-of-decimals="0" readonly="" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control copy-value-to-his-input-hidden 
 
-										  expandable-amount-input 			  repeat-to-right-input-formatted  custom-input-string-width input-text-left  " type="text" value="{{ $subItemArr['options']['title']??$subItemId }}" data-column-index="-1">
+										  expandable-amount-input 			  repeat-to-right-input-formatted  custom-input-string-width  input-text-left  " type="text" value="{{ $subItemArr['options']['title']??$subItemId }}" data-column-index="-1">
                                                     <input data-number-of-decimals="0" type="hidden" data-name="" class="repeat-to-right-input-hidden input-hidden-with-name  " value="{{ $subItemArr['options']['title']??$subItemId }}" data-column-index="-1">
                                                 </div>
                                                 <span class="ml-2 currency-class"> </span>

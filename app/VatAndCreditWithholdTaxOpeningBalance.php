@@ -25,5 +25,8 @@ class VatAndCreditWithholdTaxOpeningBalance extends Model
     {
         return $this->credit_withhold_taxes ;
     }
-	
+	public function getCorporateTaxesPayableAmount():float 
+    {
+        return $this->corporate_taxes_payable ;
+    }
 }

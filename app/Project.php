@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Console\Helper\Helper;
 
 class Project extends Model
 {
@@ -719,7 +718,7 @@ class Project extends Model
             $defaultPercentageInputClasses
         ];
         $orderIndexPerExpenseCategory = [
-            // 'sales_revenue'=>0,
+            'sales-revenue'=>0,
             'cost-of-service'=>1 ,
             'gross-profit'=>2 ,
             'other-operation-expense'=>3,
@@ -727,20 +726,25 @@ class Project extends Model
             'sales'=>5,
             'general-expenses'=>6,
             'ebitda'=>7,
-            'ebit'=>8,
-            
-            'ebt'=>10,
-            'corporate-taxes'=>11,
-            'net-profit'=>12
+            'depreciation'=>8,
+            'ebit'=>9,
+            'finance-expense'=>10,
+            'ebt'=>11,
+            'corporate-taxes'=>12,
+            'net-profit'=>13
         ];
-        
         // $financialYearsEndMonths = $project->getFinancialYearsEndMonths();
         
         
         
         
+        $salesRevenueOrderIndex = $orderIndexPerExpenseCategory['sales-revenue'];
+        $costOfServiceOrderIndex = $orderIndexPerExpenseCategory['cost-of-service'];
         $grossProfitOrderIndex = $orderIndexPerExpenseCategory['gross-profit'];
+        $salesOrderIndex = $orderIndexPerExpenseCategory['sales'];
         $ebitdaOrderIndex = $orderIndexPerExpenseCategory['ebitda'];
+        $depreciationOrderIndex = $orderIndexPerExpenseCategory['depreciation'];
+        $financeExpenseExpenseOrderIndex = $orderIndexPerExpenseCategory ['finance-expense'];
         $ebitOrderIndex = $orderIndexPerExpenseCategory['ebit'];
         $ebtOrderIndex = $orderIndexPerExpenseCategory['ebt'];
         $corporateTaxesOrderIndex = $orderIndexPerExpenseCategory['corporate-taxes'];
@@ -749,7 +753,7 @@ class Project extends Model
         // $studyMonthsForViews=$project->getStudyDurationPerYearFromIndexesForView();
 		$studyMonthsForViews = array_flip($project->getOperationDatesAsDateAndDateAsIndexToStudyEndDate());
          
-        
+        $sumKeys = array_keys($studyMonthsForViews);
         
         
         
@@ -759,39 +763,38 @@ class Project extends Model
         /**
 		 * * First Tab Sales Revenue
 		*/
-		$tableDataFormatted[0]['main_items']['sales-revenue']['options'] = array_merge([
+		$tableDataFormatted[$salesRevenueOrderIndex]['main_items']['sales-revenue']['options'] = array_merge([
 		   'title'=>__('Sales Revenue')
 		], $defaultNumericInputClasses);
 		$yearWithItsMonths=$project->getYearIndexWithItsMonthsAsIndexAndString();
-		$tableDataFormatted[0]['main_items']['growth-rate']['options'] = array_merge($defaultPercentageInputClasses, ['title'=>__('Growth Rate %')]);
+		$tableDataFormatted[$salesRevenueOrderIndex]['main_items']['growth-rate']['options'] = array_merge($defaultPercentageInputClasses, ['title'=>__('Growth Rate %')]);
 		$productsTotals = [];
-		$sumKeys = array_keys($studyMonthsForViews);
         foreach ($products as $product) {
-            $tableDataFormatted[0]['sub_items'][$product->getName()]['options'] =array_merge([
+            $tableDataFormatted[$salesRevenueOrderIndex]['sub_items'][$product->getName()]['options'] =array_merge([
                 'title'=>$product->getName(),
             ], $defaultNumericInputClasses);
 			$monthlySalesTargetValues = $product->monthly_sales_target_values;
-            $tableDataFormatted[0]['sub_items'][$product->getName()]['data'] = $monthlySalesTargetValues;
-			$tableDataFormatted[0]['sub_items'][$product->getName()]['year_total'] = HArr::sumPerYearIndex($monthlySalesTargetValues,$yearWithItsMonths);
+            $tableDataFormatted[$salesRevenueOrderIndex]['sub_items'][$product->getName()]['data'] = $monthlySalesTargetValues;
+			$tableDataFormatted[$salesRevenueOrderIndex]['sub_items'][$product->getName()]['year_total'] = HArr::sumPerYearIndex($monthlySalesTargetValues,$yearWithItsMonths);
 			$productsTotals = HArr::sumAtDates([$monthlySalesTargetValues?:[],$productsTotals],$sumKeys);
         }
 		
-		$tableDataFormatted[0]['main_items']['sales-revenue']['data'] = $productsTotals;
-		$tableDataFormatted[0]['main_items']['sales-revenue']['year_total'] = $salesRevenueYearTotal = HArr::sumPerYearIndex($productsTotals,$yearWithItsMonths);
-		$tableDataFormatted[0]['main_items']['growth-rate']['data'] = HArr::calculateGrowthRate($productsTotals);
-		
+		$tableDataFormatted[$salesRevenueOrderIndex]['main_items']['sales-revenue']['data'] = $productsTotals;
+		$tableDataFormatted[$salesRevenueOrderIndex]['main_items']['sales-revenue']['year_total'] = $salesRevenueYearTotal = HArr::sumPerYearIndex($productsTotals,$yearWithItsMonths);
+		$tableDataFormatted[$salesRevenueOrderIndex]['main_items']['growth-rate']['data'] = HArr::calculateGrowthRate($productsTotals);
+		$tableDataFormatted[$salesRevenueOrderIndex]['main_items']['growth-rate']['year_total'] = $annuallySalesRevenueGrowthRates = HArr::calculateGrowthRate($salesRevenueYearTotal);
 		
 		/**
 		 * * Second Tab Cost Of Goods Sold 
 		 */
 		
 		
-        $tableDataFormatted[1]['main_items']['cost-of-goods-sold']['options'] = array_merge([
+        $tableDataFormatted[$costOfServiceOrderIndex]['main_items']['cost-of-goods-sold']['options'] = array_merge([
            'title'=>__('Cost Of Goods Sold')
         ], $defaultNumericInputClasses);
         
         
-        $tableDataFormatted[1]['main_items']['revenues-percentage']['options'] = array_merge([
+        $tableDataFormatted[$costOfServiceOrderIndex]['main_items']['revenues-percentage']['options'] = array_merge([
             'title'=>__('%/Revenues')
         ], $defaultPercentageInputClasses);
 		$products = DB::table('products')->where('project_id',$project->id)->get();
@@ -802,6 +805,7 @@ class Project extends Model
 			'direct_labor'=>[],
 			'manufacturing-overheads'=>[]
 		];
+	
 		foreach($products as $product){
 			
 			$rawMaterialCogs = $product->raw_material_statement ? (array)(@json_decode($product->raw_material_statement)->cogs) : [];
@@ -812,34 +816,41 @@ class Project extends Model
 			$totalCogs['manufacturing-overheads'] = HArr::sumAtDates([$manufacturingCogs,$totalCogs['manufacturing-overheads']],$sumKeys);
 			
 		}
-		
+
+			$totalCogsPerYear = [];
+			$totalCogsPercentageOfRevenues = [];
         foreach (['raw_material'=>__('Raw Materials') , 'direct_labor'=>__('Direct Labors') , 'manufacturing-overheads'=>__('Manufacturing Overheads')] as $id => $title) {
 			
-            $tableDataFormatted[1]['sub_items'][$id]['options'] =array_merge([
+            $tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['options'] =array_merge([
                 'title'=>$title,
             ], $defaultNumericInputClasses); 
 			$currentTotalCogs = $totalCogs[$id]??[];
-			$tableDataFormatted[1]['sub_items'][$id]['data'] = $currentTotalCogs ;
-			$tableDataFormatted[1]['sub_items'][$id]['year_total'] = HArr::sumPerYearIndex($currentTotalCogs,$yearWithItsMonths);
+			$tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['data'] = $currentTotalCogs ;
+			$tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['year_total'] = $currentTotalPerYear = HArr::sumPerYearIndex($currentTotalCogs,$yearWithItsMonths);
+			$totalCogsPerYear[$id] = array_values($currentTotalPerYear);
+			$totalCogsPercentageOfRevenues[$id]  = array_values(HArr::calculatePercentageOf($salesRevenueYearTotal,$currentTotalPerYear)) ;
         }
+		// dd();
 		$totalCostOfGoodsSold = HArr::sumAtDates(array_values($totalCogs),$sumKeys) ;
-		$tableDataFormatted[1]['main_items']['cost-of-goods-sold']['data'] =  $totalCostOfGoodsSold ; 
-		$tableDataFormatted[1]['main_items']['cost-of-goods-sold']['year_total'] =$costOfGodSoldTotalPerYear = HArr::sumPerYearIndex($totalCostOfGoodsSold,$yearWithItsMonths);
-		$tableDataFormatted[1]['main_items']['revenues-percentage']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalCostOfGoodsSold) ; 
-		$tableDataFormatted[1]['main_items']['revenues-percentage']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$costOfGodSoldTotalPerYear);
+		$tableDataFormatted[$costOfServiceOrderIndex]['main_items']['cost-of-goods-sold']['data'] =  $totalCostOfGoodsSold ; 
+		$tableDataFormatted[$costOfServiceOrderIndex]['main_items']['cost-of-goods-sold']['year_total'] =$costOfGodSoldTotalPerYear = HArr::sumPerYearIndex($totalCostOfGoodsSold,$yearWithItsMonths);
+		$tableDataFormatted[$costOfServiceOrderIndex]['main_items']['revenues-percentage']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalCostOfGoodsSold) ; 
+		$tableDataFormatted[$costOfServiceOrderIndex]['main_items']['revenues-percentage']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$costOfGodSoldTotalPerYear);
 		
+		
+	
 		
         /**
 		 * Three Items 
 		*/
         
 		$totalGrossProfit = HArr::subtractAtDates([$productsTotals,$totalCostOfGoodsSold],$sumKeys) ;
-		$tableDataFormatted[2]['main_items']['gross-profit']['data'] =  $totalGrossProfit ; 
-		$tableDataFormatted[2]['main_items']['gross-profit']['year_total'] = $grossProfitTotalPerYear = HArr::sumPerYearIndex($totalGrossProfit,$yearWithItsMonths);
+		$tableDataFormatted[$grossProfitOrderIndex]['main_items']['gross-profit']['data'] =  $totalGrossProfit ; 
+		$tableDataFormatted[$grossProfitOrderIndex]['main_items']['gross-profit']['year_total'] = $grossProfitTotalPerYear = HArr::sumPerYearIndex($totalGrossProfit,$yearWithItsMonths);
         $tableDataFormatted[$grossProfitOrderIndex]['main_items']['gross-profit']['options']['title'] = __('Gross Profit');
         $tableDataFormatted[$grossProfitOrderIndex]['main_items']['% Of Revenue']['options']['title'] = __('% Of Revenue');
-        $tableDataFormatted[2]['main_items']['% Of Revenue']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalGrossProfit) ; 
-		$tableDataFormatted[2]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$grossProfitTotalPerYear);
+        $tableDataFormatted[$grossProfitOrderIndex]['main_items']['% Of Revenue']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalGrossProfit) ; 
+		$tableDataFormatted[$grossProfitOrderIndex]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$grossProfitTotalPerYear);
 
         /**
 		 * * Four Item
@@ -847,7 +858,7 @@ class Project extends Model
         // general-expenses
 		// sales
 		// marketing
-        $tableDataFormatted[5]['main_items']['sganda']['options'] = array_merge([
+        $tableDataFormatted[$salesOrderIndex]['main_items']['sganda']['options'] = array_merge([
            'title'=>__('Sales, Marketing & General Exp.')
         ], $defaultNumericInputClasses);
         
@@ -866,27 +877,34 @@ class Project extends Model
 			$currentAmount = (array)$amount ;
 			$resultPerCategory[$categoryId] = isset($resultPerCategory[$categoryId]) ? HArr::sumAtDates([$currentAmount,$resultPerCategory[$categoryId]],$sumKeys):$currentAmount ;
 		}
+		$resultTotalPerCategoryPerYear = [];
+		$resultTotalPercentagesPerCategoryPerYear = [];
+		foreach($resultPerCategory as $categoryId => $values){
+			$currentItems=HArr::sumPerYearIndex($values,$yearWithItsMonths);
+			$resultTotalPerCategoryPerYear[$categoryId]=array_values($currentItems);
+			$resultTotalPercentagesPerCategoryPerYear[$categoryId]=array_values(HArr::calculatePercentageOf($salesRevenueYearTotal,$currentItems));
+		}
 		
-        
+       
             
         
-        $tableDataFormatted[5]['main_items']['revenues-percentage']['options'] = array_merge([
+        $tableDataFormatted[$salesOrderIndex]['main_items']['revenues-percentage']['options'] = array_merge([
             'title'=>__('%/Revenues')
         ], $defaultPercentageInputClasses);
         foreach (['sales'=>__('Sales Expenses') , 'marketing'=>__('Marketing Expenses') , 'general-expenses'=>__('General Expenses')] as $id => $title) {
             $orderId = $orderIndexPerExpenseCategory[$id];
-            $tableDataFormatted[5]['sub_items'][$id]['options'] =array_merge([
+            $tableDataFormatted[$salesOrderIndex]['sub_items'][$id]['options'] =array_merge([
                 'title'=>$title,
             ], $defaultNumericInputClasses);  
 			$currentTotalForCategory = $resultPerCategory[$id] ?? [];
-			$tableDataFormatted[5]['sub_items'][$id]['data'] =$currentTotalForCategory;
-			$tableDataFormatted[5]['sub_items'][$id]['year_total'] = HArr::sumPerYearIndex($currentTotalForCategory,$yearWithItsMonths);
+			$tableDataFormatted[$salesOrderIndex]['sub_items'][$id]['data'] =$currentTotalForCategory;
+			$tableDataFormatted[$salesOrderIndex]['sub_items'][$id]['year_total'] = HArr::sumPerYearIndex($currentTotalForCategory,$yearWithItsMonths);
         }
-		$totalSGANDA = HArr::sumAtDates(array_values($resultPerCategory),$sumKeys);
-		$tableDataFormatted[5]['main_items']['sganda']['data'] =$totalSGANDA;
-		$tableDataFormatted[5]['main_items']['sganda']['year_total'] =$sgandaTotalPerYear = HArr::sumPerYearIndex($totalSGANDA,$yearWithItsMonths);
-          $tableDataFormatted[5]['main_items']['revenues-percentage']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalSGANDA) ; 
-        		$tableDataFormatted[5]['main_items']['revenues-percentage']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$sgandaTotalPerYear);
+			$totalSGANDA = HArr::sumAtDates(array_values($resultPerCategory),$sumKeys);
+			$tableDataFormatted[$salesOrderIndex]['main_items']['sganda']['data'] =$totalSGANDA;
+			$tableDataFormatted[$salesOrderIndex]['main_items']['sganda']['year_total'] =$sgandaTotalPerYear = HArr::sumPerYearIndex($totalSGANDA,$yearWithItsMonths);
+			$tableDataFormatted[$salesOrderIndex]['main_items']['revenues-percentage']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalSGANDA) ; 
+			$tableDataFormatted[$salesOrderIndex]['main_items']['revenues-percentage']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$sgandaTotalPerYear);
 		  
 		  
 		  /**
@@ -911,15 +929,30 @@ class Project extends Model
 			$value = (array)json_decode($value);
 		});
 		$totalFixedAssetAdminDepreciation = HArr::sumAtDates(array_merge($fixedAssetAdminDepreciations,$fixedAssetOpeningBalancesAdminDepreciations),$sumKeys);
-		$sum = HArr::sumAtDates([$formattedDepreciationCogs,$totalFixedAssetAdminDepreciation,$totalGrossProfit],$sumKeys);
+		$totalDepreciation = HArr::sumAtDates([$formattedDepreciationCogs,$totalFixedAssetAdminDepreciation],$sumKeys);
+		$sum = HArr::sumAtDates([$totalDepreciation,$totalGrossProfit],$sumKeys);
 		$editda = HArr::subtractAtDates([$sum,$totalSGANDA],$sumKeys) ;
 		
         $tableDataFormatted[$ebitdaOrderIndex]['main_items']['ebitda']['data'] = $editda;
 		$tableDataFormatted[$ebitdaOrderIndex]['main_items']['ebitda']['year_total'] =$ebitdaTotalPerYear= HArr::sumPerYearIndex($editda,$yearWithItsMonths);
 		$tableDataFormatted[$ebitdaOrderIndex]['main_items']['% Of Revenue']['data'] =  HArr::calculatePercentageOf($productsTotals,$editda);
-			$tableDataFormatted[$ebitdaOrderIndex]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$ebitdaTotalPerYear);
+			$tableDataFormatted[$ebitdaOrderIndex]['main_items']['% Of Revenue']['year_total'] = $editdaRevenuePercentage = HArr::calculatePercentageOf($salesRevenueYearTotal,$ebitdaTotalPerYear);
 		/**
 		 * * End Five Item
+		 */
+		
+		
+		/**
+		 * * Start Sixth Item 
+		 */
+		   $tableDataFormatted[$depreciationOrderIndex]['main_items']['total-depreciation']['options']['title'] = __('Total Depreciation');
+		   $tableDataFormatted[$depreciationOrderIndex]['main_items']['total-depreciation']['data'] = $totalDepreciation ;
+		   $tableDataFormatted[$depreciationOrderIndex]['main_items']['total-depreciation']['year_total'] =$totalDepreciationTotalPerYear = HArr::sumPerYearIndex($totalDepreciation,$yearWithItsMonths);
+		   $tableDataFormatted[$depreciationOrderIndex]['main_items']['% Of Revenue']['options']['title'] = __('% Of Revenue');
+		   $tableDataFormatted[$depreciationOrderIndex]['main_items']['% Of Revenue']['data'] = HArr::calculatePercentageOf($productsTotals,$totalDepreciation);
+			$tableDataFormatted[$depreciationOrderIndex]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$totalDepreciationTotalPerYear);
+		/**
+		 * * End  Sixth Item 
 		 */
 		
 		
@@ -932,7 +965,7 @@ class Project extends Model
 		   $tableDataFormatted[$ebitOrderIndex]['main_items']['ebit']['year_total'] =$ebitTotalPerYear= HArr::sumPerYearIndex($ebit,$yearWithItsMonths);
 		   $tableDataFormatted[$ebitOrderIndex]['main_items']['% Of Revenue']['options']['title'] = __('% Of Revenue');
 		   $tableDataFormatted[$ebitOrderIndex]['main_items']['% Of Revenue']['data'] = HArr::calculatePercentageOf($productsTotals,$ebit);
-				$tableDataFormatted[$ebitOrderIndex]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$ebitTotalPerYear);
+				$tableDataFormatted[$ebitOrderIndex]['main_items']['% Of Revenue']['year_total'] = $grossProfitRevenuePercentages =$editRevenuePercentage= HArr::calculatePercentageOf($salesRevenueYearTotal,$ebitTotalPerYear);
 		/**
 		 * * End  Sixth Item 
 		 */
@@ -944,7 +977,7 @@ class Project extends Model
 		 * * Start Seven Item 
 		 */
 		
-		$tableDataFormatted[9]['main_items']['finance_exp']['options'] = array_merge([
+		$tableDataFormatted[$financeExpenseExpenseOrderIndex]['main_items']['finance_exp']['options'] = array_merge([
            'title'=>__('Finance Expense')
         ], $defaultNumericInputClasses);
 		$loanSchedulePayments = DB::table('loan_schedule_payments')->where('loan_schedule_payments.project_id',$project->id)->join('fixed_assets','fixed_assets.id','=','fixed_asset_id')->selectRaw('interestAmount,name')->get();
@@ -955,27 +988,27 @@ class Project extends Model
 		}
 		// $loanSchedulePaymentsFormatted = [];
 		foreach($loanSchedulePayments as $loanSchedulePayment){
-			 $tableDataFormatted[9]['sub_items'][$loanSchedulePayment->name]['options'] =array_merge([
+			 $tableDataFormatted[$financeExpenseExpenseOrderIndex]['sub_items'][$loanSchedulePayment->name]['options'] =array_merge([
                 'title'=>__('Interest Expense') . ' '.$loanSchedulePayment->name,
             ], $defaultNumericInputClasses);
 			$currentInterestAmounts = (array)json_decode($loanSchedulePayment->interestAmount);
-            $tableDataFormatted[9]['sub_items'][$loanSchedulePayment->name]['data'] = $currentInterestAmounts;
-			$tableDataFormatted[9]['sub_items'][$loanSchedulePayment->name]['year_total'] = HArr::sumPerYearIndex($currentInterestAmounts,$yearWithItsMonths);
+            $tableDataFormatted[$financeExpenseExpenseOrderIndex]['sub_items'][$loanSchedulePayment->name]['data'] = $currentInterestAmounts;
+			$tableDataFormatted[$financeExpenseExpenseOrderIndex]['sub_items'][$loanSchedulePayment->name]['year_total'] = HArr::sumPerYearIndex($currentInterestAmounts,$yearWithItsMonths);
 		}
 		if(count($openingLoansTotal)){
-			$tableDataFormatted[9]['sub_items'][__('Opening Balance Loans Interests')]['data'] = $openingLoansTotal;
-			$tableDataFormatted[9]['sub_items'][__('Opening Balance Loans Interests')]['year_total'] = HArr::sumPerYearIndex($openingLoansTotal,$yearWithItsMonths);
+			$tableDataFormatted[$financeExpenseExpenseOrderIndex]['sub_items'][__('Opening Balance Loans Interests')]['data'] = $openingLoansTotal;
+			$tableDataFormatted[$financeExpenseExpenseOrderIndex]['sub_items'][__('Opening Balance Loans Interests')]['year_total'] = HArr::sumPerYearIndex($openingLoansTotal,$yearWithItsMonths);
 		}
-		$totalFinanceExpense = HArr::sumAtDates(array_column($tableDataFormatted[9]['sub_items']??[],'data'),$sumKeys);
-		$tableDataFormatted[9]['main_items']['finance_exp']['data'] = $totalFinanceExpense;
-		$tableDataFormatted[9]['main_items']['finance_exp']['year_total'] = $financeExpenseTotalPerYear = HArr::sumPerYearIndex($totalFinanceExpense,$yearWithItsMonths);
+		$totalFinanceExpense = HArr::sumAtDates(array_column($tableDataFormatted[$financeExpenseExpenseOrderIndex]['sub_items']??[],'data'),$sumKeys);
+		$tableDataFormatted[$financeExpenseExpenseOrderIndex]['main_items']['finance_exp']['data'] = $totalFinanceExpense;
+		$tableDataFormatted[$financeExpenseExpenseOrderIndex]['main_items']['finance_exp']['year_total'] = $financeExpenseTotalPerYear = HArr::sumPerYearIndex($totalFinanceExpense,$yearWithItsMonths);
         
-        $tableDataFormatted[9]['main_items']['revenues-percentage']['options'] = array_merge([
+        $tableDataFormatted[$financeExpenseExpenseOrderIndex]['main_items']['revenues-percentage']['options'] = array_merge([
             'title'=>__('%/Revenues')
         ], $defaultPercentageInputClasses);
 		
-		$tableDataFormatted[9]['main_items']['revenues-percentage']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalFinanceExpense) ;
-			$tableDataFormatted[9]['main_items']['revenues-percentage']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$financeExpenseTotalPerYear);
+		$tableDataFormatted[$financeExpenseExpenseOrderIndex]['main_items']['revenues-percentage']['data'] =  HArr::calculatePercentageOf($productsTotals,$totalFinanceExpense) ;
+			$tableDataFormatted[$financeExpenseExpenseOrderIndex]['main_items']['revenues-percentage']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$financeExpenseTotalPerYear);
 		/**
 		 * * End Seven Item 
 		 */
@@ -991,7 +1024,7 @@ class Project extends Model
 		 $tableDataFormatted[$ebtOrderIndex]['main_items']['ebt']['year_total'] =$ebtTotalPerYear = HArr::sumPerYearIndex($ebt,$yearWithItsMonths);
         $tableDataFormatted[$ebtOrderIndex]['main_items']['% Of Revenue']['options']['title'] = __('% Of Revenue');
         $tableDataFormatted[$ebtOrderIndex]['main_items']['% Of Revenue']['data']=  HArr::calculatePercentageOf($productsTotals,$ebt);
-			$tableDataFormatted[$ebtOrderIndex]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$ebtTotalPerYear);
+			$tableDataFormatted[$ebtOrderIndex]['main_items']['% Of Revenue']['year_total'] = $ebtRevenuePercentagePerYear= HArr::calculatePercentageOf($salesRevenueYearTotal,$ebtTotalPerYear);
 		   
 		
 			/**
@@ -1010,7 +1043,7 @@ class Project extends Model
 		  $tableDataFormatted[$corporateTaxesOrderIndex]['main_items']['corporate-taxes']['year_total'] = $corporateTaxesTotalPerYear = HArr::sumPerYearIndex($corporateTaxes,$yearWithItsMonths);
         $tableDataFormatted[$corporateTaxesOrderIndex]['main_items']['% Of Revenue']['options']['title'] = __('% Of Revenue');
         $tableDataFormatted[$corporateTaxesOrderIndex]['main_items']['% Of Revenue']['data']=  HArr::calculatePercentageOf($productsTotals,$corporateTaxes);
-      $tableDataFormatted[$corporateTaxesOrderIndex]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$corporateTaxesTotalPerYear);
+      $tableDataFormatted[$corporateTaxesOrderIndex]['main_items']['% Of Revenue']['year_total'] = $corporateTaxesRevenuePercentage=HArr::calculatePercentageOf($salesRevenueYearTotal,$corporateTaxesTotalPerYear);
 		
 	  $totalProductsWithholdAmounts = [];
 	  foreach($this->products as $product){
@@ -1024,7 +1057,9 @@ class Project extends Model
 				$value =0 ;
 			}
 		}
-		$corporateTaxesStatement  = Project::calculateCorporateTaxesStatement($totalProductsWithholdAmounts,$calculatedCorporateTaxesPerYear,0,$dateIndexWithDate);
+		$corporateTaxesPayable = $this->getCorporateTaxesPayable();
+		$studyStartDateAsMonthNumber = array_values($this->getDateWithMonthNumber())[0];
+		$corporateTaxesStatement  = Project::calculateCorporateTaxesStatement($totalProductsWithholdAmounts,$calculatedCorporateTaxesPerYear,$corporateTaxesPayable,$dateIndexWithDate,$studyStartDateAsMonthNumber);
 
 		$this->update([
 			'corporate_taxes_statement'=>$corporateTaxesStatement
@@ -1038,14 +1073,40 @@ class Project extends Model
 		 * * Start  Sixth Item 
 		 */
 		
-			$netProfit = HArr::subtractAtDates([$ebt,$corporateTaxes],$sumKeys);
-			     $tableDataFormatted[$netProfitOrderIndex]['main_items']['net-profit']['options']['title'] = __('Net Profit');
-			     $tableDataFormatted[$netProfitOrderIndex]['main_items']['net-profit']['data'] = $netProfit;
-				 $tableDataFormatted[$netProfitOrderIndex]['main_items']['net-profit']['year_total'] = $netProfitTotalPerYear = HArr::sumPerYearIndex($netProfit,$yearWithItsMonths);
+		$netProfit = HArr::subtractAtDates([$ebt,$corporateTaxes],$sumKeys);
+		$tableDataFormatted[$netProfitOrderIndex]['main_items']['net-profit']['options']['title'] = __('Net Profit');
+		$tableDataFormatted[$netProfitOrderIndex]['main_items']['net-profit']['data'] = $netProfit;
+		$tableDataFormatted[$netProfitOrderIndex]['main_items']['net-profit']['year_total'] = $netProfitTotalPerYear = HArr::sumPerYearIndex($netProfit,$yearWithItsMonths);
         $tableDataFormatted[$netProfitOrderIndex]['main_items']['% Of Revenue']['options']['title'] = __('% Of Revenue');
         $tableDataFormatted[$netProfitOrderIndex]['main_items']['% Of Revenue']['data'] = HArr::calculatePercentageOf($productsTotals,$netProfit);
-		$tableDataFormatted[$netProfitOrderIndex]['main_items']['% Of Revenue']['year_total'] = HArr::calculatePercentageOf($salesRevenueYearTotal,$netProfitTotalPerYear);
+		$tableDataFormatted[$netProfitOrderIndex]['main_items']['% Of Revenue']['year_total'] = $netProfitRevenuePercentage = HArr::calculatePercentageOf($salesRevenueYearTotal,$netProfitTotalPerYear);
 		
+		
+		$retainedEarningOpening = DB::table('equity_opening_balances')->where('project_id',$this->id)->first();
+		$retainedEarningOpening = $retainedEarningOpening ? $retainedEarningOpening->retained_earnings : 0;
+		$retainedEarning = HArr::calculateRetainEarning($retainedEarningOpening,$netProfit);
+		// $accumulatedRetainedEarning = HArr::accumulateArray($retainedEarning);
+		$data = [
+			'total_sales_revenues'=>array_values($salesRevenueYearTotal) , 
+			'annually_sales_revenues_growth_rates'=>array_values($annuallySalesRevenueGrowthRates) ,
+			'gross_profit'=>array_values($grossProfitTotalPerYear),
+			'annually_gross_profit_revenue_percentages'=>array_values($grossProfitRevenuePercentages),
+			'ebitda'=>array_values($ebitdaTotalPerYear),
+			'annually_ebitda_revenue_percentages'=>array_values($editdaRevenuePercentage),
+			'ebit'=>array_values($ebitTotalPerYear),
+			'annually_ebit_revenue_percentages'=>array_values($editRevenuePercentage),
+			'ebt'=>array_values($ebtTotalPerYear),
+			'annually_ebt_revenue_percentages'=>array_values($ebtRevenuePercentagePerYear),
+			'net_profit'=>array_values($netProfitTotalPerYear),
+			'annually_net_profit_revenue_percentages'=>array_values($netProfitRevenuePercentage),
+			'total_cogs'=>$totalCogsPerYear,
+			'total_percentages_cogs'=>$totalCogsPercentageOfRevenues,
+			'accumulated_retained_earnings'=>$retainedEarning,
+			'total_depreciation'=>$totalDepreciation,
+			'sganda'=>$resultTotalPerCategoryPerYear,
+			'sganda_revenues_percentages'=>$resultTotalPercentagesPerCategoryPerYear
+		];
+		$this->incomeStatement ? $this->incomeStatement->update($data)  : $this->incomeStatement()->create($data);
 		return [
             'step_data'=>$step_data,
             'financialYearEndMonthNumber'=>$financialYearEndMonthNumber,
@@ -1078,12 +1139,12 @@ class Project extends Model
         $defaultNumericInputClasses = [
             'number-format-decimals'=>0,
             'is-percentage'=>false,
-            'classes'=>'repeater-with-collapse-input',
-            'formatted-input-classes'=>'custom-input-numeric-width ',
+            'classes'=>'repeater-with-collapse-input readonly',
+            'formatted-input-classes'=>'custom-input-numeric-width readonly',
         ];
         $defaultPercentageInputClasses = [
             'classes'=>'',
-            'formatted-input-classes'=>'',
+            'formatted-input-classes'=>'ddd',
             'is-percentage'=>true ,
             'number-format-decimals'=> 2,
         ];
@@ -1407,6 +1468,7 @@ class Project extends Model
 		 * * End Cash And Bank End Balance;
 		 */
 			$tableDataFormatted[-1]['main_items']['cash-and-banks']['data'] = $workingCapitalStatement['beginning_balance'] ??[];
+			$tableDataFormatted[-1]['main_items']['cash-and-banks']['year_total'] = HArr::getPerYearIndexForCashAndBank($workingCapitalStatement['beginning_balance'] ??[],$yearWithItsMonths);
 			$totalCashOut = HArr::sumAtDates([$supplierPayments,$taxes,$totalExpenses,$fixedAssetPayments,$totalLoanWithSchedulePayments],$sumKeys);
 			$statementData = [
 				'cash_end_balance'=>$cashEndBalance,
@@ -1491,7 +1553,6 @@ class Project extends Model
 			$fixedAssetBalanceEndBalance= ((array)((array)json_decode($fixedAssetBalanceEndBalance))['end_balance']??[]);
 			$totalFixedAsset = HArr::sumAtDates([$totalFixedAsset,$fixedAssetBalanceEndBalance],$sumKeys);
 		}
-		// // dd($totalFixedAssetOpening);
 		$netFixedAsset =  HArr::sumAtDates([$totalFixedAssetOpening,$totalFixedAsset],$sumKeys) ;
 		$currentDataArr =$netFixedAsset;  
 			$title = __('Net Fixed Asset');
@@ -1670,10 +1731,13 @@ class Project extends Model
 		
 		
 		$totalDebtorsOpening = [];
-		$debtorsOpeningBalanceEndBalances =  DB::table('other_debtors_opening_balances')->where('project_id',$projectId)->pluck('statement')->toArray();
-		foreach($debtorsOpeningBalanceEndBalances as $debtorsOpeningBalanceEndBalance){
+		$debtorsOpeningBalances =  DB::table('other_debtors_opening_balances')->where('project_id',$projectId)->get();
+		$debtorsOpeningBalanceEndBalances = $debtorsOpeningBalances->pluck('statement')->toArray();
+		$totalDebtorsAmounts = 0 ; 
+		foreach($debtorsOpeningBalanceEndBalances as $index=>$debtorsOpeningBalanceEndBalance){
 			$debtorsOpeningBalanceEndBalance= ((array)((array)json_decode($debtorsOpeningBalanceEndBalance))['monthly']??[])['end_balance']??[];
 			$totalDebtorsOpening = HArr::sumAtDates([$totalDebtorsOpening,$debtorsOpeningBalanceEndBalance],$sumKeys);
+			$totalDebtorsAmounts += $debtorsOpeningBalances[$index]->amount;
 		}
 		
 	
@@ -1695,7 +1759,9 @@ class Project extends Model
 		 * * End Seventh Key 
 		 */
 		
-		
+		/**
+		 * * Start Key 
+		 */
 		
 		$totalCurrentAssets = HArr::sumAtDates([$cashEndBalance,$customerReceivables,$totalRawMaterials , $totalFGs,$totalOtherDebtors],$sumKeys);
 		$currentDataArr = $totalCurrentAssets; ;
@@ -1708,13 +1774,17 @@ class Project extends Model
 		], $defaultNumericInputClasses);
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
-	
+	/**
+		 * * End Key 
+		 */
+		/**
+		 * * Start Key 
+		 */
 		
 		
 		
-		
-		
-		$currentDataArr = HArr::sumAtDates([$totalCurrentAssets,$totalProjectUnderProgress ,$netFixedAsset],$sumKeys); ;
+		$totalAssets = HArr::sumAtDates([$totalCurrentAssets,$totalProjectUnderProgress ,$netFixedAsset],$sumKeys);
+		$currentDataArr = $totalAssets ;
 		$title = __('Total Assets');
 		$currentTabId = $title ;
 		$currentTabIndex +=1;
@@ -1724,10 +1794,14 @@ class Project extends Model
 		], $defaultNumericInputClasses);
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
-	
+	/**
+		 * * End Key 
+		 */
 		
 		
-		
+		/**
+		 * * Start Key 
+		 */
 		
 	   $supplierOpening = DB::table('supplier_payable_opening_balances')->where('project_id',$this->id)->pluck('statement')->toArray()[0]??[];
 		$supplierOpeningEndBalance = ((array)(((array) json_decode($supplierOpening))['monthly']))['end_balance']??[];
@@ -1751,7 +1825,13 @@ class Project extends Model
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
 	
+		/**
+		 * * End Key 
+		 */
 		
+		/**
+		 * * Start Key 
+		 */
 		
 		$ffePayables = DB::table('fixed_assets')->where('project_id',$projectId)->pluck('ffe_payable')->toArray();
 		$totalFfePayables  = [];
@@ -1774,8 +1854,14 @@ class Project extends Model
 		], $defaultNumericInputClasses);
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
-	
+	/**
+		 * * End Key 
+		 */
 		
+	
+		/**
+		 * * Start Key 
+		 */
 		
 		$totalVatPayables = $this->vat_statements['monthly']['end_balance']??[];
 		$currentDataArr = $totalVatPayables ;
@@ -1789,9 +1875,13 @@ class Project extends Model
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
 	
+		/**
+		 * * End Key 
+		 */
 		
-		
-		
+		/**
+		 * * Start Key 
+		 */
 		$totalCreditWithholdsEndBalance = [];
 		$creditWithholdEndBalances =  DB::table('raw_materials')->where('project_id',$projectId)->pluck('credit_withhold_statement')->toArray();
 		foreach($creditWithholdEndBalances as $creditWithhold){
@@ -1809,8 +1899,13 @@ class Project extends Model
 		], $defaultNumericInputClasses);
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+	/**
+		 * * End Key 
+		 */
 	
-	
+		/**
+		 * * Start Key 
+		 */
 	
 		$totalSalaryTaxesEndBalance = [];
 		$salaryTaxesEndBalances =  DB::table('manpowers')->where('project_id',$projectId)->pluck('tax_and_social_insurance_statement')->toArray();
@@ -1829,9 +1924,13 @@ class Project extends Model
 		], $defaultNumericInputClasses);
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
-	
+	/**
+		 * * End Key 
+		 */
 		
-	
+	/**
+		 * * Start Key 
+		 */
 		
 		
 		
@@ -1853,23 +1952,28 @@ class Project extends Model
 		
 		
 		
-		
+		/**
+		 * * End Key 
+		 */
 		
 		
 		
 		
 		 /**
-		 * * Seventh Tab 
+		 * * Start Tab 
 		*/
 		
 		
 		
 		
 		$totalCreditorsOpening = [];
-		$creditorsOpeningBalanceEndBalances =  DB::table('other_credits_opening_balances')->where('project_id',$projectId)->pluck('statement')->toArray();
-		foreach($creditorsOpeningBalanceEndBalances as $creditorsOpeningBalanceEndBalance){
+		$totalCreditorsAmount = 0 ;
+		$creditorsOpeningBalances =  DB::table('other_credits_opening_balances')->where('project_id',$projectId)->get();
+		$creditorsOpeningBalanceEndBalances = $creditorsOpeningBalances->pluck('statement')->toArray();
+		foreach($creditorsOpeningBalanceEndBalances as $index=>$creditorsOpeningBalanceEndBalance){
 			$creditorsOpeningBalanceEndBalance= ((array)((array)json_decode($creditorsOpeningBalanceEndBalance))['monthly']??[])['end_balance']??[];
 			$totalCreditorsOpening = HArr::sumAtDates([$totalCreditorsOpening,$creditorsOpeningBalanceEndBalance],$sumKeys);
+			$totalCreditorsAmount += ($creditorsOpeningBalances[$index]->amount); 
 		}
 	
 		$totalExpenses = [];
@@ -1878,6 +1982,7 @@ class Project extends Model
 			$expenseArr= ((array)(((array)((array)json_decode($expenseArr))['monthly']??[]))['end_balance']??[]);
 			$totalExpenses = HArr::sumAtDates([$expenseArr,$totalExpenses],$sumKeys);
 		}
+		
 		$otherCreditors  = HArr::sumAtDates([$totalExpenses,$totalCreditorsOpening],$sumKeys) ;
 		$currentDataArr = $otherCreditors ;
 		$title = __('Other Creditors');
@@ -1892,250 +1997,303 @@ class Project extends Model
 		
 		
 		/**
-		 * * End Seventh Key 
+		 * * End Key 
+		 */
+		
+		/**
+		 * * Start Key 
+		 */
+		
+		$totalCurrentLiabilities = HArr::sumAtDates([$supplierPayables,  $totalFfePayables, $totalVatPayables, $totalCreditWithholdsEndBalance, $totalSalaryTaxesEndBalance, $corporateTaxesEndBalance, $otherCreditors],$sumKeys);
+		$currentDataArr = $totalCurrentLiabilities; ;
+		$title = __('Total Current Liabilities');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
+		
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
 		 */
 		
 		
-		// /**
-		//  * * Cash And Bank
-		//  */
+		
+		
+		
+		 /**
+		 * * Start Tab 
+		*/
+		
+		
+		
+		
+		$totalLoansOpening = [];
+		$loansOpeningBalanceEndBalances =  DB::table('long_term_loan_opening_balances')->where('project_id',$projectId)->pluck('statement')->toArray();
+		foreach($loansOpeningBalanceEndBalances as $loansOpeningBalanceEndBalance){
+			$loansOpeningBalanceEndBalance= ((array)((array)json_decode($loansOpeningBalanceEndBalance))['monthly']??[])['end_balance']??[];
+			$totalLoansOpening = HArr::sumAtDates([$totalLoansOpening,$loansOpeningBalanceEndBalance],$sumKeys);
+		}
 	
-			
-			
-        // foreach ($products as $product) {
-		// 	$collectionPayment = $product->collection_statement['monthly']['payment']??[];
-        //     $tableDataFormatted[0]['sub_items'][$product->getName()]['options'] =array_merge([
-        //         'title'=>$product->getName(),
-        //     ], $defaultNumericInputClasses);
-        //     $tableDataFormatted[0]['sub_items'][$product->getName()]['data'] = $collectionPayment;
-		// 	$tableDataFormatted[0]['sub_items'][$product->getName()]['year_total'] = HArr::sumPerYearIndex($collectionPayment,$yearWithItsMonths);
-        
-		// }
-		// $totalcustomerReceivablesEquity = [];
-		// $totalFixedAssetLoanWithdrawal = [];
-		// foreach($project->fixedAssets as $fixedAsset)
-		// 	{
-		// 		$totalFixedAssetEquity = HArr::sumAtDates([$fixedAsset->getFfeEquityPayment(),$totalFixedAssetEquity],$sumKeys);
-		// 		$totalFixedAssetLoanWithdrawal = HArr::sumAtDates([$fixedAsset->getFfeLoanWithdrawal(),$totalFixedAssetLoanWithdrawal],$sumKeys);
-		// 	}
-		// 	$otherDebtorsOpeningBalances = DB::table('other_debtors_opening_balances')->where('project_id',$project->id)->pluck('payload');
-		// 	$totalOtherDebtorsOpeningBalances = [];
-		// 	foreach($otherDebtorsOpeningBalances as $otherDebtorsOpeningBalance){
-		// 		$otherDebtorsOpeningBalance= (array)json_decode($otherDebtorsOpeningBalance);
-		// 		$totalOtherDebtorsOpeningBalances = HArr::sumAtDates([$totalOtherDebtorsOpeningBalances,$otherDebtorsOpeningBalance],$sumKeys);
-		// 	}
-		// 	if(count($totalOtherDebtorsOpeningBalances)){
-		// 		$tableDataFormatted[0]['sub_items'][__('Other Debtors')]['data'] = $totalOtherDebtorsOpeningBalances;
-		// 		$tableDataFormatted[0]['sub_items'][__('Other Debtors')]['year_total'] = HArr::sumPerYearIndex($totalOtherDebtorsOpeningBalances,$yearWithItsMonths);
-		// 	}
-		// 	if(count($totalFixedAssetEquity)){
-		// 		$tableDataFormatted[0]['sub_items'][__('Equity Injection')]['data'] = $totalFixedAssetEquity;
-		// 		$tableDataFormatted[0]['sub_items'][__('Equity Injection')]['year_total'] = HArr::sumPerYearIndex($totalFixedAssetEquity,$yearWithItsMonths);
-		// 	}
-		// 	if(count($totalFixedAssetLoanWithdrawal)){
-		// 		$tableDataFormatted[0]['sub_items'][__('Loan Withdrawals')]['data'] = $totalFixedAssetLoanWithdrawal;
-		// 		$tableDataFormatted[0]['sub_items'][__('Loan Withdrawals')]['year_total'] = HArr::sumPerYearIndex($totalFixedAssetLoanWithdrawal,$yearWithItsMonths);
-		// 	}
-			
-		// 	$totalCashIn = HArr::sumAtDates(array_column($tableDataFormatted[0]['sub_items'],'data'),$sumKeys);
-			
+		$totalLoanBalances = [];
+		$loanEndBalances =  DB::table('loan_schedule_payments')->where('project_id',$projectId)->pluck('endBalance')->toArray();
+		foreach($loanEndBalances as $loanEndBalance){
+			$loanEndBalance= (array)json_decode($loanEndBalance);
+			$totalLoanBalances = HArr::sumAtDates([$loanEndBalance,$totalLoanBalances],$sumKeys);
+		}
 		
-		// $tableDataFormatted[0]['main_items']['cash-in-flow']['data'] = $totalCashIn;
-		// $tableDataFormatted[0]['main_items']['cash-in-flow']['year_total'] = HArr::sumPerYearIndex($totalCashIn,$yearWithItsMonths);
+		$mediumTermLoans  = HArr::sumAtDates([$totalLoanBalances,$totalLoansOpening],$sumKeys) ;
+		$currentDataArr = $mediumTermLoans ;
+		$title = __('Medium Term Loan');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
+		
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =$mediumTermLoanPerYear = HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		
+		
+		/**
+		 * * End Key 
+		 */
+		
+		
+		
+		 /**
+		 * * Start Tab 
+		*/
 		
 		
 		
 		
+		$totalOtherLongTermsOpening = [];
+		$otherLongTermsOpeningBalanceEndBalances =  DB::table('other_long_term_liabilities_opening_balances')->where('project_id',$projectId)->pluck('statement')->toArray();
+		foreach($otherLongTermsOpeningBalanceEndBalances as $otherLongTermsOpeningBalanceEndBalance){
+			$otherLongTermsOpeningBalanceEndBalance= ((array)((array)json_decode($otherLongTermsOpeningBalanceEndBalance))['monthly']??[])['end_balance']??[];
+			$totalOtherLongTermsOpening = HArr::sumAtDates([$totalOtherLongTermsOpening,$otherLongTermsOpeningBalanceEndBalance],$sumKeys);
+		}
+		
+		$currentDataArr = $totalOtherLongTermsOpening ;
+		$title = __('Other Long Term Liabilities');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
+		
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		
+		
+		/**
+		 * * End Key 
+		 */
+		
+		
+			/**
+		 * * Start Key 
+		 */
+		
+		$totalLongTermLiabilities = HArr::sumAtDates([$mediumTermLoans,$totalOtherLongTermsOpening],$sumKeys);
+		$currentDataArr = $totalLongTermLiabilities; ;
+		$title = __('Total Long Term Liabilities');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
+		
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
 		
 		
 		
+		/**
+		 * * Start Key 
+		 */
+		$equityOpeningBalance = count($this->equityOpeningBalances) ? $this->equityOpeningBalances[0] : null;
+		
+		$paidUpCapitals = $equityOpeningBalance ? $equityOpeningBalance->getExtendedPaidUpCapitalAmount() : [];
+		$currentDataArr =$paidUpCapitals ; ;
+		$title = __('Paid Up Capital');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
+		
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
 		
 		
+		/**
+		 * * Start Key 
+		 */
+		$workingCapitalInjection = $cashInOutStatement ? $cashInOutStatement->working_capital_injection : [];
+		$equityInjection = $cashInOutStatement ? $cashInOutStatement->equity_injection : [];
+		$additionalPaidUpCapital = HArr::sumAtDates([$workingCapitalInjection,$equityInjection],$sumKeys) ; 
+		$currentDataArr =$additionalPaidUpCapital; ;
+		$title = __('Additional Paid Up Capital');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
 		
-		// ////////////////////////////////////////////////////////////////////////////////
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
 		
-		
-		
-		
-		//    /**
-		//  * * Second Tab Cash Out
-		// */
-		// $currentTabIndex = 1 ;
-		// $currentTabId = 'cash-out-flow';
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
-		//    'title'=>__('Total CashOut Flow')
-		// ], $defaultNumericInputClasses);
+		/**
+		 * * Start Key 
+		 */
 
-		// $sumKeys = array_keys($studyMonthsForViews);
-		// $rawMaterials = $project->rawMaterials;
-		// $totalCreditWithholdTaxPayments = [];
-        // foreach ($rawMaterials as $rawMaterial) {
-		// 	$collectionPayment = $rawMaterial->collection_statement['monthly']['payment']??[];
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$rawMaterial->getName()]['options'] =array_merge([
-        //         'title'=>$rawMaterial->getName(),
-        //     ], $defaultNumericInputClasses);
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$rawMaterial->getName()]['data'] = $collectionPayment;
-		// 	$tableDataFormatted[$currentTabIndex]['sub_items'][$rawMaterial->getName()]['year_total'] = HArr::sumPerYearIndex($collectionPayment,$yearWithItsMonths);
-		// 	$creditWithholdPayment = $rawMaterial->credit_withhold_statement['monthly']['payment']??[];
-		// 	$totalCreditWithholdTaxPayments = HArr::sumAtDates([$totalCreditWithholdTaxPayments,$creditWithholdPayment],$sumKeys);
-        // }
-		// if($this->getCreditWithholdOpeningBalanceAmount() > 0){
-		// 	$firstItemValue = $totalCreditWithholdTaxPayments[0] ?? 0 ; 
-		// 	$totalCreditWithholdTaxPayments[0] = $firstItemValue + $this->getCreditWithholdOpeningBalanceAmount();
-		// }
-		// $totalSalaryPayments = [];
-		// $totalTaxAndSocialInsurances = [];
-		// $salaryPayments = DB::table('manpowers')->where('project_id',$project->id)->pluck('salary_payments')->toArray();
-		// $salaryTaxAndSocialInsurances = DB::table('manpowers')->where('project_id',$project->id)->pluck('tax_and_social_insurance_statement')->toArray();
-		// foreach($salaryPayments as $index=>$manpowerSalaryPayment){
-		// 	$manpowerSalaryPayment = (array)json_decode($manpowerSalaryPayment);
-		// 	$salaryTaxAndSocialInsurance = ((array)json_decode($salaryTaxAndSocialInsurances[$index]))['monthly']??[];
-		// 	$salaryTaxAndSocialInsurance = $salaryTaxAndSocialInsurance->payment;
-		// 	$totalSalaryPayments  = HArr::sumAtDates([$totalSalaryPayments,$manpowerSalaryPayment],$sumKeys);
-		// 	$totalTaxAndSocialInsurances  = HArr::sumAtDates([$totalTaxAndSocialInsurances,$salaryTaxAndSocialInsurance],$sumKeys);
-		// }
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Salaries Payments')]['data'] = $totalSalaryPayments;
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Salaries Payments')]['year_total'] = HArr::sumPerYearIndex($totalSalaryPayments,$yearWithItsMonths);
 		
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Salary Taxes & Social Insurance')]['data'] = $totalTaxAndSocialInsurances;
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Salary Taxes & Social Insurance')]['year_total'] = HArr::sumPerYearIndex($totalTaxAndSocialInsurances,$yearWithItsMonths);		
+		$legalReserve = $equityOpeningBalance ? $equityOpeningBalance->getExtendedLegalReserveAmount() : [];
+		$currentDataArr =$legalReserve ; ;
+		$title = __('Legal Reserve');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
 		
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Credit Withhold Taxes Payments')]['data'] = $totalCreditWithholdTaxPayments;
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Credit Withhold Taxes Payments')]['year_total'] = HArr::sumPerYearIndex($totalCreditWithholdTaxPayments,$yearWithItsMonths);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
 		
-		// $totalVatsPayments = $this->vat_statements['monthly']['payment']??[];
+		/**
+		 * * Start Key 
+		 */
+
+		$incomeStatement  = $this->incomeStatement;
+		$accumulatedRetainedEarnings = $incomeStatement ? $incomeStatement->accumulated_retained_earnings : [];
 		
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('VAT Payments')]['data'] = $totalVatsPayments;
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('VAT Payments')]['year_total'] = HArr::sumPerYearIndex($totalVatsPayments,$yearWithItsMonths);
+		$currentDataArr =$accumulatedRetainedEarnings ; ;
+		$title = __('Retained Earnings');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
 		
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
 		
-		// $totalCorporateTaxesPayments = $this->corporate_taxes_statement['monthly']['payment']??[];
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Corporate Taxes Payments')]['data'] = $totalCorporateTaxesPayments;
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][__('Corporate Taxes Payments')]['year_total'] = HArr::sumPerYearIndex($totalCorporateTaxesPayments,$yearWithItsMonths);
+		/**
+		 * * Start Key 
+		 */
+
+		$incomeStatement  = $this->incomeStatement;
+		$netProfits = $incomeStatement ? $incomeStatement->net_profit : [];
 		
+		$currentDataArr =$netProfits ; ;
+		$title = __('Profit Of The Period');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
 		
-		
-		
-		
-		// $expenses = Expense::where('project_id',$project->id)->get();
-		
-		//  foreach ($expenses as $expense) {
-		// 	$paymentAmounts = $expense->payment_amounts;
-		// 	$expenseName = $expense->name;
-		// 	$currentItemId = $expense->id.$expenseName ;
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['options'] =array_merge([
-        //         'title'=>$expenseName,
-        //     ], $defaultNumericInputClasses);
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['data'] = $paymentAmounts;
-		// 	$tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['year_total'] = HArr::sumPerYearIndex($paymentAmounts,$yearWithItsMonths);
-        // }
-		// $totalReplaceCost = [];
-		// foreach ($project->fixedAssets as $fixedAsset) {
-		// 	$ffePayment = $fixedAsset->getFfePayment();
-		// 	$currentItemId = $fixedAsset->id ;
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['options'] =array_merge([
-        //         'title'=>$fixedAsset->getName(),
-        //     ], $defaultNumericInputClasses);
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['data'] = $ffePayment;
-		// 	$tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['year_total'] = HArr::sumPerYearIndex($ffePayment,$yearWithItsMonths);
-		// 	$totalReplaceCost = HArr::sumAtDates([$totalReplaceCost,$fixedAsset->getReplaceCost()],$sumKeys);
-        // }
-		// $currentItemId = 'fixed-asset-replacement-cost';
-		// $tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['options'] =array_merge([
-        //         'title'=>__('Fixed Asset Replacement Cost'),
-        //     ], $defaultNumericInputClasses);
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['data'] = $totalReplaceCost;
-		// 	$tableDataFormatted[$currentTabIndex]['sub_items'][$currentItemId]['year_total'] = HArr::sumPerYearIndex($totalReplaceCost,$yearWithItsMonths);
-			
-		
-		// $loanSchedulePayments = DB::table('loan_schedule_payments')->where('loan_schedule_payments.project_id',$project->id)->join('fixed_assets','fixed_assets.id','=','loan_schedule_payments.fixed_asset_id')->selectRaw('schedulePayment,name')->get();
-		// foreach($loanSchedulePayments as $loanSchedulePayments){
-		// 	$schedulePayment = (array)json_decode($loanSchedulePayments->schedulePayment);
-		// 	$name = $loanSchedulePayments->name .' '. __('Loan Installment') ;
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$name]['options'] =array_merge([
-        //         'title'=>$name,
-        //     ], $defaultNumericInputClasses);
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][$name]['data'] = $schedulePayment;
-		// 	$tableDataFormatted[$currentTabIndex]['sub_items'][$name]['year_total'] = HArr::sumPerYearIndex($schedulePayment,$yearWithItsMonths);
-		// }
-		
-		// $openingLoans = DB::table('long_term_loan_opening_balances')->where('long_term_loan_opening_balances.project_id',$project->id)->get();
-		// $totalLoanInstallments =[]; 
-		// $totalLoanInterests =[]; 
-		// foreach($openingLoans as $openingLoan){
-		// 	$installment = (array)json_decode($openingLoan->installments);
-		// 	$interest = (array)json_decode($openingLoan->interests);
-		// 	$totalLoanInstallments = HArr::sumAtDates([$totalLoanInstallments,$installment],$sumKeys);
-		// 	$totalLoanInterests = HArr::sumAtDates([$totalLoanInterests,$interest],$sumKeys);
-		// }
-		// $totalLoansAmounts = HArr::sumAtDates([$totalLoanInterests,$totalLoanInstallments],$sumKeys);
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['options'] =array_merge([
-        //         'title'=>__('Opening Loan Installments'),
-        //     ], $defaultNumericInputClasses);
-        //     $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['data'] = $totalLoansAmounts;
-		// 	$tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['year_total'] = HArr::sumPerYearIndex($totalLoansAmounts,$yearWithItsMonths);
-		
-			
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
 		
 		
-		// $totalCashOut = HArr::sumAtDates(array_column($tableDataFormatted[$currentTabIndex]['sub_items'],'data'),$sumKeys);
-			
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $totalCashOut;
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =  HArr::sumPerYearIndex($totalCashOut,$yearWithItsMonths);
+			/**
+		 * * Start Key 
+		 */
 		
-		// $workingCapitalStatement = HArr::calculateWorkingCapital($cashAndBankAmount,$totalCashIn,$totalCashOut,$sumKeys);
-		// /**
-		//  * * Start Net Cash Before Working Capital;
-		// */
-		// $currentTabIndex = 2 ; 
-		// $currentTabId = 'net-cash-before-working-capital';
+		$totalOwnersEquity = HArr::sumAtDates([$paidUpCapitals,$additionalPaidUpCapital,$legalReserve,$accumulatedRetainedEarnings,$netProfits],$sumKeys);
+		$currentDataArr = $totalOwnersEquity; ;
+		$title = __('Total Owners Equity');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
 		
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
-		//    'title'=>__('Net Cash Before Working Capital')
-		// ], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] = $totalOwnerEquity = HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
 		
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentData = $workingCapitalStatement['net_cash_before_working_capital']??[];
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =  HArr::sumPerYearIndex($currentData,$yearWithItsMonths);
 		
-		// 	/**
-		//  * * End Net Cash Before Working Capital;
-		//  */
+				/**
+		 * * Start Key 
+		 */
+		
+		$checkErrors = HArr::subtractAtDates([$totalAssets,$totalCurrentLiabilities,$totalLongTermLiabilities,$totalOwnersEquity],$sumKeys);
+		$currentDataArr = $checkErrors; ;
+		$title = __('Check Errors');
+		$currentTabId = $title ;
+		$currentTabIndex +=1;
+		
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
+		   'title'=>$title
+		], $defaultNumericInputClasses);
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		/**
+		 * * End Key 
+		 */
+		
+		$yearIndexWithLastMonth = HArr::getLastMonthOfYear($yearWithItsMonths);
+		$customerReceivablesOpeningBalance = DB::table('cash_and_bank_opening_balances')->where('project_id',$this->id)->first();
+		$customerReceivablesOpeningBalance = $customerReceivablesOpeningBalance ? $customerReceivablesOpeningBalance->customer_receivable_amount : 0;
+		$changeInCustomerReceivables = HArr::calculateChangeInAfter($customerReceivables,$customerReceivablesOpeningBalance,$yearIndexWithLastMonth);
 	
-			
-		// 	/**
-		//  * * Start Net Cash Before Working Capital;
-		// */
-		// $currentTabIndex = 3 ; 
-		// $currentTabId = 'working-capital-injection';
+		$fgInventoryAmount = $this->getTotalFgInventoryValue();
+		$totalRawMaterialInventoryValue = $this->getTotalRawMaterialInventoryValue();
 		
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
-		//    'title'=>__('Working Capital Injection')
-		// ], $defaultNumericInputClasses);
+		$changeInFg  = HArr::calculateChangeInAfter($totalFGs,$fgInventoryAmount,$yearIndexWithLastMonth);
+		$changeInRawMaterial  = HArr::calculateChangeInAfter($totalRawMaterials,$totalRawMaterialInventoryValue,$yearIndexWithLastMonth);
+		$changeInOtherDebtors  = HArr::calculateChangeInAfter($totalOtherDebtors,$totalDebtorsAmounts,$yearIndexWithLastMonth);
 		
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentData = $workingCapitalStatement['working_capital_injection']??[];
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =  HArr::sumPerYearIndex($currentData,$yearWithItsMonths);
 		
-		// 	/**
-		//  * * End Net Cash Before Working Capital;
-		//  */
+		$supplierPayablesOpeningBalance = DB::table('supplier_payable_opening_balances')->where('project_id',$this->id)->first();
+		$supplierPayablesOpeningBalance = $supplierPayablesOpeningBalance ? $supplierPayablesOpeningBalance->amount : 0;
+		$changeInSupplierPayables  = HArr::calculateChangeInBefore($supplierPayables,$supplierPayablesOpeningBalance,$yearIndexWithLastMonth);
+		$changeInOtherCreditors  = HArr::calculateChangeInAfter($otherCreditors,$totalCreditorsAmount,$yearIndexWithLastMonth);
+		$netChangeInWorkingCapital = HArr::sumAtDates([$changeInCustomerReceivables,$changeInFg,$changeInRawMaterial,$changeInOtherDebtors,$changeInSupplierPayables,$changeInOtherCreditors],$sumKeys);
+		$totalCapital = HArr::sumAtDates([$totalOwnerEquity,$mediumTermLoanPerYear]);
+		$equityFundingPercentages = HArr::divideTwoArrAtSameIndex($totalOwnerEquity,$totalCapital);
+		$debitFundingPercentages = HArr::divideTwoArrAtSameIndex($mediumTermLoanPerYear,$totalCapital);
+
 		
-			
-		// 		/**
-		//  * * Start Cash And Bank End Balance;
-		// */
-		// $currentTabIndex = 4 ; 
-		// $currentTabId = 'cash-and-bank-end-balance';
+		$data = [
+			'change_in_customer_receivables'=>$changeInCustomerReceivables,
+			'change_in_fg_inventory'=>$changeInFg,
+			'change_in_raw_material_inventory'=>$changeInRawMaterial,
+			'change_in_other_debtors'=>$changeInOtherDebtors,
+			'change_in_supplier_payables'=>$changeInSupplierPayables,
+			'change_in_other_creditors'=>$changeInOtherCreditors,
+			'net_change_in_working_capital'=>$netChangeInWorkingCapital,
+			'debit_funding_percentages'=>$debitFundingPercentages,
+			'equity_funding_percentages'=>$equityFundingPercentages,
+		];
+		$this->balanceSheet ? $this->balanceSheet->update($data) : $this->balanceSheet()->create($data);
 		
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
-		//    'title'=>__('Cash And Bank End Balance')
-		// ], $defaultNumericInputClasses);
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentData = $workingCapitalStatement['cash_end_balance']??[];
-		// $tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =  HArr::sumPerYearIndex($currentData,$yearWithItsMonths);
-		
-		// 	/**
-		//  * * End Cash And Bank End Balance;
-		//  */
-		// 	$tableDataFormatted[-1]['main_items']['cash-and-banks']['data'] = $workingCapitalStatement['beginning_balance'] ??[];
 		
 		return  [
             // 'step_data'=>$step_data,
@@ -2144,9 +2302,143 @@ class Project extends Model
             'project'=>$project,
             'tableDataFormatted'=>$tableDataFormatted,
             'defaultClasses'=>$defaultClasses,
-            'title'=>__('Cash In Out Flow'),
-			'nextRoute'=>route('balance.sheet.result',['project'=>$project->id]),
+            'title'=>__('Balance Sheet'),
+			'nextRoute'=>route('view.results.dashboard',['project'=>$project->id]),
 			
+		];
+	}
+	public function getDashboardViewVars():array 
+	{
+		$project = $this ; 
+		
+		$withSensitivity = false ;
+		$incomeStatement = $project->incomeStatement;
+		$balanceSheet = $project->balanceSheet;
+		$cashflow = $project->cashInOutStatement;
+		$formattedResult['sales_revenue'] = $incomeStatement ? $incomeStatement->total_sales_revenues : [];
+		$formattedResult['growth_rate'] = $incomeStatement ? $incomeStatement->annually_sales_revenues_growth_rates : [];
+		$formattedResult['gross_profit'] = $incomeStatement ? $incomeStatement->gross_profit : [];
+		$formattedResult['gross_profit_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_gross_profit_revenue_percentages : [];
+		$formattedResult['ebitda'] =  $incomeStatement ? $incomeStatement->ebitda : [];
+		$formattedResult['ebitda_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_ebitda_revenue_percentages : [];
+		$formattedResult['ebit'] = $incomeStatement ? $incomeStatement->ebit : [];
+		$formattedResult['ebit_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_ebit_revenue_percentages : [];
+		$formattedResult['ebt'] =  $incomeStatement ? $incomeStatement->ebt : [];
+		$formattedResult['ebt_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_ebt_revenue_percentages : [];
+		$formattedResult['net_profit'] =  $incomeStatement ? $incomeStatement->net_profit : [];
+		$formattedResult['net_profit_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_net_profit_revenue_percentages : [];
+		$formattedExpenses['raw-material-cost'] = $incomeStatement ? $incomeStatement->total_cogs['raw_material']??[] : [];
+		$formattedExpenses['labor-cost'] = $incomeStatement ? $incomeStatement->total_cogs['direct_labor']??[] : [];
+		$formattedExpenses['manufacturing-overheads'] = $incomeStatement ? $incomeStatement->total_cogs['manufacturing-overheads']??[] : [];
+		$formattedExpenses['marketing-expense'] = $incomeStatement ? $incomeStatement->sganda['marketing']??[] : [];
+		$formattedExpenses['sales-expense'] = $incomeStatement ? $incomeStatement->sganda['sales']??[] : [];
+		$formattedExpenses['general-expense'] = $incomeStatement ? $incomeStatement->sganda['general-expenses']??[] : [];
+		
+		$formattedDcfMethod['ebit'] = $ebit = $incomeStatement ? $incomeStatement->ebit : [];
+		$years = range(0,$this->duration-1);
+		
+		$taxRate = $project->tax_rate?:0 / 100 ;
+		$formattedDcfMethod['taxes'] = $taxes =  HArr::MultiplyWithNumber($formattedDcfMethod['ebit'] ,$taxRate );
+		$formattedDcfMethod['depreciation'] = $depreciation =  $incomeStatement ? $incomeStatement->total_depreciation : [];
+		$formattedDcfMethod['net-change-in-working-capital'] = $netChangeInWorkingCapital = $balanceSheet ? $balanceSheet->net_change_in_working_capital : [];
+		$formattedDcfMethod['capex'] = $capex =  $cashflow ? $cashflow->fixed_asset_payments : [];
+		$sum = HArr::sumAtDates([$ebit,$depreciation,$netChangeInWorkingCapital],$years);
+		$minus = HArr::sumAtDates([$taxes,$capex],$years);
+		$freeCashflow = HArr::subtractAtDates([$sum,$minus],$years);
+		$formattedDcfMethod['free-cashflow'] = $freeCashflow ;
+		$lastValueFreeCashflow = $freeCashflow[array_key_last($freeCashflow)] ??0;
+		$perptual = $this->perpetual_growth_rate/100;
+		$lastValueFreeCashflow = $lastValueFreeCashflow * (1+$perptual);
+		$returnRate = $this->return_rate/100;
+		$total =  0 ; 
+		$fixedAssetAmounts = [];
+		foreach($this->fixedAssets as $fixedAsset){
+			$debitFundingRate = (100-$fixedAsset->equity_funding_rate) /100;
+			$amount = $fixedAsset->getAmount();
+			$total += 	($amount*$debitFundingRate);
+			$fixedAssetAmounts[$fixedAsset->id] = $amount*$debitFundingRate ;
+		}
+		$totalAfterInterest = [];
+		foreach($fixedAssetAmounts as $fixedAssetId => &$currentTotal){
+			$fixedAsset = FixedAsset::find($fixedAssetId);
+			$totalAfterInterest[$fixedAssetId] = ($currentTotal / $total) * ($fixedAsset->interest_rate/100);
+		}
+		$costOfDebit = array_sum($totalAfterInterest);
+		$debitFundingPercentages = $balanceSheet ? $balanceSheet->debit_funding_percentages  : [];
+		$equityFundingPercentages = $balanceSheet ? $balanceSheet->equity_funding_percentages  : [];
+		$debitFundingPercentages = HArr::MultiplyWithNumber($debitFundingPercentages ,$costOfDebit );
+		$equityFundingPercentages = HArr::MultiplyWithNumber($equityFundingPercentages ,$returnRate );
+		$wacc = HArr::sumAtDates([$equityFundingPercentages,$debitFundingPercentages]);
+		unset($wacc[array_key_last($wacc)]);
+		$lastKeyInWacc  = $wacc[array_key_last($wacc)] ?? 0;
+		$terminalValues = [];
+		foreach($years as $index => $yearIndex){
+			$terminalValues[$yearIndex] = 0 ;
+			if($index == count($years)-1){
+				$terminalValues[$yearIndex] = $lastValueFreeCashflow /($lastKeyInWacc-$perptual);
+			}
+		}
+		$formattedDcfMethod['terminal-value'] = $terminalValues ;
+		$formattedDcfMethod['free-cashflow-with-terminal'] = $freeCashflowWithTerminal = HArr::sumAtDates([$terminalValues,$freeCashflow]) ;
+		$newWacc=[];
+		$index = 1 ;
+		foreach($wacc as $yearAsIndex => $wacc){
+			$newWacc[$yearAsIndex] = pow(1+$wacc,$index);
+			$index++;
+		}
+		$formattedDcfMethod['discount-factor'] = array_values($newWacc) ;
+		$formattedDcfMethod['npv'] = [0=>array_sum(HArr::divideTwoArrAtSameIndex($freeCashflowWithTerminal,array_values($newWacc)))] ;
+		
+		
+		
+		
+		// $resultPerRevenueStreamType = [];
+		// $chartsFormatted =$this->formatForTheeLineChart($resultPerRevenueStreamType); 
+		// $lineChart = $chartsFormatted['line_chart'];
+		// $barChart = $chartsFormatted['bar_chart'];
+		
+		// $dashboardData = [
+		// 	'formattedResult'=>[],
+		// 	'formattedExpenses'=>[],
+		// 	'lineChart'=>[],
+		// 	'titlesMapping'=>[],
+		// 	'barChart'=>[],
+		// 	'yearWithItsIndexes'=>
+		// ];
+		// $dashboardData = $this->generateDashboardData($project,false);
+		// $formattedResult = $dashboardData['formattedResult'];
+		// $formattedExpenses =$dashboardData['formattedExpenses'];
+		// $lineChart =$dashboardData['lineChart'];
+		// $titlesMapping =$dashboardData['titlesMapping'];
+		// $barChart =$dashboardData['barChart'];
+		$yearWithItsIndexes = $project->getOperationDurationPerYearFromIndexes();
+		$sensitivityFormattedResult = [];
+		$sensitivityFormattedExpenses=[];
+		// if($withSensitivity){
+		// 	$sensitivityDashboardData = $this->generateDashboardData($project,true );
+		// 	$sensitivityFormattedResult = $sensitivityDashboardData['formattedResult'];
+		// 	$sensitivityFormattedExpenses = $sensitivityDashboardData['formattedExpenses'];
+		// }
+		$yearOrMonthsIndexes = $project->getYearOrMonthIndexes();
+	
+		$isYearsStudy = true;
+		
+		return [
+		'yearsWithItsMonths' => $project->getOperationDurationPerYearFromIndexes(),
+		'model'=>$project,
+		'project'=>$project,
+		'formattedResult'=>$formattedResult,
+		'formattedExpenses'=>$formattedExpenses,
+		// 'lineChart'=>$lineChart,
+		// 'lineChart'=>$lineChart,
+		// 'barChart'=>$barChart,
+		'yearWithItsIndexes'=>$yearWithItsIndexes,
+		'sensitivityFormattedResult'=>$sensitivityFormattedResult,
+		'sensitivityFormattedExpenses'=>$sensitivityFormattedExpenses,
+		'withSensitivity'=>$withSensitivity,
+		'yearOrMonthsIndexes'=>$yearOrMonthsIndexes,
+		'isYearsStudy'=>$isYearsStudy,
+		'formattedDcfMethod'=>$formattedDcfMethod
 		];
 	}
 	
@@ -2249,17 +2541,42 @@ class Project extends Model
 	}
 		public function getInventoryAmount():float 
     {
-		$inventoryAmount = 0 ;
-		foreach($this->products as $product){
-			$inventoryAmount+=$product->getFgInventoryValue();
-		}
-		foreach($this->rawMaterials as $rawMaterial){
-			$inventoryAmount+= $rawMaterial->getBeginningInventoryValue();
-		}
-        return $inventoryAmount ;
+		$fgInventoryAmount = $this->getTotalFgInventoryValue();
+		$totalRawMaterialInventoryValue = $this->getTotalRawMaterialInventoryValue();
+        return $fgInventoryAmount +  $totalRawMaterialInventoryValue ;
     }
+	public function getTotalFgInventoryValue():float
+	{
+		$fgInventoryAmount = 0 ;
+		foreach($this->products as $product){
+			$fgInventoryAmount+=$product->getFgInventoryValue();
+		}
+		return $fgInventoryAmount;
+	}
+	public function getTotalRawMaterialInventoryValue():float
+	{
+		$totalRawMaterialInventoryValue = 0;
+		foreach($this->rawMaterials as $rawMaterial){
+			$totalRawMaterialInventoryValue+= $rawMaterial->getBeginningInventoryValue();
+		}
+		return $totalRawMaterialInventoryValue;
+	}
 	public function cashInOutStatement():HasOne
 	{
 		return $this->hasOne(CashInOutStatement::class,'project_id','id');
 	}
+		public function incomeStatement():HasOne
+	{
+		return $this->hasOne(IncomeStatement::class,'project_id','id');
+	}
+	public function balanceSheet():HasOne
+	{
+		return $this->hasOne(BalanceSheet::class,'project_id','id');
+	}
+	public function getCorporateTaxesPayable():float
+	{
+		$corporateTaxesPayable = DB::table('vat_and_credit_withhold_tax_opening_balances')->where('project_id',$this->id)->first();
+		return $corporateTaxesPayable ? $corporateTaxesPayable->corporate_taxes_payable  : 0 ;
+	}
+	
 }

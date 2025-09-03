@@ -682,6 +682,7 @@ class ComposerStaticInite97a568dc59bb3b2403c43c21046be64
         'App\\Http\\Requests\\StoreProjectRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreProjectRequest.php',
         'App\\Http\\Requests\\UpdateProjectRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateProjectRequest.php',
         'App\\Http\\Requests\\storeProjectDetailRequest' => __DIR__ . '/../..' . '/app/Http/Requests/storeProjectDetailRequest.php',
+        'App\\IncomeStatement' => __DIR__ . '/../..' . '/app/IncomeStatement.php',
         'App\\Loan' => __DIR__ . '/../..' . '/app/Loan.php',
         'App\\LongTermLoanOpeningBalance' => __DIR__ . '/../..' . '/app/LongTermLoanOpeningBalance.php',
         'App\\Mail\\ConnectWithProjectOwner' => __DIR__ . '/../..' . '/app/Mail/ConnectWithProjectOwner.php',
