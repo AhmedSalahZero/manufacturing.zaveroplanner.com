@@ -773,7 +773,7 @@ class Project extends Model
             $tableDataFormatted[$salesRevenueOrderIndex]['sub_items'][$product->getName()]['options'] =array_merge([
                 'title'=>$product->getName(),
             ], $defaultNumericInputClasses);
-			$monthlySalesTargetValues = $product->monthly_sales_target_values;
+			$monthlySalesTargetValues = $product->monthly_sales_target_values?:[];
             $tableDataFormatted[$salesRevenueOrderIndex]['sub_items'][$product->getName()]['data'] = $monthlySalesTargetValues;
 			$tableDataFormatted[$salesRevenueOrderIndex]['sub_items'][$product->getName()]['year_total'] = HArr::sumPerYearIndex($monthlySalesTargetValues,$yearWithItsMonths);
 			$productsTotals = HArr::sumAtDates([$monthlySalesTargetValues?:[],$productsTotals],$sumKeys);
@@ -1214,7 +1214,8 @@ class Project extends Model
 				$otherDebtorsOpeningBalance= (array)json_decode($otherDebtorsOpeningBalance);
 				$totalOtherDebtorsOpeningBalances = HArr::sumAtDates([$totalOtherDebtorsOpeningBalances,$otherDebtorsOpeningBalance],$sumKeys);
 			}
-			$openingBalanceCollection = DB::table('cash_and_bank_opening_balances')->where('project_id',$this->id)->pluck('payload')->toArray()[0]??[];
+			$openingBalanceCollection = DB::table('cash_and_bank_opening_balances')->where('project_id',$this->id)->pluck('payload')->toArray()[0]??'';
+			
 			$openingBalanceCollection = (array) json_decode($openingBalanceCollection);
 			if(count($openingBalanceCollection)){
 				$tableDataFormatted[0]['sub_items'][__('Opening Balance Collection')]['data'] = $openingBalanceCollection;
@@ -1279,7 +1280,7 @@ class Project extends Model
 			$totalCreditWithholdTaxPayments = HArr::sumAtDates([$totalCreditWithholdTaxPayments,$creditWithholdPayment],$sumKeys);
         }
 		
-			$openingBalancePayment = DB::table('supplier_payable_opening_balances')->where('project_id',$this->id)->pluck('payload')->toArray()[0]??[];
+			$openingBalancePayment = DB::table('supplier_payable_opening_balances')->where('project_id',$this->id)->pluck('payload')->toArray()[0]??'';
 			$openingBalancePayment = (array) json_decode($openingBalancePayment);
 			if(count($openingBalancePayment)){
 			
@@ -1641,7 +1642,8 @@ class Project extends Model
 		$totalCustomerReceivables = [];
 		$collectionStatements =  DB::table('products')->where('project_id',$projectId)->pluck('collection_statement')->toArray();
 		foreach($collectionStatements as $collectionStatementEndBalance){
-			$collectionStatementEndBalance= ((array)((array)json_decode($collectionStatementEndBalance))['monthly']??[])['end_balance'];
+			$collectionStatementEndBalance= @((array)((array)json_decode($collectionStatementEndBalance))['monthly']??[])['end_balance'];
+			$collectionStatementEndBalance= $collectionStatementEndBalance ?: [];
 		
 			$totalCustomerReceivables = HArr::sumAtDates([$totalCustomerReceivables,$collectionStatementEndBalance],$sumKeys);
 		}
@@ -1674,7 +1676,8 @@ class Project extends Model
 		$totalFGs = [];
 		$fgInventories =  DB::table('products')->where('project_id',$projectId)->pluck('product_inventory_value_statement')->toArray();
 		foreach($fgInventories as $fgInventory){
-			$fgInventory= ((array)((array)json_decode($fgInventory))['end_balance']??[]);
+			$fgInventory= @((array)((array)json_decode($fgInventory))['end_balance']??[]);
+			$fgInventory = $fgInventory?:[];
 			$totalFGs = HArr::sumAtDates([$fgInventory,$totalFGs],$sumKeys);
 		}
 		$currentDataArr = $totalFGs ;
@@ -1704,7 +1707,8 @@ class Project extends Model
 		$totalRawMaterials = [];
 		$rmInventories =  DB::table('raw_materials')->where('project_id',$projectId)->pluck('inventory_value_statement')->toArray();
 		foreach($rmInventories as $rmInventory){
-			$rmInventory= ((array)((array)json_decode($rmInventory))['end_balance']??[]);
+			$rmInventory= @((array)((array)json_decode($rmInventory))['end_balance']??[]);
+			$rmInventory = $rmInventory?:[];
 			$totalRawMaterials = HArr::sumAtDates([$rmInventory,$totalRawMaterials],$sumKeys);
 		}
 		$currentDataArr = $totalRawMaterials   ;
@@ -1803,14 +1807,16 @@ class Project extends Model
 		 * * Start Key 
 		 */
 		
-	   $supplierOpening = DB::table('supplier_payable_opening_balances')->where('project_id',$this->id)->pluck('statement')->toArray()[0]??[];
-		$supplierOpeningEndBalance = ((array)(((array) json_decode($supplierOpening))['monthly']))['end_balance']??[];
+	   $supplierOpening = DB::table('supplier_payable_opening_balances')->where('project_id',$this->id)->pluck('statement')->toArray()[0]??'';
+		$supplierOpeningEndBalance = @((array)(((array) json_decode($supplierOpening))['monthly']))['end_balance']??[];
+		$supplierOpeningEndBalance = $supplierOpeningEndBalance?:[];
 			
 			
 		$totalRawMaterialsEndBalance = [];
 		$rawMaterialEndBalances =  DB::table('raw_materials')->where('project_id',$projectId)->pluck('collection_statement')->toArray();
 		foreach($rawMaterialEndBalances as $rawMaterial){
-			$rawMaterial= ((array)(((array)((array)json_decode($rawMaterial))['monthly']??[]))['end_balance']??[]);
+			$rawMaterial= @((array)(((array)((array)json_decode($rawMaterial))['monthly']??[]))['end_balance']??[]);
+			$rawMaterial = $rawMaterial?:[];
 			$totalRawMaterialsEndBalance = HArr::sumAtDates([$rawMaterial,$totalRawMaterialsEndBalance],$sumKeys);
 		}
 		$supplierPayables = HArr::sumAtDates([$supplierOpeningEndBalance,$totalRawMaterialsEndBalance],$sumKeys);
@@ -1885,7 +1891,8 @@ class Project extends Model
 		$totalCreditWithholdsEndBalance = [];
 		$creditWithholdEndBalances =  DB::table('raw_materials')->where('project_id',$projectId)->pluck('credit_withhold_statement')->toArray();
 		foreach($creditWithholdEndBalances as $creditWithhold){
-			$creditWithhold= ((array)(((array)((array)json_decode($creditWithhold))['monthly']??[]))['end_balance']??[]);
+			$creditWithhold= @((array)(((array)((array)json_decode($creditWithhold))['monthly']??[]))['end_balance']??[]);
+			$creditWithhold = $creditWithhold?:[];
 			$totalCreditWithholdsEndBalance = HArr::sumAtDates([$creditWithhold,$totalCreditWithholdsEndBalance],$sumKeys);
 		}
 		

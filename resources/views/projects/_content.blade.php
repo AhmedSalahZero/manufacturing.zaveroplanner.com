@@ -126,7 +126,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label> {{__('Required Investment Return %')}} </label>
-                            <input type="number" step="any" min="0" class="form-control @error('return_rate') is-invalid @enderror  " name="return_rate" value="{{isset($project->return_rate) ? $project->return_rate  :old('return_rate') }}" placeholder="{{__('Required Investment Return %')}}" id="return_rate">
+                            <input type="number" step="any" min="0" class="form-control   " name="return_rate" value="{{isset($project->return_rate) ? $project->return_rate  :old('return_rate') }}" placeholder="{{__('Required Investment Return %')}}" id="return_rate">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -134,7 +134,7 @@
                         <div class="form-group">
                             <label>{{__('Perpetual Growth Rate %')}} </label>
                             <?php $perpetual_growth_rate = isset($project->perpetual_growth_rate) ? $project->perpetual_growth_rate  :old('perpetual_growth_rate')  ?>
-                            <input type="number" title="{{__('Recommended Between 2.5% & 5%')}}" max="10" step="any" min="0" id="perpetual_growth_rate" class="form-control @error('perpetual_growth_rate') is-invalid @enderror  " name="perpetual_growth_rate" value="{{$perpetual_growth_rate}}" placeholder="{{__('Perpetual Growth Rate %')}}" {{isset($duration_data) && $duration_data < 3 ? 'readonly': ''}}>
+                            <input type="number" title="{{__('Recommended Between 2.5% & 5%')}}" max="10" step="any" min="0" id="perpetual_growth_rate" class="form-control   " name="perpetual_growth_rate" value="{{$perpetual_growth_rate}}" placeholder="{{__('Perpetual Growth Rate %')}}" {{isset($duration_data) && $duration_data < 3 ? 'readonly': ''}}>
                         </div>
 
                     </div>
