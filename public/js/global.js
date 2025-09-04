@@ -987,4 +987,5 @@ $(document).on('change','.sum_product_value_1,.sum_product_quantity_1,.sum_produ
 })
 $(function(){
 	$('.collapse-before-me').trigger('click')
+	$('.expense-category-class').trigger('change')
 })

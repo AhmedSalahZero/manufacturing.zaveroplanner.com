@@ -782,7 +782,7 @@
 
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>{{__('Cash Payment %')}} </label>
+                                    <label>{{__('Cash %')}} </label>
                                     <input type="number" step="any" class="form-control @error($nameToOld) is-invalid @enderror" value="{{$currentVal}}" name="{{ $currentFieldName }}" id="{{ $currentFieldName }}">
                                     @error($nameToOld)
                                     <div class="alert alert-danger" role="alert">
@@ -805,7 +805,7 @@
                             @for($numberOfCollections = 0 ; $numberOfCollections<= 1 ; $numberOfCollections++) <div class="col-md-2">
 
                                 <div class="form-group">
-                                    <label>{{__('Collection Rate %')}} </label>
+                                    <label>{{__('Rate %')}} </label>
                                     @php
                                     $currentFieldName = "collection_policy_value[$localOrExport][$index][rate][$numberOfCollections]";
                                     $nameToOld = generateOldNameFromFieldName($currentFieldName) ;

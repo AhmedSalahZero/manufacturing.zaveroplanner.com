@@ -19,7 +19,7 @@ trait HasManpowerExpense
         $yearWithItsIndexes = $this->getOperationDurationPerYearFromIndexesForAllStudyInfo();
         $monthsWithItsYear = $this->getMonthsWithItsYear($yearWithItsIndexes) ;
        
-        $isYearsStudy = !$this->isMonthlyStudy();
+        $isYearsStudy = true;
         $currentIndex = 0 ;
         $currentSalaryAtMonthIndex = $monthlyNetSalary ;
         $accumulatedManpowerCounts = [];
@@ -31,7 +31,6 @@ trait HasManpowerExpense
             foreach ($itsMonths as $dateAsIndex => $dateAsString) {
                 
                 $currentYearOrMonthIndex = $isYearsStudy ? $monthsWithItsYear[$dateAsIndex] : $dateAsIndex  ;
-                //   $annualIncreaseRate = $generalAndReserveAssumption->getSalariesAnnualIncreaseRateAtYearOrMonthIndex($currentYearOrMonthIndex) ;
                 $increaseRateCondition = $isYearsStudy ? $currentIndex%12 == 0 : true ; // true to be increase every month so this condition will not have any effect if monthly study
                 $previousHiringCount = $accumulatedManpowerCounts[$dateAsIndex-1] ?? $existingCount;
         
@@ -44,7 +43,6 @@ trait HasManpowerExpense
                 $currentIndex++;
             }
         }
-      
             
         /**
          * * To Calculate Payment Statement

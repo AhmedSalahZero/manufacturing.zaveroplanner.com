@@ -876,9 +876,32 @@ class Project extends Model
 			$currentAmount = (array)$amount ;
 			$resultPerCategory[$categoryId] = isset($resultPerCategory[$categoryId]) ? HArr::sumAtDates([$currentAmount,$resultPerCategory[$categoryId]],$sumKeys):$currentAmount ;
 		}
+		$manpowers = DB::table('manpowers')->whereIn('type',['sales','general'])->where('project_id',$this->id)->get();
+		foreach($manpowers as $manpower){
+			$categoryId = $manpower->type ;
+			if($categoryId == 'general'){
+				$categoryId = 'general-expenses';
+			}
+			$currentAmount = json_decode($manpower->salary_expenses);
+			$resultPerCategory[$categoryId] = isset($resultPerCategory[$categoryId]) ? HArr::sumAtDates([$currentAmount,$resultPerCategory[$categoryId]],$sumKeys):$currentAmount;
+		}
+		foreach($this->fixedAssets as $fixedAsset) 
+		{
+			$currentAmount = $fixedAsset->admin_depreciations;
+			$categoryId = 'general-expenses';
+			$resultPerCategory[$categoryId] = isset($resultPerCategory[$categoryId]) ? HArr::sumAtDates([$currentAmount,$resultPerCategory[$categoryId]],$sumKeys):$currentAmount;
+			
+		}
+		$openingFixedAssets = DB::table('fixed_asset_opening_balances')->where('project_id',$this->id)->get();
+		foreach($openingFixedAssets as $openingFixedAsset){
+			$currentAmount =(array) json_decode($openingFixedAsset->admin_depreciations?:'');
+			$categoryId = 'general-expenses';
+			$resultPerCategory[$categoryId] = isset($resultPerCategory[$categoryId]) ? HArr::sumAtDates([$currentAmount,$resultPerCategory[$categoryId]],$sumKeys):$currentAmount;
+		}
 		$resultTotalPerCategoryPerYear = [];
 		$resultTotalPercentagesPerCategoryPerYear = [];
 		foreach($resultPerCategory as $categoryId => $values){
+			
 			$currentItems=HArr::sumPerYearIndex($values,$yearWithItsMonths);
 			$resultTotalPerCategoryPerYear[$categoryId]=array_values($currentItems);
 			$resultTotalPercentagesPerCategoryPerYear[$categoryId]=array_values(HArr::calculatePercentageOf($salesRevenueYearTotal,$currentItems));
