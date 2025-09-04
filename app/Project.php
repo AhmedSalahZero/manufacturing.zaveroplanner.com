@@ -574,7 +574,7 @@ class Project extends Model
             foreach ($manufacturingAllocationPercentages as $openingId => $dateAsIndexAndValue) {
                 foreach ($allocationPercentage as $productId => $percentage) {
                     foreach ($dateAsIndexAndValue as $dateIndex => $value) {
-                        $productExpenses[$openingId][$productId][$dateIndex] = $value  * $percentage/100;
+                        $productExpenses[$openingId][$productId][$dateIndex] = $value  * ($percentage/100);
                     }
                 }
             }
@@ -2343,7 +2343,7 @@ class Project extends Model
 		$formattedDcfMethod['ebit'] = $ebit = $incomeStatement ? $incomeStatement->ebit : [];
 		$years = range(0,$this->duration-1);
 		
-		$taxRate = $project->tax_rate?:0 / 100 ;
+		$taxRate = $project->tax_rate / 100 ;
 		$formattedDcfMethod['taxes'] = $taxes =  HArr::MultiplyWithNumber($formattedDcfMethod['ebit'] ,$taxRate );
 		$formattedDcfMethod['depreciation'] = $depreciation =  $incomeStatement ? $incomeStatement->total_depreciation : [];
 		$formattedDcfMethod['net-change-in-working-capital'] = $netChangeInWorkingCapital = $balanceSheet ? $balanceSheet->net_change_in_working_capital : [];
@@ -2359,7 +2359,7 @@ class Project extends Model
 		$total =  0 ; 
 		$fixedAssetAmounts = [];
 		foreach($this->fixedAssets as $fixedAsset){
-			$debitFundingRate = (100-$fixedAsset->equity_funding_rate) /100;
+			$debitFundingRate = (100-($fixedAsset->equity_funding_rate/100)) ;
 			$amount = $fixedAsset->getAmount();
 			$total += 	($amount*$debitFundingRate);
 			$fixedAssetAmounts[$fixedAsset->id] = $amount*$debitFundingRate ;
