@@ -380,7 +380,6 @@ class CalculateFixedLoanAtEndService
 					$ffeLoanInstallment['FFE Loan Installment'] = $ffeLoanCalculations['schedulePayment']??[];
 				}
 			}
-		// dd('exee',$executionAndPayment);
 		return [
 			'contractPayments'=>$contractPayments,
 			'ffeEquityPayment'=>$ffeEquityPayment,

@@ -830,7 +830,6 @@ class Project extends Model
 			$totalCogsPerYear[$id] = array_values($currentTotalPerYear);
 			$totalCogsPercentageOfRevenues[$id]  = array_values(HArr::calculatePercentageOf($salesRevenueYearTotal,$currentTotalPerYear)) ;
         }
-		// dd();
 		$totalCostOfGoodsSold = HArr::sumAtDates(array_values($totalCogs),$sumKeys) ;
 		$tableDataFormatted[$costOfServiceOrderIndex]['main_items']['cost-of-goods-sold']['data'] =  $totalCostOfGoodsSold ; 
 		$tableDataFormatted[$costOfServiceOrderIndex]['main_items']['cost-of-goods-sold']['year_total'] =$costOfGodSoldTotalPerYear = HArr::sumPerYearIndex($totalCostOfGoodsSold,$yearWithItsMonths);
@@ -2368,7 +2367,12 @@ class Project extends Model
 		$totalAfterInterest = [];
 		foreach($fixedAssetAmounts as $fixedAssetId => &$currentTotal){
 			$fixedAsset = FixedAsset::find($fixedAssetId);
-			$totalAfterInterest[$fixedAssetId] = ($currentTotal / $total) * ($fixedAsset->interest_rate/100);
+			if($total != 0){
+				$totalAfterInterest[$fixedAssetId] = ($currentTotal / $total) * ($fixedAsset->interest_rate/100);
+				
+			}else{
+				$totalAfterInterest[$fixedAssetId] = 0;
+ 			}
 		}
 		$costOfDebit = array_sum($totalAfterInterest);
 		$debitFundingPercentages = $balanceSheet ? $balanceSheet->debit_funding_percentages  : [];
