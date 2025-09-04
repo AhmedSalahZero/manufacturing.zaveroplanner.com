@@ -125,6 +125,18 @@ class HArr
 		}
 		return $newItems ;
 	}
+	public static function MultiplyWithNumberIfPositive(array $items , float $number)
+	{
+		$newItems = [];
+		foreach($items as $key=>$value){
+			if($value < 0){
+				$newItems[$key]=0;
+			}else{
+				$newItems[$key]=$value * $number ;
+			}
+		}
+		return $newItems ;
+	}
 	
 	public static function sumWithNumber(array $items , float $number)
 	{

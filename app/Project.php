@@ -2344,7 +2344,7 @@ class Project extends Model
 		$years = range(0,$this->duration-1);
 		
 		$taxRate = $project->tax_rate / 100 ;
-		$formattedDcfMethod['taxes'] = $taxes =  HArr::MultiplyWithNumber($formattedDcfMethod['ebit'] ,$taxRate );
+		$formattedDcfMethod['taxes'] = $taxes =  HArr::MultiplyWithNumberIfPositive($formattedDcfMethod['ebit'] ,$taxRate );
 		$formattedDcfMethod['depreciation'] = $depreciation =  $incomeStatement ? $incomeStatement->total_depreciation : [];
 		$formattedDcfMethod['net-change-in-working-capital'] = $netChangeInWorkingCapital = $balanceSheet ? $balanceSheet->net_change_in_working_capital : [];
 		$formattedDcfMethod['capex'] = $capex =  $cashflow ? $cashflow->fixed_asset_payments : [];
