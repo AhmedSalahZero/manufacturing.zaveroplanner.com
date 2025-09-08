@@ -1107,7 +1107,6 @@ class Project extends Model
 		$retainedEarningOpening = DB::table('equity_opening_balances')->where('project_id',$this->id)->first();
 		$retainedEarningOpening = $retainedEarningOpening ? $retainedEarningOpening->retained_earnings : 0;
 		$retainedEarning = HArr::calculateRetainEarning($retainedEarningOpening,$netProfit);
-		// $accumulatedRetainedEarning = HArr::accumulateArray($retainedEarning);
 		$data = [
 			'total_sales_revenues'=>array_values($salesRevenueYearTotal) , 
 			'annually_sales_revenues_growth_rates'=>array_values($annuallySalesRevenueGrowthRates) ,
@@ -1119,12 +1118,13 @@ class Project extends Model
 			'annually_ebit_revenue_percentages'=>array_values($editRevenuePercentage),
 			'ebt'=>array_values($ebtTotalPerYear),
 			'annually_ebt_revenue_percentages'=>array_values($ebtRevenuePercentagePerYear),
-			'net_profit'=>array_values($netProfitTotalPerYear),
+			'net_profit'=>$netProfit,
+			'annually_net_profit'=>$netProfitTotalPerYear,
 			'annually_net_profit_revenue_percentages'=>array_values($netProfitRevenuePercentage),
 			'total_cogs'=>$totalCogsPerYear,
 			'total_percentages_cogs'=>$totalCogsPercentageOfRevenues,
 			'accumulated_retained_earnings'=>$retainedEarning,
-			'total_depreciation'=>$totalDepreciation,
+			'total_depreciation'=>array_values($totalDepreciationTotalPerYear),
 			'sganda'=>$resultTotalPerCategoryPerYear,
 			'sganda_revenues_percentages'=>$resultTotalPercentagesPerCategoryPerYear
 		];
@@ -1808,7 +1808,6 @@ class Project extends Model
 		 */
 		
 		
-		
 		$totalAssets = HArr::sumAtDates([$totalCurrentAssets,$totalProjectUnderProgress ,$netFixedAsset],$sumKeys);
 		$currentDataArr = $totalAssets ;
 		$title = __('Total Assets');
@@ -2232,7 +2231,7 @@ class Project extends Model
 
 		$incomeStatement  = $this->incomeStatement;
 		$netProfits = $incomeStatement ? $incomeStatement->net_profit : [];
-		
+		$annuallyNetProfits = $incomeStatement ? $incomeStatement->annually_net_profit : [];
 		$currentDataArr =$netProfits ; ;
 		$title = __('Profit Of The Period');
 		$currentTabId = $title ;
@@ -2242,7 +2241,7 @@ class Project extends Model
 		   'title'=>$title
 		], $defaultNumericInputClasses);
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
-		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =$annuallyNetProfits ;
 		/**
 		 * * End Key 
 		 */

@@ -20,6 +20,7 @@ class IncomeStatement extends Model
                 'ebt'=>'array',
                 'annually_ebt_revenue_percentages'=>'array',
                 'net_profit'=>'array',
+                'annually_net_profit'=>'array',
                 'annually_net_profit_revenue_percentages'=>'array',
                 'accumulated_retained_earnings'=>'array',
                 'total_depreciation'=>'array',

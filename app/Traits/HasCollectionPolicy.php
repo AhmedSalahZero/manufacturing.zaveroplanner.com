@@ -72,10 +72,14 @@ trait HasCollectionPolicy
         
         // for amount after vat
         $monthlySalesTargetValueAfterVat = HArr::sumAtDates([$monthlySalesTargetValueBeforeVat,$vatAmounts], array_keys($monthlySalesTargetValueBeforeVat));
+	
         $salesActiveYearsIndexWithItsMonths=  $this->getSalesActiveYearsIndexWithItsMonths();
         $hasMultiYear = array_key_exists(1, $salesActiveYearsIndexWithItsMonths) ;
         $monthlySalesTargetValueAfterVatForFirstYearMonths = array_intersect_key($monthlySalesTargetValueAfterVat, array_flip(array_keys($salesActiveYearsIndexWithItsMonths[0])));
         $dueDayWithRates = $this->getDueDayWithRates(0,$localOrExport);
+		// if($localOrExport == 'export'){
+			
+		// }
         $amountAfterVat = [];
         $amountAfterVatForFirstYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $monthlySalesTargetValueAfterVatForFirstYearMonths);
         $amountAfterVat = $amountAfterVatForFirstYear;

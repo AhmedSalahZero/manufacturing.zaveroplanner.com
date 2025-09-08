@@ -64,8 +64,11 @@ class RedirectionController extends Controller
          * monthly_sal target value
          */
         $monthlySalesTargetValueBeforeVat  = $product->calculateMonthlySalesTargetValue();
-		$localCollectionStatement = $product->calculateMultiYearsCollectionPolicy($monthlySalesTargetValueBeforeVat,'local');
-		$exportCollectionStatement = $product->calculateMultiYearsCollectionPolicy($monthlySalesTargetValueBeforeVat,'export');
+        $localMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['localMonthlySalesTargetValue'];
+        $exportMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['exportMonthlySalesTargetValue'];
+		
+		$localCollectionStatement = $product->calculateMultiYearsCollectionPolicy($localMonthlySalesTargetValueBeforeVat,'local');
+		$exportCollectionStatement = $product->calculateMultiYearsCollectionPolicy($exportMonthlySalesTargetValueBeforeVat,'export');
 		$collectionStatement = HArr::sumTwoIntervalArrays($localCollectionStatement,$exportCollectionStatement);
         $product->update([
 			'local_collection_statement'=> $localCollectionStatement ,
@@ -157,7 +160,7 @@ class RedirectionController extends Controller
                         $manpowers['manpowers'][$index][$name] = $value ;
                     }
                     $existingCount = $items['existing_count'];
-                    $hiringCounts  = $items['hirings'];
+                    $hiringCounts  = $items['hirings']??[];
                     
                     $monthlyNetSalary = $items['avg_salary'] ;
                     $salaryTaxesRate = $project->getSalaryTaxRate() / 100;

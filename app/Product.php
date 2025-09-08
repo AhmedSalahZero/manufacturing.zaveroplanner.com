@@ -342,7 +342,6 @@ class Product extends Model
 		$monthlySalesTargetQuantityColumnName = $isSensitivity ? 'sensitivity_monthly_sales_target_quantities' :  'monthly_sales_target_quantities';
 		$beginningBalance = $this->getFgInventoryQuantity();
 		$monthsToCover = $this->getMonthsToCover();
-		// $monthlySalesTargetValue
 		$productRawMaterialConsumed = [];
 		foreach($monthlySalesTargetValue as $dateAsIndex => $monthlySalesValue){
 			$currentYearIndex = $datesIndexWithYearIndex[$dateAsIndex];
@@ -360,7 +359,10 @@ class Product extends Model
 			'product_raw_material_consumed'=>$productRawMaterialConsumed
 		]);
 		
-		return $monthlySalesTargetValue;
+		return [
+			'localMonthlySalesTargetValue'=>$localMonthlySalesTargetValue,
+			'exportMonthlySalesTargetValue'=>$exportMonthlySalesTargetValue
+		];
 	}
 	/**
 	 * * vat  rate 20 for example NOT 0.20

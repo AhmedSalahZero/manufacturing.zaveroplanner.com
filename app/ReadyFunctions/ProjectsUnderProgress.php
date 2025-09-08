@@ -8,7 +8,7 @@ class ProjectsUnderProgress
 {
 	public function calculateForFFE(int $ffeEndDateAsIndex,array $ffeExecutionAndPayment,array $ffeLoanInterestAmount,array $ffeLoanWithdrawalInterestAmounts,Project $project,int $operationStartDateAsIndex,array $datesAsStringAndIndex,array $datesIndexWithYearIndex,array $yearIndexWithYear,array $dateIndexWithDate,array $dateWithMonthNumber):array
 	{
-		
+
 		$studyDurationPerYear = $project->getStudyDurationPerYear($datesAsStringAndIndex,$datesIndexWithYearIndex,$yearIndexWithYear,$dateIndexWithDate,$dateWithMonthNumber,true, true, false);
 		$studyDates = $project->getOnlyDatesOfActiveStudy($studyDurationPerYear,$dateIndexWithDate);
 		
@@ -23,7 +23,7 @@ class ProjectsUnderProgress
 		// $finalFFEExecutionDateAsIndex = $project->convertDateStringToDateIndex($finalFFEExecutionDateAsIndex);
 		$dateBeforeOperation = $operationStartDateAsIndex == 0 ? $operationStartDateAsIndex : $operationStartDateAsIndex- 1;
 		$dateBeforeOperation = $dateBeforeOperation < 0 ? 0 : $dateBeforeOperation ;
-		$dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ? $dateBeforeOperation : $ffeEndDateAsIndex-1;
+		$dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ? $dateBeforeOperation : $ffeEndDateAsIndex;
 		$finalCapitalizedInterestDateAsIndex = $dateBeforeOperation >= $finalFFEExecutionDateAsIndex ? $dateBeforeOperation : $finalFFEExecutionDateAsIndex;
 		$transferredToFixedAssetDateAsIndex = $finalCapitalizedInterestDateAsIndex;
 

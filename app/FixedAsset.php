@@ -91,7 +91,10 @@ class FixedAsset extends Model
 	}
 	public function getDuration():int 
 	{
-		return $this->getEndDateAsIndex() - $this->getStartDateAsIndex();
+		if($this->getEndDateAsIndex() == $this->getStartDateAsIndex()){
+			return 0;
+		}
+		return $this->getEndDateAsIndex() - $this->getStartDateAsIndex() +1 ;
 	}
 	public function getDepreciationDuration():int
 	{
