@@ -341,17 +341,20 @@ class Product extends Model
 		$monthlySalesTargetValueColumnName = $isSensitivity ? 'sensitivity_monthly_sales_target_values' :  'monthly_sales_target_values';
 		$monthlySalesTargetQuantityColumnName = $isSensitivity ? 'sensitivity_monthly_sales_target_quantities' :  'monthly_sales_target_quantities';
 		$beginningBalance = $this->getFgInventoryQuantity();
+		
 		$monthsToCover = $this->getMonthsToCover();
+		$inventoryQuantityStatement  = (new InventoryQuantityStatement())->createInventoryQuantityStatement($monthlySalesTargetQuantities,$beginningBalance,$monthsToCover);
 		$productRawMaterialConsumed = [];
 		foreach($monthlySalesTargetValue as $dateAsIndex => $monthlySalesValue){
 			$currentYearIndex = $datesIndexWithYearIndex[$dateAsIndex];
+			$currentSalesQuantity = $inventoryQuantityStatement['sales_quantity'][$dateAsIndex]??1;
+			$currentManufacturingQuantity = $inventoryQuantityStatement['manufacturing_quantity'][$dateAsIndex]??1;
 			foreach($this->rawMaterials as $rawMaterial ){
 				$percentagesForCurrentDateIndex = (json_decode($rawMaterial->pivot->percentages)[$currentYearIndex]??0) / 100;
-				$productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex]  = $percentagesForCurrentDateIndex * $monthlySalesValue ;
+				$productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex]  = ($percentagesForCurrentDateIndex * $monthlySalesValue) / $currentSalesQuantity *  $currentManufacturingQuantity;
 				$productRawMaterialConsumed['total'][$dateAsIndex] = isset($productRawMaterialConsumed['total'][$dateAsIndex]) ? $productRawMaterialConsumed['total'][$dateAsIndex] + $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex] : $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex];
 			}
 		}
-		$inventoryQuantityStatement  = (new InventoryQuantityStatement())->createInventoryQuantityStatement($monthlySalesTargetQuantities,$beginningBalance,$monthsToCover);
 		$this->update([
 			$monthlySalesTargetValueColumnName=>$monthlySalesTargetValue,
 			$monthlySalesTargetQuantityColumnName=>$monthlySalesTargetQuantities,

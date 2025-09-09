@@ -155,7 +155,7 @@ class RedirectionController extends Controller
         foreach (getManpowerTypes() as $id => $manpowerOptionArr) {
             foreach ($request->get($id) as $i => $items) {
                 if (isset($items['position']) && isset($items['avg_salary'])) {
-					$items['existing_count'] = isset($items['existing_count']) ? $items['existing_count'] : [];
+					$items['existing_count'] = isset($items['existing_count']) ? $items['existing_count'] : 0;
                     foreach ($items as $name => $value) {
                         $manpowers['manpowers'][$index][$name] = $value ;
                     }

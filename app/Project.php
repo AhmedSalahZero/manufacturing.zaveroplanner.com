@@ -380,7 +380,6 @@ class Project extends Model
         DB::table('products')->where('project_id', $this->id)->update([
             'product_overheads_allocation'=>null
         ]);
-        $result = [];
         $productExpenseAllocations = DB::table('product_expense_allocations')->where('project_id', $this->id)->get()->toArray();
         $result = [];
         $depreciationResult = [];
@@ -390,6 +389,7 @@ class Project extends Model
 			$isDepreciation = $productExpenseAllocation->is_depreciation || $productExpenseAllocation->is_opening_depreciation;
             $payload = json_decode($payload);
             foreach ($payload as $dateAsIndex => $value) {
+				
                 $result[$productId][$dateAsIndex] = isset($result[$productId][$dateAsIndex]) ? $result[$productId][$dateAsIndex] + $value : $value ;
 				if($isDepreciation){
 					                $depreciationResult[$productId][$dateAsIndex] = isset($depreciationResult[$productId][$dateAsIndex]) ? $depreciationResult[$productId][$dateAsIndex] + $value : $value ;
@@ -402,7 +402,6 @@ class Project extends Model
 				'product_depreciation_allocation'=> isset($depreciationResult[$productId]) ? json_encode($depreciationResult[$productId]) : null
             ]);
         }
-        
         $this->recalculateFgInventoryValueStatement();
         
     }
@@ -437,13 +436,17 @@ class Project extends Model
             foreach ($fgBeginningInventoryBreakdowns as $inventoryItemType => $inventoryItemValues) {
                 $fgBeginningInventoryBreakdownValue =  $inventoryItemValues['value']??0	;
                 $currentColumnMapping = $columnNameMapping[$inventoryItemType];
-                $fgStatementValues[$productId][$inventoryItemType]['beginning_value'] = $fgBeginningInventoryBreakdownValue;
                 $currentManufacturingExpenseArr = $currentColumnMapping == 'product_raw_material_consumed' ?  ($product->{$currentColumnMapping}['total']??[]) :   (array)$product->{$currentColumnMapping} ;
-                foreach ($currentManufacturingExpenseArr as $dateAsIndex => $currentManufacturingExpenseVal) {
+				// if($inventoryItemType == 'raw_material_value'){
+					// 	dd($product ,$currentColumnMapping,$product->{$currentColumnMapping}  );
+					// }
+					foreach ($currentManufacturingExpenseArr as $dateAsIndex => $currentManufacturingExpenseVal) {
+					$fgStatementValues[$productId][$inventoryItemType]['beginning_value'][$dateAsIndex] = $fgBeginningInventoryBreakdownValue;
                     $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex] = $currentManufacturingExpenseVal+$fgBeginningInventoryBreakdownValue;
                     $totalAvailableValueAtCurrentDateIndex = $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex];
                     $fgStatementValues[$productId][$inventoryItemType]['addition_manufacturing_expenses'][$dateAsIndex] = $currentManufacturingExpenseVal;
                     $totalAvailableQuantityAtDate  = $totalAvailableQuantity[$dateAsIndex] ??0 ;
+					
                     $fgStatementValues[$productId][$inventoryItemType]['manufacturing_expenses_per_unit'][$dateAsIndex] =$totalAvailableQuantityAtDate ?  $totalAvailableValueAtCurrentDateIndex /$totalAvailableQuantityAtDate: 0 ;
                     $manufacturingExpensesPerUnit = $fgStatementValues[$productId][$inventoryItemType]['manufacturing_expenses_per_unit'][$dateAsIndex];
                     $salesQuantityAtCurrentDate = $salesQuantity[$dateAsIndex] ?? 0 ;
@@ -451,20 +454,18 @@ class Project extends Model
                     $currentCogsAtDate = $fgStatementValues[$productId][$inventoryItemType]['cogs'][$dateAsIndex]??0 ;
                     $fgStatementValues[$productId][$inventoryItemType]['end_balance'][$dateAsIndex] = $totalAvailableValueAtCurrentDateIndex - $currentCogsAtDate ;
                     $currentEndBalanceAtDate = $fgStatementValues[$productId][$inventoryItemType]['end_balance'][$dateAsIndex] ?? [];
-                    $fgBeginningInventoryBreakdowns = $currentEndBalanceAtDate;
+					// dd($fgBeginningInventoryBreakdowns ,$currentEndBalanceAtDate );
+                    $fgBeginningInventoryBreakdownValue = $currentEndBalanceAtDate;
+                    // $fgBeginningInventoryBreakdowns = $currentEndBalanceAtDate;
                     
                     if($inventoryItemType =='product_depreciation_allocation'){
 						$currentCogsAtDate = 0 ;
 						$currentEndBalanceAtDate = 0 ;
 					}
-					
                     $fgValueStatement[$productId]['cogs'][$dateAsIndex] = isset($fgValueStatement[$productId]['cogs'][$dateAsIndex]) ? $fgValueStatement[$productId]['cogs'][$dateAsIndex] +  $currentCogsAtDate : $currentCogsAtDate ;
-                    $fgValueStatement[$productId]['end_balance'][$dateAsIndex] = isset($fgValueStatement[$productId]['end_balance'][$dateAsIndex]) ? $fgValueStatement[$productId]['end_balance'][$dateAsIndex] +  $currentCogsAtDate : $currentEndBalanceAtDate;
-                    
-              
+                    $fgValueStatement[$productId]['end_balance'][$dateAsIndex] = isset($fgValueStatement[$productId]['end_balance'][$dateAsIndex]) ? $fgValueStatement[$productId]['end_balance'][$dateAsIndex] +  $currentEndBalanceAtDate : $currentEndBalanceAtDate;
                     
                 }
-                
                 // $currentManufacturingExpenseArr = HArr::sumWithNumber($currentManufacturingExpenseArr,$fgBeginningInventoryBreakdownValue);
                 
             }
@@ -809,6 +810,7 @@ class Project extends Model
 		foreach($products as $product){
 			
 			$rawMaterialCogs = $product->raw_material_statement ? (array)(@json_decode($product->raw_material_statement)->cogs) : [];
+			
 			$directLaborCogs =$product->product_manpower_statement ?  (array)(@json_decode($product->product_manpower_statement)->cogs) : [] ;
 			$manufacturingCogs = $product->product_overheads_statement ? (array)(@json_decode($product->product_overheads_statement)->cogs) : [] ;
 			$totalCogs['raw_material'] = HArr::sumAtDates([$rawMaterialCogs,$totalCogs['raw_material']],$sumKeys);
@@ -816,7 +818,7 @@ class Project extends Model
 			$totalCogs['manufacturing-overheads'] = HArr::sumAtDates([$manufacturingCogs,$totalCogs['manufacturing-overheads']],$sumKeys);
 			
 		}
-
+	
 			$totalCogsPerYear = [];
 			$totalCogsPercentageOfRevenues = [];
         foreach (['raw_material'=>__('Raw Materials') , 'direct_labor'=>__('Direct Labors') , 'manufacturing-overheads'=>__('Manufacturing Overheads')] as $id => $title) {
@@ -824,6 +826,7 @@ class Project extends Model
             $tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['options'] =array_merge([
                 'title'=>$title,
             ], $defaultNumericInputClasses); 
+			
 			$currentTotalCogs = $totalCogs[$id]??[];
 			$tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['data'] = $currentTotalCogs ;
 			$tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['year_total'] = $currentTotalPerYear = HArr::sumPerYearIndex($currentTotalCogs,$yearWithItsMonths);
@@ -938,7 +941,6 @@ class Project extends Model
 		$depreciationCogs =DB::table('products')->where('project_id',$project->id)->pluck('product_depreciation_statement')->toArray();
 		$formattedDepreciationCogs = [];
 		foreach($depreciationCogs as $index => $depreciationCogArr){
-		
 			$formattedDepreciationCogs[$index] = isset(json_decode($depreciationCogArr)->cogs) ?  (array)json_decode($depreciationCogArr)->cogs : [];
 		}
 		$formattedDepreciationCogs = HArr::sumAtDates($formattedDepreciationCogs,$sumKeys);
@@ -951,10 +953,10 @@ class Project extends Model
 			$value = (array)json_decode($value);
 		});
 		$totalFixedAssetAdminDepreciation = HArr::sumAtDates(array_merge($fixedAssetAdminDepreciations,$fixedAssetOpeningBalancesAdminDepreciations),$sumKeys);
+	
 		$totalDepreciation = HArr::sumAtDates([$formattedDepreciationCogs,$totalFixedAssetAdminDepreciation],$sumKeys);
 		$sum = HArr::sumAtDates([$totalDepreciation,$totalGrossProfit],$sumKeys);
 		$editda = HArr::subtractAtDates([$sum,$totalSGANDA],$sumKeys) ;
-		
         $tableDataFormatted[$ebitdaOrderIndex]['main_items']['ebitda']['data'] = $editda;
 		$tableDataFormatted[$ebitdaOrderIndex]['main_items']['ebitda']['year_total'] =$ebitdaTotalPerYear= HArr::sumPerYearIndex($editda,$yearWithItsMonths);
 		$tableDataFormatted[$ebitdaOrderIndex]['main_items']['% Of Revenue']['data'] =  HArr::calculatePercentageOf($productsTotals,$editda);
@@ -2169,7 +2171,7 @@ class Project extends Model
 		 */
 		$workingCapitalInjection = $cashInOutStatement ? $cashInOutStatement->working_capital_injection : [];
 		$equityInjection = $cashInOutStatement ? $cashInOutStatement->equity_injection : [];
-		$additionalPaidUpCapital = HArr::sumAtDates([$workingCapitalInjection,$equityInjection],$sumKeys) ; 
+		$additionalPaidUpCapital = HArr::accumulateArray(HArr::sumAtDates([$workingCapitalInjection,$equityInjection],$sumKeys)) ; 
 		$currentDataArr =$additionalPaidUpCapital; ;
 		$title = __('Additional Paid Up Capital');
 		$currentTabId = $title ;
