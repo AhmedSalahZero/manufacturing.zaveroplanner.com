@@ -4,6 +4,7 @@ $(document).on('change', '.percentage_field,.number_field', function () {
 	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
 	const number = number_unformat($(parent).find('.number_field' + appendColumnIndex).val())
 	const percentage = number_unformat($(parent).find('.percentage_field' + appendColumnIndex).val())
+	console.log(number,percentage);
 	const result = number * percentage / 100
 	$(parent).find('.number_multiple_percentage' + appendColumnIndex).val(result).trigger('change')
 })

@@ -6,9 +6,18 @@ use App\Project;
 
 class ProjectsUnderProgress
 {
-	public function calculateForFFE(int $ffeEndDateAsIndex,array $ffeExecutionAndPayment,array $ffeLoanInterestAmount,array $ffeLoanWithdrawalInterestAmounts,Project $project,int $operationStartDateAsIndex,array $datesAsStringAndIndex,array $datesIndexWithYearIndex,array $yearIndexWithYear,array $dateIndexWithDate,array $dateWithMonthNumber):array
+	public function calculateForFFE(int $ffeStartDateAsIndex,int $ffeEndDateAsIndex,array $ffeExecutionAndPayment,array $ffeLoanInterestAmount,array $ffeLoanWithdrawalInterestAmounts,Project $project,int $operationStartDateAsIndex,array $datesAsStringAndIndex,array $datesIndexWithYearIndex,array $yearIndexWithYear,array $dateIndexWithDate,array $dateWithMonthNumber):array
 	{
-
+		$fixedStartDateISEqualToFixedEndDate = $ffeEndDateAsIndex == $ffeStartDateAsIndex ;
+		$transferDateFactor = $fixedStartDateISEqualToFixedEndDate ? 0 : 1 ;
+		// if(){
+		// 	return [
+		// 		'transferred_date_and_vales'=>[
+		// 			$ffeEndDateAsIndex=>0
+		// 		]
+		// 		];
+		// }
+		
 		$studyDurationPerYear = $project->getStudyDurationPerYear($datesAsStringAndIndex,$datesIndexWithYearIndex,$yearIndexWithYear,$dateIndexWithDate,$dateWithMonthNumber,true, true, false);
 		$studyDates = $project->getOnlyDatesOfActiveStudy($studyDurationPerYear,$dateIndexWithDate);
 		
@@ -26,7 +35,6 @@ class ProjectsUnderProgress
 		$dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ? $dateBeforeOperation : $ffeEndDateAsIndex;
 		$finalCapitalizedInterestDateAsIndex = $dateBeforeOperation >= $finalFFEExecutionDateAsIndex ? $dateBeforeOperation : $finalFFEExecutionDateAsIndex;
 		$transferredToFixedAssetDateAsIndex = $finalCapitalizedInterestDateAsIndex;
-
 		$capitalizedInterest = $project->sumTwoArrayUntilIndex($ffeLoanWithdrawalInterestAmounts, $ffeLoanInterestAmount, $finalCapitalizedInterestDateAsIndex);
 		foreach ($studyDates as  $dateAsIndex) {
 			$result['beginning_balance'][$dateAsIndex] = $beginningBalance;
@@ -37,16 +45,16 @@ class ProjectsUnderProgress
 			$total = $beginningBalance  + $additionsAtDate  +  $capitalizedInterestAtDate;
 			$result['total'][$dateAsIndex] = $total;
 			$beginningBalance = $total;
-			if ($dateAsIndex == ($transferredToFixedAssetDateAsIndex+1)) {
+			if ($dateAsIndex == ($transferredToFixedAssetDateAsIndex+$transferDateFactor)    ) {
 				$result['transferred_date_and_vales'][$dateAsIndex] = $total;
 				$result['end_balance'][$dateAsIndex] = $total  -  $result['transferred_date_and_vales'][$dateAsIndex];
 				break;
 			} else {
+
 				$result['transferred_date_and_vales'][$dateAsIndex] = 0;
 				$result['end_balance'][$dateAsIndex] =$total;
 			}
 		}
-		
 		return $result;
 	}
 }

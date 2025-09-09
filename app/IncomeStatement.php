@@ -18,6 +18,7 @@ class IncomeStatement extends Model
                 'ebit'=>'array',
                 'annually_ebit_revenue_percentages'=>'array',
                 'ebt'=>'array',
+                'monthly_ebt'=>'array',
                 'annually_ebt_revenue_percentages'=>'array',
                 'net_profit'=>'array',
                 'annually_net_profit'=>'array',

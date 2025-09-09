@@ -817,6 +817,25 @@ public static function getPerYearIndexForEndBalance(array $itemsAsDateIndexAndVa
 	}
 	return $result ;
 }
+public static function getPerYearIndexForFirstMonthInYear(array $itemsAsDateIndexAndValue ,  array $yearWithItsMonths):array{
+	$result = [];
+	foreach($yearWithItsMonths as $yearIndex => $itsMonths){
+		$currentYearTotal = 0;
+		$isFirstMonth = true ;
+		foreach($itsMonths as $dateAsIndex => $dateAsString){
+			if($isFirstMonth){
+				$currentValue = $itemsAsDateIndexAndValue[$dateAsIndex]??0 ;
+				$currentYearTotal =  $currentValue;
+				$isFirstMonth = false ;
+			}
+		}
+		/**
+		 * * هنحط النتيجه بتاعتك كل سنه عند اخر شهر في السنه دي
+		 */
+		$result[$dateAsIndex] = $currentYearTotal;
+	}
+	return $result ;
+}
 public static function getPerYearIndexForCashAndBank(array $itemsAsDateIndexAndValue ,  array $yearWithItsMonths):array{
 	$result = [];
 	foreach($yearWithItsMonths as $yearIndex => $itsMonths){

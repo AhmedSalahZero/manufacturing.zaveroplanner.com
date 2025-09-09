@@ -20,8 +20,7 @@ input.form-control[type="text"][readonly] {
 		<div class="mt-3">
 			<a href="{{ $nextRoute }}" type="submit" class="btn btn-rev float-right" name="submit_button" value="next">{{ __('Next') }}</a>
             <a href="{{ route('main.project.page',['project'=>$project->id]) }}" type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{ __('Go To Main Page') }}</a>
-
-			</div>
+		</div>
 			
 
 </div>

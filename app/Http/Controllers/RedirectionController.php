@@ -276,7 +276,7 @@ class RedirectionController extends Controller
                     $tableDataArr['monthly_repeating_amounts']  = $monthlyFixedRepeatingResults['total_before_vat'];
                     $tableDataArr['total_vat']  = $monthlyFixedRepeatingResults['total_vat'];
                     $tableDataArr['total_after_vat']  = $monthlyFixedRepeatingResults['total_after_vat'];
-                    $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy) ;
+                    $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy,true) ;
                     $withholdPayments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $withholdAmounts, $datesAsIndexAndString, $customCollectionPolicy) ;
                     $netPaymentsAfterWithhold = HArr::subtractAtDates([$payments,$withholdPayments], array_keys($payments));
                     $tableDataArr['withhold_amounts'] = $withholdAmounts ;
@@ -545,7 +545,6 @@ class RedirectionController extends Controller
         $dateValue = convertIndexKeysToString($dateValue, $datesAsIndexAndString);
         $collectionPolicyValue = is_array($collectionPolicyValue) ?  $this->formatDues($collectionPolicyValue) : $collectionPolicyValue;
         $result = (new CollectionPolicyService())->applyCollectionPolicy(true, $collectionPolicyType, $collectionPolicyValue, $dateValue) ;
-        
         return convertStringKeysToIndexes($result, $datesAsIndexAndString);
     }
     private function formatDues(array $duesAndDays)

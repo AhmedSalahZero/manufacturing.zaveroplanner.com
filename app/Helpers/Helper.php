@@ -247,7 +247,7 @@ function convertStringKeysToIndexes(array $items, array $datesAsIndexAndString)
     $result = [];
     foreach ($items as $dateAsString => $value) {
         $dateAsIndex = array_search($dateAsString, $datesAsIndexAndString);
-        if ($dateAsIndex != false) {
+        if ($dateAsIndex !== false) {
             $result[$dateAsIndex] = $value ;
         }
     }

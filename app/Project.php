@@ -307,7 +307,7 @@ class Project extends Model
             $ffeExecutionAndPayment = $fixedAssetCalculationResultArr['ffeExecutionAndPayment'];
             $ffeLoanInterestAmounts = $fixedAssetCalculationResultArr['ffeLoanInterestAmounts'];
             $ffeLoanWithdrawalInterestAmounts = $fixedAssetCalculationResultArr['ffeLoanWithdrawalInterest'];
-            $projectUnderProgressFFE = $projectUnderProgressService->calculateForFFE($fixedAsset->getEndDateAsIndex(), $ffeExecutionAndPayment, $ffeLoanInterestAmounts, $ffeLoanWithdrawalInterestAmounts, $this, $operationStartDateAsIndex, $datesAsStringAndIndex, $datesIndexWithYearIndex, $yearIndexWithYear, $dateIndexWithDate, $dateWithMonthNumber);
+            $projectUnderProgressFFE = $projectUnderProgressService->calculateForFFE($fixedAsset->getStartDateAsIndex(),$fixedAsset->getEndDateAsIndex(), $ffeExecutionAndPayment, $ffeLoanInterestAmounts, $ffeLoanWithdrawalInterestAmounts, $this, $operationStartDateAsIndex, $datesAsStringAndIndex, $datesIndexWithYearIndex, $yearIndexWithYear, $dateIndexWithDate, $dateWithMonthNumber);
 	
         
             $transferredDateForFFEAsIndex = array_key_last($projectUnderProgressFFE['transferred_date_and_vales']??[]);
@@ -370,8 +370,8 @@ class Project extends Model
                     'payload'=>json_encode($fixedAssetsAllocations[$productId])
                 ]);
             }
-            $this->recalculateAllProductsOverheadExpenses();
         }
+		$this->recalculateAllProductsOverheadExpenses();
         $this->recalculateFgInventoryValueStatement();
         
     }
@@ -380,7 +380,7 @@ class Project extends Model
         DB::table('products')->where('project_id', $this->id)->update([
             'product_overheads_allocation'=>null
         ]);
-        $productExpenseAllocations = DB::table('product_expense_allocations')->where('project_id', $this->id)->get()->toArray();
+        $productExpenseAllocations = DB::table('product_expense_allocations')->where('project_id', $this->id)->get();
         $result = [];
         $depreciationResult = [];
         foreach ($productExpenseAllocations as $index => $productExpenseAllocation) {
@@ -437,9 +437,7 @@ class Project extends Model
                 $fgBeginningInventoryBreakdownValue =  $inventoryItemValues['value']??0	;
                 $currentColumnMapping = $columnNameMapping[$inventoryItemType];
                 $currentManufacturingExpenseArr = $currentColumnMapping == 'product_raw_material_consumed' ?  ($product->{$currentColumnMapping}['total']??[]) :   (array)$product->{$currentColumnMapping} ;
-				// if($inventoryItemType == 'raw_material_value'){
-					// 	dd($product ,$currentColumnMapping,$product->{$currentColumnMapping}  );
-					// }
+				
 					foreach ($currentManufacturingExpenseArr as $dateAsIndex => $currentManufacturingExpenseVal) {
 					$fgStatementValues[$productId][$inventoryItemType]['beginning_value'][$dateAsIndex] = $fgBeginningInventoryBreakdownValue;
                     $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex] = $currentManufacturingExpenseVal+$fgBeginningInventoryBreakdownValue;
@@ -477,11 +475,7 @@ class Project extends Model
                 'product_inventory_value_statement'=>$fgValueStatement[$productId]??[]
             ]);
         }
-        //
-        //
-        // foreach($fgStatementValues as $productId => $statementArr){
-        // 	$prodc
-        // 	$productManpowerStatement = $statementArr['direct_labor_value']??[];
+   
             
             
         // }
@@ -810,7 +804,6 @@ class Project extends Model
 		foreach($products as $product){
 			
 			$rawMaterialCogs = $product->raw_material_statement ? (array)(@json_decode($product->raw_material_statement)->cogs) : [];
-			
 			$directLaborCogs =$product->product_manpower_statement ?  (array)(@json_decode($product->product_manpower_statement)->cogs) : [] ;
 			$manufacturingCogs = $product->product_overheads_statement ? (array)(@json_decode($product->product_overheads_statement)->cogs) : [] ;
 			$totalCogs['raw_material'] = HArr::sumAtDates([$rawMaterialCogs,$totalCogs['raw_material']],$sumKeys);
@@ -953,8 +946,8 @@ class Project extends Model
 			$value = (array)json_decode($value);
 		});
 		$totalFixedAssetAdminDepreciation = HArr::sumAtDates(array_merge($fixedAssetAdminDepreciations,$fixedAssetOpeningBalancesAdminDepreciations),$sumKeys);
-	
 		$totalDepreciation = HArr::sumAtDates([$formattedDepreciationCogs,$totalFixedAssetAdminDepreciation],$sumKeys);
+		// dd($formattedDepreciationCogs,$totalFixedAssetAdminDepreciation);
 		$sum = HArr::sumAtDates([$totalDepreciation,$totalGrossProfit],$sumKeys);
 		$editda = HArr::subtractAtDates([$sum,$totalSGANDA],$sumKeys) ;
         $tableDataFormatted[$ebitdaOrderIndex]['main_items']['ebitda']['data'] = $editda;
@@ -1108,6 +1101,7 @@ class Project extends Model
 		
 		$retainedEarningOpening = DB::table('equity_opening_balances')->where('project_id',$this->id)->first();
 		$retainedEarningOpening = $retainedEarningOpening ? $retainedEarningOpening->retained_earnings : 0;
+		// $retainedEarning = HArr::calculateRetainEarning($retainedEarningOpening,$ebt);
 		$retainedEarning = HArr::calculateRetainEarning($retainedEarningOpening,$netProfit);
 		$data = [
 			'total_sales_revenues'=>array_values($salesRevenueYearTotal) , 
@@ -1118,6 +1112,7 @@ class Project extends Model
 			'annually_ebitda_revenue_percentages'=>array_values($editdaRevenuePercentage),
 			'ebit'=>array_values($ebitTotalPerYear),
 			'annually_ebit_revenue_percentages'=>array_values($editRevenuePercentage),
+			'monthly_ebt'=>$ebt,
 			'ebt'=>array_values($ebtTotalPerYear),
 			'annually_ebt_revenue_percentages'=>array_values($ebtRevenuePercentagePerYear),
 			'net_profit'=>$netProfit,
@@ -1604,10 +1599,9 @@ class Project extends Model
 		$totalProjectUnderProgress = [];
 		$capitalizedStatements =  DB::table('fixed_assets')->where('project_id',$projectId)->pluck('capitalization_statement')->toArray();
 		foreach($capitalizedStatements as $capitalizedStatement){
-			$capitalizedStatement= ((array)((array)json_decode($capitalizedStatement))['end_balance']??[]);
+			$capitalizedStatement= @((array)((array)json_decode($capitalizedStatement))['end_balance']??[]);
 			$totalProjectUnderProgress = HArr::sumAtDates([$totalProjectUnderProgress,$capitalizedStatement],$sumKeys);
 		}
-		
 		$currentDataArr = $totalProjectUnderProgress  ;   
 			$title = __('Projects Under Progress');
 		$currentTabId = $title ;
@@ -2222,7 +2216,7 @@ class Project extends Model
 		   'title'=>$title
 		], $defaultNumericInputClasses);
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
-		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForFirstMonthInYear($currentDataArr,$yearWithItsMonths) ;
 		/**
 		 * * End Key 
 		 */
@@ -2233,6 +2227,8 @@ class Project extends Model
 
 		$incomeStatement  = $this->incomeStatement;
 		$netProfits = $incomeStatement ? $incomeStatement->net_profit : [];
+		$monthlyEbt = $incomeStatement ? $incomeStatement->monthly_ebt : [];
+		
 		$annuallyNetProfits = $incomeStatement ? $incomeStatement->annually_net_profit : [];
 		$currentDataArr =$netProfits ; ;
 		$title = __('Profit Of The Period');
@@ -2242,7 +2238,7 @@ class Project extends Model
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
 		   'title'=>$title
 		], $defaultNumericInputClasses);
-		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $monthlyEbt;
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =$annuallyNetProfits ;
 		/**
 		 * * End Key 
@@ -2253,8 +2249,9 @@ class Project extends Model
 		 * * Start Key 
 		 */
 		
-		$totalOwnersEquity = HArr::sumAtDates([$paidUpCapitals,$additionalPaidUpCapital,$legalReserve,$accumulatedRetainedEarnings,$netProfits],$sumKeys);
-		$currentDataArr = $totalOwnersEquity; ;
+		$monthlyTotalOwnersEquity = HArr::sumAtDates([$paidUpCapitals,$additionalPaidUpCapital,$legalReserve,$accumulatedRetainedEarnings,$monthlyEbt],$sumKeys);
+		$annuallyTotalOwnersEquity = HArr::sumAtDates([$paidUpCapitals,$additionalPaidUpCapital,$legalReserve,$accumulatedRetainedEarnings,$netProfits],$sumKeys);
+		// $currentDataArr = $totalOwnersEquity; ;
 		$title = __('Total Owners Equity');
 		$currentTabId = $title ;
 		$currentTabIndex +=1;
@@ -2262,8 +2259,8 @@ class Project extends Model
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
 		   'title'=>$title
 		], $defaultNumericInputClasses);
-		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
-		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] = $totalOwnerEquity = HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $monthlyTotalOwnersEquity;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] = $totalOwnerEquity = HArr::getPerYearIndexForEndBalance($annuallyTotalOwnersEquity,$yearWithItsMonths) ;
 		/**
 		 * * End Key 
 		 */
@@ -2273,8 +2270,9 @@ class Project extends Model
 		 * * Start Key 
 		 */
 		
-		$checkErrors = HArr::subtractAtDates([$totalAssets,$totalCurrentLiabilities,$totalLongTermLiabilities,$totalOwnersEquity],$sumKeys);
-		$currentDataArr = $checkErrors; ;
+		$monthlyCheckErrors = HArr::subtractAtDates([$totalAssets,$totalCurrentLiabilities,$totalLongTermLiabilities,$monthlyTotalOwnersEquity],$sumKeys);
+		$annuallyCheckErrors = HArr::subtractAtDates([$totalAssets,$totalCurrentLiabilities,$totalLongTermLiabilities,$annuallyTotalOwnersEquity],$sumKeys);
+		// $currentDataArr = $checkErrors; ;
 		$title = __('Check Errors');
 		$currentTabId = $title ;
 		$currentTabIndex +=1;
@@ -2282,8 +2280,8 @@ class Project extends Model
 		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['options'] = array_merge([
 		   'title'=>$title
 		], $defaultNumericInputClasses);
-		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $currentDataArr;
-		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($currentDataArr,$yearWithItsMonths) ;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['data'] = $monthlyCheckErrors;
+		$tableDataFormatted[$currentTabIndex]['main_items'][$currentTabId]['year_total'] =HArr::getPerYearIndexForEndBalance($annuallyCheckErrors,$yearWithItsMonths) ;
 		/**
 		 * * End Key 
 		 */

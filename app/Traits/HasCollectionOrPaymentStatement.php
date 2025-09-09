@@ -172,12 +172,13 @@ trait HasCollectionOrPaymentStatement {
             $beginningBalance = $initialBeginningBalance;
 			$settlements = [];
 			$isFirstMonth = true ;
+			$previousAddition = 0 ;
             foreach ($additionsForIntervals[$intervalName] as $dateIndex=>$additionAtDate) {
                 $dateIndex;
                 $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
 			//	$addition = $withholdForIntervals[$intervalName][$dateIndex]??0;
                 $totalDue[$dateIndex] =  $additionAtDate+$beginningBalance;
-				$settlements[$dateIndex+1] = $totalDue[$dateIndex] < 0 ? 0 : $totalDue[$dateIndex];
+				$settlements[$dateIndex+1] = $totalDue[$dateIndex] < 0 ? 0 : $additionAtDate;
 				if($initialBeginningBalance > 0 && $isFirstMonth){
 					$settlements[$dateIndex] = $initialBeginningBalance;
 				}
@@ -192,7 +193,6 @@ trait HasCollectionOrPaymentStatement {
 				$isFirstMonth=false;
             }
         }
-	
         return $result;
     
         
