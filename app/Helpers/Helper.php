@@ -66,18 +66,22 @@ function formatStringToTitle(string $str):string
 {
     return ucwords(str_replace('_', ' ', $str));
 }
+
+
 function getManpowerTypes():array
 {
     return [
          'direct_labor' => [
             'title'=>__('Direct Labor Salaries') ,
             'has_allocation'=>true ,
-            'allocation_column_name'=>'product_manpower_allocation'
+            'allocation_column_name'=>'product_manpower_allocation',
+			'is_indirect_manpower'=>false 
          ] ,
          'manufacturing_overheads'=>[
             'title'=>__('Manufacturing Overheads Salaries'),
             'has_allocation'=>true ,
-            'allocation_column_name'=>'product_overheads_allocation'
+            'allocation_column_name'=>'product_overheads_allocation',
+			'is_indirect_manpower'=>true
          ],
           'operational_salaries'=>[
             'title'=>__('Other Operational Salaries'),

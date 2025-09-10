@@ -61,33 +61,29 @@ class RawMaterial extends Model
 	{
 		return $this->beginning_inventory_value?:0;
 	}
-	public  function calculateInventoryQuantityStatement()
+	public static function calculateInventoryQuantityStatement(int $projectId)
 	{
 		$inventoryQuantityStatement = new InventoryQuantityStatement;
-		$project = $this->project;
-		$projectId = $project->id;
 		$dateIndexWithDate = Project::find($projectId)->getDateIndexWithDate();
-	//	$rawMaterialIds = DB::table('product_raw_material')->where('project_id',$projectId)->pluck('raw_material_id','raw_material_id')->toArray();
+		$rawMaterialIds = DB::table('product_raw_material')->where('project_id',$projectId)->pluck('raw_material_id','raw_material_id')->toArray();
 		$productConsumedRawMaterials = Product::where('project_id',$projectId)->where('product_raw_material_consumed','!=',null)->pluck('product_raw_material_consumed')->toArray();
 		
-		// foreach($rawMaterialIds as $rawMaterialId){
-			// $rawMaterial = RawMaterial::find($rawMaterialId);
-			
-			$rawMaterialId = $this->id ;
-			$totalConsumed = HArr::sumAtDates(array_column($productConsumedRawMaterials,$rawMaterialId)) ;
-			$beginningBalance = $this->getBeginningInventoryValue();
-			$monthsToCover = $this->getRmInventoryCoverageDays() / 30;
+		foreach($rawMaterialIds as $rawMaterialId){
+			$rawMaterial = RawMaterial::find($rawMaterialId);
+			$totalConsumed = HArr::sumAtDates(array_column($productConsumedRawMaterials,$rawMaterial->id)) ;
+			$beginningBalance = $rawMaterial->getBeginningInventoryValue();
+			$monthsToCover = $rawMaterial->getRmInventoryCoverageDays() / 30;
 			$currentInventoryQuantityStatement = $inventoryQuantityStatement->createInventoryQuantityStatement($totalConsumed,$beginningBalance,$monthsToCover); 
 			$manufacturingQuantity = $currentInventoryQuantityStatement['manufacturing_quantity']??[];
-			$collectionPolicyStatement = $this->calculateMultiYearsCollectionPolicy($manufacturingQuantity,null);
+			$collectionPolicyStatement = $rawMaterial->calculateMultiYearsCollectionPolicy($manufacturingQuantity,null);
 			$withholdAmount = $collectionPolicyStatement['monthly']['withhold_amount']??[] ;
-			$this->update([
+			$rawMaterial->update([
 				'collection_statement'=>$collectionPolicyStatement,
-				'credit_withhold_statement'=>$this->calculateWithholdStatement($withholdAmount,0,$dateIndexWithDate),
+				'credit_withhold_statement'=>$rawMaterial->calculateWithholdStatement($withholdAmount,0,$dateIndexWithDate),
 				'inventory_value_statement'=>$currentInventoryQuantityStatement
 			]);
 	//		$inventoryQuantityStatements[$rawMaterialId]=$currentInventoryQuantityStatement;
-		// }
+		}
 		
 	}
 	public function getSalesActiveYearsIndexWithItsMonths()

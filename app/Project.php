@@ -201,26 +201,60 @@ class Project extends Model
     }
     public function reallocateProductsOnManpowers()
     {
+		// direct_labor
+		// manufacturing_overheads
+		$totalIndirectManpowers = [];
         $operationDates = $this->getOperationDatesAsDateAndDateAsIndex();
+		  DB::table('product_expense_allocations')->where('project_id', $this->id)->where('is_indirect_manpower', 1)->delete();
+		// product_expense_allocations
         foreach (getManpowerTypes() as $id => $manpowerOptionArr) {
             if ($manpowerOptionArr['has_allocation']) {
+				$isIndirectManpower = $manpowerOptionArr['is_indirect_manpower'];
                 $allocationColumnName= $manpowerOptionArr['allocation_column_name'];
                 $salaryExpenses = ManPower::where('type', $id)->where('project_id', $this->id)->pluck('salary_expenses')->toArray();
                 $allocationForManpowerType = $this->getManpowerAllocationForType($id);
-            
+				
                 $totalManpowerSalaries = HArr::sumAtDates($salaryExpenses, $operationDates);
                 foreach ($allocationForManpowerType as $productId => $allocationPercentage) {
-                    $product = Product::find($productId);
+					$product = Product::find($productId);
+					//  if($id != 'direct_labor'){
+						// dd($id,$allocationColumnName,HArr::MultiplyWithNumber($totalManpowerSalaries, $allocationPercentage/100));
+						// }
+						$currentValue = HArr::MultiplyWithNumber($totalManpowerSalaries, $allocationPercentage/100) ;
+						if($isIndirectManpower){
+							$totalIndirectManpowers[$id][$productId]= $currentValue ; 
+						}
                     $product->update([
-                        $allocationColumnName => HArr::MultiplyWithNumber($totalManpowerSalaries, $allocationPercentage/100)
+                        $allocationColumnName => $currentValue 
                     ]);
                     
                 }
                 
             }
         }
-        $this->recalculateFgInventoryValueStatement();
+		foreach($totalIndirectManpowers as $typeId => $productIdWithValues){
+			foreach($productIdWithValues as $productId => $payload){
+				DB::table('product_expense_allocations')->insert([
+						'project_id'=>$this->id ,
+						'product_id'=>$productId,
+						'expense_name'=>$typeId,
+						'is_expense'=>0,
+						'is_depreciation'=>0 ,
+						'is_indirect_manpower'=>1 ,
+						'payload'=>json_encode($payload)
+					]);
+			}
+			
+			
+		}
+				
+		$this->recalculateAllProductsOverheadExpenses();
+        
     }
+	public function expenseHasAllocation(string $expenseTypeId):bool
+	{
+		return $this->getExpenseCategories()[$expenseTypeId]['has_allocation'];
+	}
     public function getExpenseCategories():array
     {
         $expenseCategories = [
@@ -373,7 +407,7 @@ class Project extends Model
             }
         }
         $this->recalculateAllProductsOverheadExpenses();
-        $this->recalculateFgInventoryValueStatement();
+    
         
     }
     public function recalculateAllProductsOverheadExpenses()

@@ -12,6 +12,7 @@ class ExpenseAsPercentageEquation
 {
 	public function calculate(string $expenseCategoryId,string $expenseType,string $expenseName,$products,array $productAllocations,int $startDateAsIndex  , int $loopEndDateAsIndex , float $monthlyPercentage , float $vatRate ,bool $isDeductible , float $withholdTaxRate ):array 
 	{
+			$resultAsDateIndexAndValue = [];
 			$expenseAllocations = [];
 			foreach($products as $product){
 			
@@ -19,23 +20,18 @@ class ExpenseAsPercentageEquation
 				foreach($monthlySalesTargetValues as $monthIndex => $val){
 					if($monthIndex <= $loopEndDateAsIndex && $monthIndex >= $startDateAsIndex){
 						$valBeforeRate = $monthlyPercentage / 100 * $val ;
-						$result[$monthIndex] = isset($result[$monthIndex]) ? $result[$monthIndex] + $valBeforeRate : $valBeforeRate ; 
+						$resultAsDateIndexAndValue[$monthIndex] = isset($resultAsDateIndexAndValue[$monthIndex]) ? $resultAsDateIndexAndValue[$monthIndex] + $valBeforeRate : $valBeforeRate ; 
 					}
 
 				}
 			}
-			foreach($products as $product){
-			foreach($result as $dateAsIndex => $value){
-				$currentAllocationPercentage = $productAllocations[$product->id] ?? 0 ;
-				$currentAllocationPercentage = $currentAllocationPercentage / 100 ;
-				$expenseAllocations[$product->id][$dateAsIndex] = $value *   $currentAllocationPercentage;
-			}
-			}
+			$expenseAllocations = Product::multiplyWithAllocation($productAllocations,$products,$resultAsDateIndexAndValue);
+			
 			
 		
 			
 			return [
-				'expense_amounts'=>$result,
+				'expense_amounts'=>$resultAsDateIndexAndValue,
 				'expense_allocations'=>$expenseAllocations
 			];
 			// return [

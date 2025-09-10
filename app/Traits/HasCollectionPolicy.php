@@ -37,6 +37,8 @@ trait HasCollectionPolicy
 	}
 	public function getDueDayWithRates(int $index,$localOrExport):array 
 	{
+		
+		
 		if(!is_null($localOrExport)){
 			$dueDayAndRatesAtIndex = $this->collection_policy_value[$localOrExport][$index] ;
 				return  [
@@ -45,7 +47,11 @@ trait HasCollectionPolicy
 					$dueDayAndRatesAtIndex['due_in_days'][1] => $dueDayAndRatesAtIndex['rate'][1],
 				];
 		}
-		$dueDayAndRatesAtIndex = $this->collection_policy_value[$index] ;
+		
+		$dueDayAndRatesAtIndex = $this->collection_policy_value[$index]??[] ;
+		if(!count($dueDayAndRatesAtIndex)){
+			return [];
+		}
 		return  [
 			0 => $dueDayAndRatesAtIndex['cash_payment']??0 , 
 			$dueDayAndRatesAtIndex['due_in_days'][0] => $dueDayAndRatesAtIndex['rate'][0],

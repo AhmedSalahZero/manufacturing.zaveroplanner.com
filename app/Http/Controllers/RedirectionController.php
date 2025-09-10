@@ -13,14 +13,10 @@ use App\Http\Requests\StoreFixedAssetsRequest;
 use App\Http\Requests\StoreManpowerRequest;
 use App\Http\Requests\StoreOpeningBalancesRequest;
 use App\Http\Requests\StoreProductsRequest;
-use App\Http\Requests\StoreProdudctsRequest;
-use App\ManPower;
-use App\OpeningBalance;
 use App\Product;
 use App\Project;
 use App\RawMaterial;
 use App\ReadyFunctions\CollectionPolicyService;
-use App\ReadyFunctions\SeasonalityService;
 use App\Sensitivity;
 use App\Traits\Redirects;
 use Illuminate\Http\Request;
@@ -123,8 +119,8 @@ class RedirectionController extends Controller
 			 */
             $rawMaterial = RawMaterial::find($rawMaterialId);
             $rawMaterial->update($dataArr);
-			$rawMaterial->calculateInventoryQuantityStatement($project->id);
         }
+		RawMaterial::calculateInventoryQuantityStatement($project->id);
 		// foreach($project)
 		unset($rawMaterial);
         if ($request->get('submit_button') != 'next') {
@@ -154,6 +150,7 @@ class RedirectionController extends Controller
             }
             
         }
+		
     
         $project->update([
             'manpower_allocations'=>$manpowerAllocations,
@@ -277,16 +274,20 @@ class RedirectionController extends Controller
                     $tableDataArr['is_deductible'] = $isDeductible[0];
                     $isDeductible= $isDeductible[0];
                 }
-                
+                $expenseAsPercentageResult = [];
              
                 if (isset($tableDataArr['amount']) && $tableId == 'fixed_monthly_repeating_amount') {
-                    $amount = $tableDataArr['amount']??0 ;
+					$amount = $tableDataArr['amount']??0 ;
                     $increaseInterval = $tableDataArr['increase_interval'] ?? 'annually' ;
                     $monthlyFixedRepeatingResults = $monthlyFixedRepeatingAmountEquation->calculate($amount, $tableDataArr['start_date'], $loopEndDate, $increaseInterval, $tableDataArr['increase_rate'], $isDeductible, $vatRate, $withholdRate);
+				
                     $withholdAmounts  = $monthlyFixedRepeatingResults['withhold_amounts'];
                     $tableDataArr['monthly_repeating_amounts']  = $monthlyFixedRepeatingResults['total_before_vat'];
                     $tableDataArr['total_vat']  = $monthlyFixedRepeatingResults['total_vat'];
                     $tableDataArr['total_after_vat']  = $monthlyFixedRepeatingResults['total_after_vat'];
+					$expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productAllocations,$project->products,$tableDataArr['total_after_vat']);
+					
+					
                     $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy,true) ;
                     $withholdPayments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $withholdAmounts, $datesAsIndexAndString, $customCollectionPolicy) ;
                     $netPaymentsAfterWithhold = HArr::subtractAtDates([$payments,$withholdPayments], array_keys($payments));
@@ -315,7 +316,7 @@ class RedirectionController extends Controller
          
                     $expenseAsPercentageResult = $expenseAsPercentageEquation->calculate($expenseCategoryId, $expenseType, $name, $project->products, $productAllocations, $tableDataArr['start_date'], $loopEndDate, $tableDataArr['monthly_percentage'], $vatRate, $isDeductible, $tableDataArr['withhold_tax_rate']) ;
                     $expenseAmounts = $expenseAsPercentageResult['expense_amounts'];
-                    $expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
+                    
                     
                 
                     $tableDataArr['expense_as_percentages']  =$expenseAmounts  ;
@@ -351,6 +352,9 @@ class RedirectionController extends Controller
                     $tableDataArr['total_vat']  =$vats  ;
                     $amountAfterVat = [$startDateAsIndex => $amountBeforeVat + $amountBeforeVat * $vatRate ];
                     $tableDataArr['total_after_vat']  =$amountAfterVat  ;
+					// dd('d',);
+					$expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productAllocations,$project->products,$oneTimeExpenses['monthly_one_time']??[]);
+					
                     $withholdAmount = $tableDataArr['withhold_tax_rate']/100 ;
                     $withholdAmounts  = [$startDateAsIndex =>  $amountBeforeVat * $withholdAmount ] ;
                     $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $amountAfterVat, $datesAsIndexAndString, $customCollectionPolicy, true) ;
@@ -363,12 +367,14 @@ class RedirectionController extends Controller
                     $tableDataArr['collection_statements']   =Expense::calculateStatement($amountBeforeVatPayload, $tableDataArr['total_vat'], $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
 					// $tableDataArr['prepaid_expense_statement'] = Expense::calculatePrepaidExpenseStatement();
                 }
-              
                 $tableDataArr['project_id']  = $project->id ;
                 $tableDataArr['model_id']   = $project->id ;
                 $tableDataArr['model_name']   = $modelName ;
                 //	$tableDataArr['collection_statements'] = [];
                 if ($name) {
+					if($project->expenseHasAllocation($expenseCategoryId)){
+						$expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
+					}
                     $project->generateRelationDynamically($tableId, $expenseType)->create($tableDataArr);
                     
                 }

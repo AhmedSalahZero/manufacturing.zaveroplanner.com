@@ -362,9 +362,7 @@ class Product extends Model
 			'product_inventory_qt_statement'=>$inventoryQuantityStatement,
 			'product_raw_material_consumed'=>$productRawMaterialConsumed
 		]);
-		foreach( $this->rawMaterials as $rawMaterial){
-			$rawMaterial->calculateInventoryQuantityStatement();
-		}
+		RawMaterial::calculateInventoryQuantityStatement($this->project->id);
 		return [
 			'localMonthlySalesTargetValue'=>$localMonthlySalesTargetValue,
 			'exportMonthlySalesTargetValue'=>$exportMonthlySalesTargetValue
@@ -434,5 +432,17 @@ class Product extends Model
 	public function getCollectionStatement():array
 	{
 		return $this->collection_statement ?:[];
+	}
+	public static function multiplyWithAllocation(array $productAllocations , $products , array $resultAsDateIndexAndValue )
+	{
+		$expenseAllocations = [];
+			foreach($products as $product){
+				foreach($resultAsDateIndexAndValue as $dateAsIndex => $value){
+					$currentAllocationPercentage = $productAllocations[$product->id] ?? 0 ;
+					$currentAllocationPercentage = $currentAllocationPercentage / 100 ;
+					$expenseAllocations[$product->id][$dateAsIndex] = $value *   $currentAllocationPercentage;
+				}
+			}
+			return $expenseAllocations;
 	}
 }
