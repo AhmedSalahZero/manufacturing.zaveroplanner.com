@@ -543,3 +543,9 @@ function getBusinessSectors()
 		}
 		return array_sum($netPresentValues) ; 
 	}
+function convertStringToClass(string $str): string
+{
+    $reg = " /^[\d]+|[!\"#$%&'\(\)\*\+,\.\/:;<=>\?\@\~\{\|\}\^ ]/ ";
+
+    return preg_replace($reg, '-', $str);
+}

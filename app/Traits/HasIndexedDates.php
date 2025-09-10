@@ -490,11 +490,11 @@ trait HasIndexedDates
         $datesIndexWithYearIndex = $datesAndIndexesHelpers['datesIndexWithYearIndex'];
         return $datesIndexWithYearIndex[$dateAsIndex];
     }
-    public function getYearFromYearIndex(int $yearAsIndex):int
+    public function getYearFromYearIndex(int $yearAsIndex):?int
     {
         $datesAndIndexesHelpers = $this->getDatesIndexesHelper();
         $yearIndexWithYear = $datesAndIndexesHelpers['yearIndexWithYear'];
-        return $yearIndexWithYear[$yearAsIndex];
+        return $yearIndexWithYear[$yearAsIndex]??null;
     }
     public function getYearFromDateIndex(int $dateAsIndex):int
     {
@@ -730,5 +730,14 @@ trait HasIndexedDates
             }
             return $results;
 			
+	}
+	public function replaceYearIndexWithYear($items,$years):array{
+		$result = [];
+		foreach($years as $yearAsIndex){
+			$value = $items[$yearAsIndex]??0;
+			$yearAsString = $this->getYearFromYearIndex($yearAsIndex);
+			$result[$yearAsString] = $value ;
+		}
+		return $result;
 	}
 }

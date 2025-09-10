@@ -75,12 +75,12 @@ class ProjectController extends Controller
 		 * @var Project $project
 		 */
 		// $result = $this->Validation($request,$project);
-        $inputs = $request->all();
-        $inputs['user_id'] = auth()->user()->id;
-        $request['slug'] =  Str::slug($request->name, '-');
-        $request['is_completed'] =  1;
-         $except = ['products','rawMaterials','submit_button','selling_start_date'];
-        
+			$inputs = $request->all();
+			$inputs['user_id'] = auth()->user()->id;
+			$request['slug'] =  Str::slug($request->name, '-');
+			$request['is_completed'] =  1;
+			$except = ['products','rawMaterials','submit_button','selling_start_date'];
+			
 			$project->update($request->except($except));
 			
 			$datesAsStringAndIndex = $project->getDatesAsStringAndIndex();

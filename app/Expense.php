@@ -25,6 +25,7 @@ class Expense extends Model
 		'withhold_payments'=>'array',
 		'withhold_amounts'=>'array',
 		'product_allocations'=>'array',
+		'prepaid_expense_statement'=>'array',
     ];
     
     public function project()

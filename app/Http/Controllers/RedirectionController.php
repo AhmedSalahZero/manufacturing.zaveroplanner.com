@@ -63,7 +63,19 @@ class RedirectionController extends Controller
         /**
          * monthly_sal target value
          */
+		
+		 $product->rawMaterials()->detach();
+        foreach ($rawMaterials as $rawMaterialArr) {
+            unset($rawMaterialArr['id']);
+            $rawMaterialArr['project_id'] = $project->id;
+            $rawMaterialId = $rawMaterialArr['raw_material_id'];
+            $rawMaterialArr['percentages'] = json_encode($rawMaterialArr['percentages']);
+            $product->rawMaterials()->attach($rawMaterialId, $rawMaterialArr);
+        }
+		
         $monthlySalesTargetValueBeforeVat  = $product->calculateMonthlySalesTargetValue();
+		
+		// here 
         $localMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['localMonthlySalesTargetValue'];
         $exportMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['exportMonthlySalesTargetValue'];
 		
@@ -75,14 +87,7 @@ class RedirectionController extends Controller
 			'export_collection_statement'=> $exportCollectionStatement,
 			'collection_statement'=>$collectionStatement
 		]);
-        $product->rawMaterials()->detach();
-        foreach ($rawMaterials as $rawMaterialArr) {
-            unset($rawMaterialArr['id']);
-            $rawMaterialArr['project_id'] = $project->id;
-            $rawMaterialId = $rawMaterialArr['raw_material_id'];
-            $rawMaterialArr['percentages'] = json_encode($rawMaterialArr['percentages']);
-            $product->rawMaterials()->attach($rawMaterialId, $rawMaterialArr);
-        }
+       
         $project->recalculateFgInventoryValueStatement();
 		$project->recalculateVatStatements();
         $nextProduct = $product->getNextProduct();
@@ -107,15 +112,21 @@ class RedirectionController extends Controller
 
     public function rawMaterialPaymentsPost(Request $request, Project $project)
     {
+	
+		$project->update([
+			'comment_for_raw_materials'=>$request->get('comment_for_raw_materials')
+		]);
+		
         foreach ($request->get('rawMaterials') as $rawMaterialId => $dataArr) {
+			/**
+			 * @var RawMaterial $rawMaterial
+			 */
             $rawMaterial = RawMaterial::find($rawMaterialId);
             $rawMaterial->update($dataArr);
+			$rawMaterial->calculateInventoryQuantityStatement($project->id);
         }
-		$rawMaterial->calculateInventoryQuantityStatement($project->id);
-        $project->update([
-            'comment_for_raw_materials'=>$request->get('comment_for_raw_materials')
-        ]);
-
+		// foreach($project)
+		unset($rawMaterial);
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
         }
@@ -350,6 +361,7 @@ class RedirectionController extends Controller
                     $tableDataArr['payment_amounts'] = $payments;
                     $tableDataArr['net_payments_after_withhold']=$netPaymentsAfterWithhold;
                     $tableDataArr['collection_statements']   =Expense::calculateStatement($amountBeforeVatPayload, $tableDataArr['total_vat'], $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
+					// $tableDataArr['prepaid_expense_statement'] = Expense::calculatePrepaidExpenseStatement();
                 }
               
                 $tableDataArr['project_id']  = $project->id ;
@@ -366,10 +378,11 @@ class RedirectionController extends Controller
             
         }
         $expenseAllocationFormatted = [];
-    
         foreach ($expenseAllocations as $expenseType => $arr1) {
-            foreach ($arr1 as $expenseCategoryId => $expenseCategoryNameAndValues) {
-                foreach ($expenseCategoryNameAndValues as $expenseName => $productIdWithPayload) {
+			foreach ($arr1 as $expenseCategoryId => $expenseCategoryNameAndValues) {
+				$hasAllocation = $project->getExpenseCategories()[$expenseCategoryId]['has_allocation'];
+				if($hasAllocation){
+					foreach ($expenseCategoryNameAndValues as $expenseName => $productIdWithPayload) {
                     foreach ($productIdWithPayload as $productId => $payload) {
                         $expenseAllocationFormatted[] = [
                             'expense_type'=>$expenseType,
@@ -382,6 +395,8 @@ class RedirectionController extends Controller
                         ];
                     }
                 }
+				}
+                
             }
         }
         DB::table('product_expense_allocations')->where('is_expense', 1)->where('project_id', $project->id)->delete();
