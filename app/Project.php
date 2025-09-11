@@ -1442,6 +1442,7 @@ class Project extends Model
             $tableDataFormatted[$currentTabIndex]['sub_items'][$name]['year_total'] = HArr::sumPerYearIndex($schedulePayment, $yearWithItsMonths);
         }
         
+		
         $openingLoans = DB::table('long_term_loan_opening_balances')->where('long_term_loan_opening_balances.project_id', $project->id)->get();
         $totalLoanInstallments =[];
         $totalLoanInterests =[];
@@ -1459,7 +1460,29 @@ class Project extends Model
         $totalLoanWithSchedulePayments =  HArr::sumAtDates([$totalLoansAmounts,$totalSchedulePayments], $sumKeys);
         $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['year_total'] = HArr::sumPerYearIndex($totalLoansAmounts, $yearWithItsMonths);
         
-            
+        
+		
+		
+		
+		     $openingLoans = DB::table('other_long_term_liabilities_opening_balances')->where('project_id', $project->id)->get();
+        $totalLoanTermLiabilities =[];
+
+        foreach ($openingLoans as $openingLoan) {
+            $payload = (array)json_decode($openingLoan->payload);
+            $totalLoanTermLiabilities = HArr::sumAtDates([$totalLoanTermLiabilities,$payload], $sumKeys);
+        }
+    
+        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['options'] =array_merge([
+            'title'=>__('Opening Long Term Liabilities'),
+        ], $defaultNumericInputClasses);
+        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['data'] = $totalLoanTermLiabilities;
+        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['year_total'] = HArr::sumPerYearIndex($totalLoanTermLiabilities, $yearWithItsMonths);
+        
+		
+		
+		
+		
+		
         
         
         $totalCashOut = HArr::sumAtDates(array_column($tableDataFormatted[$currentTabIndex]['sub_items']??[], 'data'), $sumKeys);
@@ -2451,6 +2474,19 @@ class Project extends Model
 
         return $lineChart ;
     }
+	protected function formatBarChart(array $items):array
+	{
+		$barChart = [];
+		foreach($items  as $key => $arrayItems){
+			foreach($arrayItems as $year => $value){
+					$value = $value / getDivisionNumber();
+					$barChart[$year][$key] =  isset($barChart[$year][$key]) ? $barChart[$year][$key] + $value : $value;
+					$barChart[$year]['year'] = strval($year);
+			}
+		}
+		return array_values($barChart);
+					
+	}
     public function getDashboardViewVars():array
     {
         $project = $this ;
@@ -2507,6 +2543,13 @@ class Project extends Model
                     ],
             ]
         ];
+		$barChart = [
+			'expenses'=> [
+				
+			]
+		];
+		$barCharts = $this->formatBarChart($this->replaceYearIndexWithYearInTwoDimArr($formattedExpenses,$years));
+	
         $chartTitleMapping = [
             'revenue-streams'=>__('Revenue Streams'),
             'accumulated-revenue-streams'=>__('Accumulated Revenue Streams'),
@@ -2623,7 +2666,7 @@ class Project extends Model
         'oneLineChart'=>$oneLineChart,
         'twoLineChartWithPercentageOfSales'=>$twoLineChartWithPercentageOfSales,
         'chartTitleMapping'=>$chartTitleMapping,
-        
+		'barChart'=>$barCharts,
         'formattedResult'=>$formattedResult,
         'formattedExpenses'=>$formattedExpenses,
         // 'lineChart'=>$lineChart,

@@ -740,4 +740,18 @@ trait HasIndexedDates
 		}
 		return $result;
 	}
+	public function replaceYearIndexWithYearInTwoDimArr($items,$years):array{
+		$result = [];
+	
+		foreach($items as $id => $values){
+				foreach($years as $currentYearAsIndex){
+				$value = $values[$currentYearAsIndex] ?? 0 ;
+				$yearAsString = $this->getYearFromYearIndex($currentYearAsIndex);
+				$result[$id][$yearAsString] = $value ;
+			}
+			
+			
+		}
+		return $result;
+	}
 }

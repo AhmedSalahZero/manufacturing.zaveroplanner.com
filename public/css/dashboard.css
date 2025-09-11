@@ -314,3 +314,77 @@ input.custom-input-string-width{
         width: 100%;
         height: 500px;
     }
+.chartdashboard {
+    width: 100%;
+    height: 500px;
+}
+ .chartdiv_two_lines {
+        width: 100%;
+        height: 500px;
+    }
+
+    .chartDiv {
+        max-height: 500px !important;
+    }
+	  table,
+    table * {
+        font-size: 10px !important;
+    }
+
+    .max-column-th-class {
+        width: 30% !important;
+        min-width: 30% !important;
+        max-width: 30% !important;
+    }
+
+    .expandable-percentage-input {
+        max-width: 50px !important;
+        min-width: 50px !important;
+        text-align: center !important;
+    }
+
+    .three-dots-parent {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .b-bottom {
+        border-bottom: 1px solid green !important;
+    }
+
+    .expandable-amount-input {
+        max-width: 60px !important;
+        min-width: 60px !important;
+        width: 60px !important;
+    }
+
+    table:not(.table-condensed) thead th,
+    table:not(.table-condensed) tbody td {
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+    }
+
+    input {
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+    }
+
+   
+
+    .margin__left {
+        border-left: 2px solid #366cf3;
+    }
+
+    .sky-border {
+        border-bottom: 1.5px solid #CCE2FD !important;
+    }
+
+    .kt-widget24__title {
+        color: black !important;
+    }
+	
+ input.form-control[type="text"][readonly] {
+        background-color: white !important;
+        color: black !important;
+        font-weight: 400 !important;
+    }
