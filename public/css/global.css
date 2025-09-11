@@ -1,24 +1,25 @@
-.hidden-important{
-	display:none !important;
+.hidden-important {
+    display: none !important;
 }
 .ck.ck-toolbar .ck-icon {
-width: 16px !important;
-height: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
 }
 
 :root {
-  --ck-icon-size: 16px; /* default is ~20px */
+    --ck-icon-size: 16px; /* default is ~20px */
 }
 .ck.ck-toolbar .ck-button {
-  padding: 2px 4px !important;
-}.ck.ck-toolbar {
-  min-height: 28px !important;
+    padding: 2px 4px !important;
+}
+.ck.ck-toolbar {
+    min-height: 28px !important;
 }
 
 /* Make dropdowns compact */
 .ck.ck-toolbar .ck-dropdown__button .ck-icon {
-  width: 14px !important;
-  height: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
 }
 * {
     font-size: 0.9rem !important;
@@ -136,42 +137,570 @@ input.form-control[readonly] {
     max-width: 20% !important;
 }
 .fullscreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      border-radius: 0;
-      z-index: 1000;
-      overflow: auto;
-    }
-    .fullscreen-btn {
-      position: absolute;
-      top: 10px;
-      right: 30px;
-      cursor: pointer;
-      background: #eee;
-      border-radius: 5px;
-      padding: 5px 10px;
-	  z-index:99999;
-	  border:1px solid blue ;
-    }
-	   .modal-full {
-        width: 90% !important;
-        min-width: 90% !important;
-        max-width: 90% !important;
-        font-size: 14px !important;
-    }
-	.border-left-export{
-		border-left:1px solid #3b368c;
-	}
-.plus-max-width-class{
-	max-width:25px !important;
-	width:25px !important;
-	min-width:25px !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 1000;
+    overflow: auto;
 }
-.name-max-width-class{
-	max-width:220px !important;
-	width:220px !important;
-	min-width:220px !important;
+.fullscreen-btn {
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    cursor: pointer;
+    background: #eee;
+    border-radius: 5px;
+    padding: 5px 10px;
+    z-index: 99999;
+    border: 1px solid blue;
+}
+.modal-full {
+    width: 90% !important;
+    min-width: 90% !important;
+    max-width: 90% !important;
+    font-size: 14px !important;
+}
+.border-left-export {
+    border-left: 1px solid #3b368c;
+}
+.plus-max-width-class {
+    max-width: 25px !important;
+    width: 25px !important;
+    min-width: 25px !important;
+}
+.name-max-width-class {
+    max-width: 220px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+}
+
+.kt-radio {
+    display: inline-block;
+    position: relative;
+    padding-left: 30px;
+    text-align: left;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+.kt-radio.kt-radio--disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+.kt-radio > input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+.kt-radio > span {
+    background: none;
+    position: absolute;
+    top: 1px;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    border-radius: 50% !important;
+}
+.kt-radio > span:after {
+    content: "";
+    position: absolute;
+    display: none;
+    top: 50%;
+    left: 50%;
+    margin-left: -3px;
+    margin-top: -3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 100% !important;
+}
+.kt-radio > input:checked ~ span {
+    transition: all 0.3s ease;
+    background: none;
+}
+.kt-radio > input:checked ~ span:after {
+    display: block;
+}
+.kt-radio:hover > input:not([disabled]):checked ~ span,
+.kt-radio > input:checked ~ span {
+    transition: all 0.3s ease;
+}
+.kt-radio > input:disabled ~ span {
+    opacity: 0.6;
+    pointer-events: none;
+}
+.kt-radio.kt-radio--solid > span {
+    border: 1px solid transparent;
+}
+.kt-radio.kt-radio--solid:hover > input:not([disabled]) ~ span,
+.kt-radio.kt-radio--solid > input:focus ~ span {
+    transition: all 0.3s ease;
+}
+.kt-radio.kt-radio--square > span {
+    border-radius: 0;
+}
+.kt-radio.kt-radio--bold > span {
+    border-width: 2px !important;
+    transition: all 0.3s ease;
+}
+.form-inline .kt-radio {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+.kt-radio.kt-radio--single {
+    width: 18px;
+    height: 18px;
+}
+.kt-radio.kt-radio--single > span {
+    top: 0px;
+}
+th > .kt-radio.kt-radio--single,
+td > .kt-radio.kt-radio--single {
+    right: -5px;
+}
+.input-group .kt-radio {
+    margin-bottom: 0 !important;
+    padding-left: 0;
+}
+
+.kt-radio-list {
+    padding: 0 0;
+}
+.form-horizontal .form-group .kt-radio-list {
+    padding-top: 0;
+}
+.kt-radio-list .kt-radio {
+    display: block;
+    text-align: left;
+}
+.kt-radio-list .kt-radio:last-child {
+    margin-bottom: 5px;
+}
+
+.kt-radio-inline {
+    padding: 0 0;
+}
+.kt-radio-inline .kt-radio {
+    display: inline-block;
+
+}
+.kt-radio-inline .kt-radio:last-child {
+    margin-right: 0;
+}
+
+
+
+.form-group.row .kt-radio-list {
+    margin-top: 2px;
+}
+
+.kt-radio.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio > span {
+    border: 1px solid #d1d7e2;
+}
+.kt-radio > span:after {
+    border: solid #bfc7d7;
+    background: #bfc7d7;
+}
+
+.kt-radio > input:disabled ~ span:after {
+    border-color: #c8cfdd;
+}
+
+.kt-radio > input:checked ~ span {
+    border: 1px solid #c8cfdd;
+}
+
+.kt-radio.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #c8cfdd;
+}
+
+.kt-radio > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--solid > span {
+    background: #e4e8ee;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--solid > span:after {
+    border: solid #99a6bf;
+    background: #99a6bf;
+}
+
+.kt-radio.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--solid > input:checked ~ span {
+    background: #dee2ea;
+}
+
+.kt-radio.kt-radio--brand.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--brand > span {
+    border: 1px solid #366cf3;
+}
+.kt-radio.kt-radio--brand > span:after {
+    border: solid #366cf3;
+    background: #366cf3;
+}
+
+.kt-radio.kt-radio--brand > input:disabled ~ span:after {
+    border-color: #366cf3;
+}
+
+.kt-radio.kt-radio--brand > input:checked ~ span {
+    border: 1px solid #366cf3;
+}
+
+.kt-radio.kt-radio--brand.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #366cf3;
+}
+
+.kt-radio.kt-radio--brand > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--brand.kt-radio--solid > span {
+    background: #366cf3;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--brand.kt-radio--solid > span:after {
+    border: solid #ffffff;
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--brand.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--brand.kt-radio--solid > input:checked ~ span {
+    background: #366cf3;
+}
+
+.kt-radio.kt-radio--light.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--light > span {
+    border: 1px solid #ffffff;
+}
+.kt-radio.kt-radio--light > span:after {
+    border: solid #ffffff;
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--light > input:disabled ~ span:after {
+    border-color: #ffffff;
+}
+
+.kt-radio.kt-radio--light > input:checked ~ span {
+    border: 1px solid #ffffff;
+}
+
+.kt-radio.kt-radio--light.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #ffffff;
+}
+
+.kt-radio.kt-radio--light > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--light.kt-radio--solid > span {
+    background: #ffffff;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--light.kt-radio--solid > span:after {
+    border: solid #282a3c;
+    background: #282a3c;
+}
+
+.kt-radio.kt-radio--light.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--light.kt-radio--solid > input:checked ~ span {
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--dark.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--dark > span {
+    border: 1px solid #282a3c;
+}
+.kt-radio.kt-radio--dark > span:after {
+    border: solid #282a3c;
+    background: #282a3c;
+}
+
+.kt-radio.kt-radio--dark > input:disabled ~ span:after {
+    border-color: #282a3c;
+}
+
+.kt-radio.kt-radio--dark > input:checked ~ span {
+    border: 1px solid #282a3c;
+}
+
+.kt-radio.kt-radio--dark.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #282a3c;
+}
+
+.kt-radio.kt-radio--dark > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--dark.kt-radio--solid > span {
+    background: #282a3c;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--dark.kt-radio--solid > span:after {
+    border: solid #ffffff;
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--dark.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--dark.kt-radio--solid > input:checked ~ span {
+    background: #282a3c;
+}
+
+.kt-radio.kt-radio--primary.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--primary > span {
+    border: 1px solid #5867dd;
+}
+.kt-radio.kt-radio--primary > span:after {
+    border: solid #5867dd;
+    background: #5867dd;
+}
+
+.kt-radio.kt-radio--primary > input:disabled ~ span:after {
+    border-color: #5867dd;
+}
+
+.kt-radio.kt-radio--primary > input:checked ~ span {
+    border: 1px solid #5867dd;
+}
+
+.kt-radio.kt-radio--primary.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #5867dd;
+}
+
+.kt-radio.kt-radio--primary > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--primary.kt-radio--solid > span {
+    background: #5867dd;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--primary.kt-radio--solid > span:after {
+    border: solid #ffffff;
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--primary.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--primary.kt-radio--solid > input:checked ~ span {
+    background: #5867dd;
+}
+
+.kt-radio.kt-radio--success.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--success > span {
+    border: 1px solid #1dc9b7;
+}
+.kt-radio.kt-radio--success > span:after {
+    border: solid #1dc9b7;
+    background: #1dc9b7;
+}
+
+.kt-radio.kt-radio--success > input:disabled ~ span:after {
+    border-color: #1dc9b7;
+}
+
+.kt-radio.kt-radio--success > input:checked ~ span {
+    border: 1px solid #1dc9b7;
+}
+
+.kt-radio.kt-radio--success.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #1dc9b7;
+}
+
+.kt-radio.kt-radio--success > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--success.kt-radio--solid > span {
+    background: #1dc9b7;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--success.kt-radio--solid > span:after {
+    border: solid #ffffff;
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--success.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--success.kt-radio--solid > input:checked ~ span {
+    background: #1dc9b7;
+}
+
+.kt-radio.kt-radio--info.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--info > span {
+    border: 1px solid #5578eb;
+}
+.kt-radio.kt-radio--info > span:after {
+    border: solid #5578eb;
+    background: #5578eb;
+}
+
+.kt-radio.kt-radio--info > input:disabled ~ span:after {
+    border-color: #5578eb;
+}
+
+.kt-radio.kt-radio--info > input:checked ~ span {
+    border: 1px solid #5578eb;
+}
+
+.kt-radio.kt-radio--info.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #5578eb;
+}
+
+.kt-radio.kt-radio--info > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--info.kt-radio--solid > span {
+    background: #5578eb;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--info.kt-radio--solid > span:after {
+    border: solid #ffffff;
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--info.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--info.kt-radio--solid > input:checked ~ span {
+    background: #5578eb;
+}
+
+.kt-radio.kt-radio--warning.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--warning > span {
+    border: 1px solid #ffb822;
+}
+.kt-radio.kt-radio--warning > span:after {
+    border: solid #ffb822;
+    background: #ffb822;
+}
+
+.kt-radio.kt-radio--warning > input:disabled ~ span:after {
+    border-color: #ffb822;
+}
+
+.kt-radio.kt-radio--warning > input:checked ~ span {
+    border: 1px solid #ffb822;
+}
+
+.kt-radio.kt-radio--warning.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #ffb822;
+}
+
+.kt-radio.kt-radio--warning > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--warning.kt-radio--solid > span {
+    background: #ffb822;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--warning.kt-radio--solid > span:after {
+    border: solid #111111;
+    background: #111111;
+}
+
+.kt-radio.kt-radio--warning.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--warning.kt-radio--solid > input:checked ~ span {
+    background: #ffb822;
+}
+
+.kt-radio.kt-radio--danger.kt-radio--disabled {
+    opacity: 0.8;
+}
+
+.kt-radio.kt-radio--danger > span {
+    border: 1px solid #fd397a;
+}
+.kt-radio.kt-radio--danger > span:after {
+    border: solid #fd397a;
+    background: #fd397a;
+}
+
+.kt-radio.kt-radio--danger > input:disabled ~ span:after {
+    border-color: #fd397a;
+}
+
+.kt-radio.kt-radio--danger > input:checked ~ span {
+    border: 1px solid #fd397a;
+}
+
+.kt-radio.kt-radio--danger.kt-radio--bold > input:checked ~ span {
+    border: 2px solid #fd397a;
+}
+
+.kt-radio.kt-radio--danger > input:disabled ~ span {
+    opacity: 0.6;
+}
+
+.kt-radio.kt-radio--danger.kt-radio--solid > span {
+    background: #fd397a;
+    border: 1px solid transparent !important;
+}
+.kt-radio.kt-radio--danger.kt-radio--solid > span:after {
+    border: solid #ffffff;
+    background: #ffffff;
+}
+
+.kt-radio.kt-radio--danger.kt-radio--solid > input:focus ~ span {
+    border: 1px solid transparent !important;
+}
+
+.kt-radio.kt-radio--danger.kt-radio--solid > input:checked ~ span {
+    background: #fd397a;
+}
+.font-size-18px {
+    font-size: 18px !important;
 }

@@ -20,6 +20,7 @@ class FixedAsset extends Model
 		'department_ids'=>'array',
 		'product_allocations'=>'array',
 		'custom_collection_policy'=>'array',
+		'from_total_or_executions'=>'array',
 		'depreciation_statement'=>'array',
 		'capitalization_statement'=>'array',
 		'admin_depreciations'=>'array',
@@ -121,10 +122,38 @@ class FixedAsset extends Model
 		}
 		return $this->custom_collection_policy;
 	}
+	public function getFromTotalOrExecutions():array
+	{
+		return $this->from_total_or_executions;
+	}
+	public function getRatesWithIsFromTotal():array
+	{
+		$result = [];
+		foreach($this->getFromTotalOrExecutions() as $dueDate => $isFromTotal){
+			if($isFromTotal){
+				$result[$dueDate] = $isFromTotal;
+			}
+		}
+		return $result;
+	}
+	public function getRatesWithIsFromExecution():array
+	{
+		$result = [];
+		foreach($this->getFromTotalOrExecutions() as $dueDate => $isFromTotal){
+			if(!$isFromTotal){
+				$result[$dueDate] = $isFromTotal;
+			}
+		}
+		return $result;
+	}
     public function getPaymentRate(int $rateIndex)
     {
         return array_values($this->custom_collection_policy ?? [])[$rateIndex] ?? 0 ;
     }
+	public function isFromTotal(int $dueInDay):bool 
+	{
+		return $this->from_total_or_executions[$dueInDay]??0;
+	}
     public function getPaymentRateAtDueInDays($rateIndex)
     {
         return array_keys($this->custom_collection_policy ?? [])[$rateIndex] ?? 0 ;
@@ -332,4 +361,5 @@ class FixedAsset extends Model
 	{
 		return $this->ffe_execution_and_payment?:[];
 	}
+	
 }

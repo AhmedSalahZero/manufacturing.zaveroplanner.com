@@ -38,9 +38,7 @@
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
-            $currentExpense = $formattedExpenses[$currentExpenseType][$yearOrMonthAsIndex]??0;
-            $currentSalesRevenue = $formattedResult['sales_revenue'][$yearOrMonthAsIndex]??0 ;
-            $currentVal = $currentSalesRevenue ? $currentExpense / $currentSalesRevenue * 100 : 0 ;
+            $currentVal = ($formattedExpensesPercentages[$currentExpenseType][$yearOrMonthAsIndex]??0) ;
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -59,7 +57,9 @@
 
         <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
-
+			@php
+            $currentExpenseType = 'labor-cost';
+            @endphp
 
             <td>
                 <div class="">
@@ -75,10 +75,7 @@
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
-            $currentExpense = $formattedExpenses['labor-cost'][$yearOrMonthAsIndex]??0;
-            $currentSalesRevenue = $formattedResult['sales_revenue'][$yearOrMonthAsIndex]??0 ;
-            $currentVal = $currentSalesRevenue ? $currentExpense / $currentSalesRevenue * 100 : 0 ;
-
+            $currentVal = ($formattedExpensesPercentages[$currentExpenseType][$yearOrMonthAsIndex]??0) ;
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -96,7 +93,9 @@
 		
 		
 		 <tr data-repeat-formatting-decimals="2" data-repeater-style>
-
+			@php
+            $currentExpenseType = 'manufacturing-overheads';
+            @endphp
 
 
             <td>
@@ -112,11 +111,8 @@
 
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
-            @php
-            $currentExpense = $formattedExpenses['manufacturing-overheads'][$yearOrMonthAsIndex]??0;
-            $currentSalesRevenue = $formattedResult['sales_revenue'][$yearOrMonthAsIndex]??0 ;
-            $currentVal = $currentSalesRevenue ? $currentExpense / $currentSalesRevenue * 100 : 0 ;
-
+             @php
+            $currentVal = ($formattedExpensesPercentages[$currentExpenseType][$yearOrMonthAsIndex]??0) ;
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -142,7 +138,9 @@
 
         <tr data-repeat-formatting-decimals="2" data-repeater-style>
 
-
+		@php
+            $currentExpenseType = 'marketing-expense';
+            @endphp
 
             <td>
                 <div class="">
@@ -157,10 +155,8 @@
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
 
-            @php
-            $currentExpense = $formattedExpenses['marketing-expense'][$yearOrMonthAsIndex]??0;
-            $currentSalesRevenue = $formattedResult['sales_revenue'][$yearOrMonthAsIndex]??0 ;
-            $currentVal = $currentSalesRevenue ? $currentExpense / $currentSalesRevenue * 100 : 0 ;
+             @php
+            $currentVal = ($formattedExpensesPercentages[$currentExpenseType][$yearOrMonthAsIndex]??0) ;
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -184,7 +180,9 @@
 
 
         <tr data-repeat-formatting-decimals="2" data-repeater-style>
-
+         @php
+            $currentExpenseType = 'sales-expense';
+            @endphp
 
 
             <td>
@@ -199,10 +197,8 @@
 
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
-            @php
-            $currentExpense = $formattedExpenses['sales-expense'][$yearOrMonthAsIndex]??0;
-            $currentSalesRevenue = $formattedResult['sales_revenue'][$yearOrMonthAsIndex]??0 ;
-            $currentVal = $currentSalesRevenue ? $currentExpense / $currentSalesRevenue * 100 : 0 ;
+             @php
+            $currentVal = ($formattedExpensesPercentages[$currentExpenseType][$yearOrMonthAsIndex]??0) ;
             @endphp
 
             <td>
@@ -228,8 +224,11 @@
 
 
         <tr data-repeat-formatting-decimals="2" data-repeater-style>
-
-
+		
+		@php
+            $currentExpenseType = 'general-expense';
+            @endphp
+			
 
             <td>
                 <div class="">
@@ -242,10 +241,8 @@
             $columnIndex = 0 ;
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
-            @php
-            $currentExpense = $formattedExpenses['general-expense'][$yearOrMonthAsIndex]??0;
-            $currentSalesRevenue = $formattedResult['sales_revenue'][$yearOrMonthAsIndex]??0 ;
-            $currentVal = $currentSalesRevenue ? $currentExpense / $currentSalesRevenue * 100 : 0 ;
+             @php
+            $currentVal = ($formattedExpensesPercentages[$currentExpenseType][$yearOrMonthAsIndex]??0) ;
             @endphp
 
             <td>

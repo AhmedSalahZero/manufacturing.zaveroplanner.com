@@ -324,6 +324,21 @@ function getPaymentTerms(): array
         ],
     ];
 }
+function getPaymentTermsForFixedAssets(): array
+{
+
+    return [
+        [
+            'value' => 'customize',
+            'title' => __('Customize')
+        ],
+        [
+            'value' => 'cash',
+            'title' => __('Cash')
+        ],
+      
+    ];
+}
 function dueInDays()
 {
     return [

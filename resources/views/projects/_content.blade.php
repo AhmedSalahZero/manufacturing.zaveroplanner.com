@@ -27,13 +27,33 @@
                             </div>
 
                         </div>
-                        <div class="msg-alert  {{$new_company == 1 ? '' : 'hidden'}} ">
+                        {{-- <div class="msg-alert  {{$new_company == 1 ? '' : 'hidden'}} ">
                             <span class="red">{{"* ".__('Backlog & Opening Balances Will Be Deleted Upon Saving Or Clicking Next')}}</span>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 
             </div>
+
+
+ <div class="div-title toggle-show-hide position-relative" data-query=".comment-for-sales-class">
+
+        {{__('Insert Intro Paragraph')}}
+
+    </div>
+    <div id="myCard" class="formItem comment-for-sales-class">
+        <div class="row justify-content-center">
+            <div class="col-md-11">
+                <div class="form-group ">
+                    <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn" class="fullscreen-btn">⛶</button>
+                    <textarea data-is-ck-editor name="intro_paragraph">{!! $project->intro_paragraph !!}</textarea>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
 
 
 

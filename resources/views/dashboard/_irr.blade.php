@@ -410,15 +410,22 @@ $tableClasses =  'col-md-12';
 
             @php
             $columnIndex = 0 ;
+			$isFirstLoop=true;
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
             <td>
+					@if($isFirstLoop)
                 <div class="d-flex align-items-center justify-content-center">
                     <x-repeat-right-dot-inputs :disabled="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="$currentVal" :classes="'only-greater-than-or-equal-zero-allowed total-loans-hidden js-recalculate-equity-funding-value'" :is-percentage="false" :mark="' '" :name="''" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
                 </div>
+				@php
+					$isFirstLoop = false;
+				@endphp
+				
+				@endif
             </td>
             @php
             $columnIndex++ ;
@@ -428,6 +435,58 @@ $tableClasses =  'col-md-12';
 
 
         </tr>
+		
+		@if($project->isNewCompany())
+		
+		 <tr data-repeat-formatting-decimals="2" data-repeater-style>
+            @php
+            $key ='irr';
+            $currentModalId = $key.'-modal-id';
+            $currentModalTitle = __('IRR %') ;
+            @endphp
+            <td>
+                <div class="d-flex align-items-center ">
+                    <input value="{{ __('IRR %') }}" disabled class="form-control text-left " type="text">
+                    <div>
+                        <i data-toggle="modal" data-target="#{{ $currentModalId }}" class="flaticon2-information kt-font-primary exclude-icon ml-2 cursor-pointer "></i>
+                        @include('dashboard._expense-modal',['currentModalId'=>$currentModalId,'modalTitle'=>$currentModalTitle,'modalData'=>$formattedDcfMethod[$key] ?? []])
+                    </div>
+
+
+
+                </div>
+            </td>
+
+
+            @php
+            $columnIndex = 0 ;
+			$isFirstLoop=true;
+            @endphp
+            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @php
+            $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0);
+            @endphp
+            <td>
+			@if($isFirstLoop)
+                <div class="d-flex align-items-center justify-content-center">
+                    <x-repeat-right-dot-inputs :isNumber="false" :disabled="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="number_format($currentVal,2).'%'" :classes="''" :is-percentage="false" :mark="' '" :name="''" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                </div>
+				@php
+					$isFirstLoop = false;
+				@endphp
+            @endif 
+			</td>
+			
+            @php
+            $columnIndex++ ;
+            @endphp
+
+            @endforeach
+
+
+        </tr>
+		
+		@endif 
 		
 		
 

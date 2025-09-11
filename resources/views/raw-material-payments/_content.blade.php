@@ -55,7 +55,11 @@
 
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <input class="form-control" type="text" name="rawMaterials[{{ $rawMaterialId }}][beginning_inventory_value]" value="{{ $rawMaterial->beginning_inventory_value }}">
+                                            <input 
+											@if($project->isNewCompany())
+											disabled
+											@endif 
+											class="form-control" type="text" name="rawMaterials[{{ $rawMaterialId }}][beginning_inventory_value]" value="{{ $rawMaterial->beginning_inventory_value }}">
                                         </div>
                                     </td>
 

@@ -9,15 +9,6 @@ class CalculateIrrService
 
 		$discount_rate = $discount_rate/ 100 ;
 		$yearsAndFreeCash = $annual_free_cash_array;
-		// = [
-		//     1=>-5000000 ,
-		//     2=>3000000 ,
-		//     3=>4500000,
-		//     4=>15000000 ,
-		//     5=>125000000,
-		//     // 6=>1545132872.40807
-		// ];
-
 		if ($numberOfIteration == 1 && ($this->checkIfArrayAllIsAllNegative($yearsAndFreeCash) || $this->checkIfArrayAllIsAllPositive($yearsAndFreeCash))) {
 			return 'No IRR';
 		}

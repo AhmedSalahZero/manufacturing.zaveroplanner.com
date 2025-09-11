@@ -40,11 +40,15 @@ class StoreFixedAssetsRequest extends FormRequest
             $fixedAssetArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
             unset($fixedAssetArr['product_id']);
             unset($fixedAssetArr['percentage']);
+			
         
             //
             foreach ($fixedAssetArr['due_days']??[] as $index => $dueDay) {
                 $paymentRate = $fixedAssetArr['payment_rate'][$index];
                 $fixedAssetArr['custom_collection_policy'][$dueDay] = $paymentRate;
+				$isFromTotal = $fixedAssetArr['from_total_or_executions'][$index] ?? 0 ;
+				unset($fixedAssetArr['from_total_or_executions'][$index]);
+				$fixedAssetArr['from_total_or_executions'][$dueDay] = $isFromTotal;
             }
         }
         $this->merge([

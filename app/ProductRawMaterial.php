@@ -10,6 +10,8 @@ class ProductRawMaterial extends Model
 	protected $casts = [
 		'percentages'=>'array',
 	];
+	
+	
     protected $guarded = [];
     public function project()
     {

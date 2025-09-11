@@ -157,11 +157,11 @@
                     </div>
                 </a>
             @endif --}}
-            <a @if($project_complete == 0 ) data-toggle="modal" data-target="#exampleModal"  @else href="{{route('sensitivity.form',[$project->id])}}" @endif>
+            {{-- <a @if($project_complete == 0 ) data-toggle="modal" data-target="#exampleModal"  @else href="{{route('sensitivity.form',[$project->id])}}" @endif>
                 <div class="projectItem {{$project_complete == 0  ? "disabled-class" : ""}}">
                     {{__("Sensitivity")}}
                 </div>
-            </a>
+            </a> --}}
         </Div>
 
 

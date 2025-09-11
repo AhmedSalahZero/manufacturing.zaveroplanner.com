@@ -337,15 +337,16 @@ class CalculateFixedLoanAtEndService
 			$ffeStartDateAsIndex = $dateWithDateIndex[$ffeStartDateAsString];
 			$duration = $ffe->getDuration();
 			$ffeCollectionPolicyValue  = $ffe->getCollectionPolicyValue();
+			$ratesWithIsFromTotal  = $ffe->getRatesWithIsFromTotal();
+			$ratesWithIsFromExecution  = $ffe->getRatesWithIsFromExecution();
+			
 			$ffeEquityFundingRate = $ffe->getEquityFunding();
 
 			$executionAndPayment =$ffeExecutionAndPaymentService->__calculate($totalFFECost, $ffeStartDateAsIndex, $duration,$dateIndexWithDate);
 		
-			$contractPayments['FFE Payment'] = $contractPaymentService->__calculate( $executionAndPayment, $ffeCollectionPolicyValue,$dateIndexWithDate, $dateWithDateIndex);
+			$contractPayments['FFE Payment'] = $contractPaymentService->__calculate( $executionAndPayment, $ffeCollectionPolicyValue,$ratesWithIsFromTotal,$ratesWithIsFromExecution,$dateIndexWithDate, $dateWithDateIndex);
 			$ffeEquityPayment['FFE Equity Injection'] = $ffeExecutionAndPaymentService->calculateFFEEquityPayment($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
 			$ffeLoanWithdrawal['FFE Loan Withdrawal'] = $ffeExecutionAndPaymentService->calculateFFELoanWithdrawal($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
-			
-			// $loanForFFECost = $ffe->getLoanForSection(FFE_COST);
 			$equityFunding = $ffe->getEquityFundingRate();
 			
 			if ($equityFunding < 100) {

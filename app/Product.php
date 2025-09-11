@@ -22,18 +22,10 @@ class Product extends Model
 	{
 		parent::boot();
 		static::saving(function(Product $product){
-			$directionInYears =count($product->project->getYearIndexWithYear())-2;
-			$endDateAsIndex = $product->project->getViewStudyEndDateAsIndex();
-			$config = [
-				true => [
-					'position'=>$endDateAsIndex ,
-					'no_repeats'=>12 
-				],
-				false => [
-					'position'=> $directionInYears,
-					'no_repeats'=>1 
-				]
-			];
+			$project = $product->project ; 
+			/**
+			 * @var Project $project
+			 */
 			
 			foreach([
 				'max_capacity'=>false , 
@@ -54,7 +46,8 @@ class Product extends Model
 				// is monthly column ? 
 			] as $columnName => $isMonthlyColumn){
 				if($product->isDirty($columnName)){
-					$product->{$columnName}  = extendArr($product->{$columnName},$config[$isMonthlyColumn]['position'],$config[$isMonthlyColumn]['no_repeats']);
+					$currentPayload = (array) $product->{$columnName} ;
+					$product->{$columnName} = $project->repeatArr($currentPayload ,$isMonthlyColumn );
 				}
 			}
 			// foreach($jsonColumns )
@@ -351,7 +344,7 @@ class Product extends Model
 			$currentSalesQuantity = $inventoryQuantityStatement['sales_quantity'][$dateAsIndex]??1;
 			$currentManufacturingQuantity = $inventoryQuantityStatement['manufacturing_quantity'][$dateAsIndex]??1;
 			foreach($this->rawMaterials as $rawMaterial ){
-				$percentagesForCurrentDateIndex = (json_decode($rawMaterial->pivot->percentages)[$currentYearIndex]??0) / 100;
+				$percentagesForCurrentDateIndex = (json_decode($rawMaterial->getPercentageAtYearAsIndex($currentYearIndex))) / 100;
 				$productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex]  = ($percentagesForCurrentDateIndex * $monthlySalesValue) / $currentSalesQuantity *  $currentManufacturingQuantity;
 				$productRawMaterialConsumed['total'][$dateAsIndex] = isset($productRawMaterialConsumed['total'][$dateAsIndex]) ? $productRawMaterialConsumed['total'][$dateAsIndex] + $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex] : $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex];
 			}

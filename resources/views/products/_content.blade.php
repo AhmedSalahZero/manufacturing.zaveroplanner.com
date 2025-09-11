@@ -47,7 +47,7 @@
                                     @endphp
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <x-repeat-right-dot-inputs :formattedInputClasses="'max-w-100 text-center '" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="1" :currentVal="$currentVal" :classes="'only-greater-than-or-equal-zero-allowed  number_field number_field3 '" :is-percentage="false" :mark="' '" :name="'max_capacity['.($yearAsIndex).']'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                            <x-repeat-right-dot-inputs :formattedInputClasses="'max-w-100 text-center '" :disabled="false" :removeThreeDotsClass="false" :removeThreeDots="false" :number-format-decimals="1" :currentVal="$currentVal" :classes="'only-greater-than-or-equal-zero-allowed  number_field  '" :is-percentage="false" :mark="' '" :name="'max_capacity['.($yearAsIndex).']'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
                                         </div>
                                     </td>
                                     @php
@@ -102,7 +102,7 @@
                                     @endphp
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <x-repeat-right-dot-inputs :name="'target_quantities['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="1" :currentVal="$currentVal" :classes="' only-greater-than-or-equal-zero-allowed number_multiple_percentage number_field2'" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                                            <x-repeat-right-dot-inputs :name="'target_quantities['.($yearAsIndex).']'" :formattedInputClasses="'max-w-100 text-center '" :readonly="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="1" :currentVal="$currentVal" :classes="' only-greater-than-or-equal-zero-allowed number_multiple_percentage number_field2 number_field3'" :is-percentage="false" :mark="' '" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
                                         </div>
                                     </td>
                                     @php

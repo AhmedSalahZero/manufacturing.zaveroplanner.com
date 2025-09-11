@@ -173,18 +173,21 @@ trait HasCollectionOrPaymentStatement {
 			$settlements = [];
 			$isFirstMonth = true ;
 			$previousAddition = 0 ;
+			$endBalance = [];
             foreach ($additionsForIntervals[$intervalName] as $dateIndex=>$additionAtDate) {
                 $dateIndex;
                 $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
 			//	$addition = $withholdForIntervals[$intervalName][$dateIndex]??0;
-                $totalDue[$dateIndex] =  $additionAtDate+$beginningBalance;
-				$settlements[$dateIndex+1] = $totalDue[$dateIndex] <= 0 ? 0 : $additionAtDate;
+			$totalDue[$dateIndex] =  $additionAtDate+$beginningBalance;
+				$settlementAtDate = $settlements[$dateIndex]??0;
+				 $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
+				$previousEndBalance = $endBalance[$dateIndex] ?? 0 ;
+				$settlements[$dateIndex+1] = $totalDue[$dateIndex] <= 0 ? 0 : $previousEndBalance;
 				if($initialBeginningBalance > 0 && $isFirstMonth){
 					$settlements[$dateIndex] = $initialBeginningBalance;
 				}
-				$settlementAtDate = $settlements[$dateIndex]??0;
        //         $settlementAtDate = $settlementsForInterval[$intervalName][$dateIndex]??0 ;
-                $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
+               
                 $beginningBalance = $endBalance[$dateIndex] ;
                 $result[$intervalName]['addition'][$dateIndex] =  $additionAtDate ;
                 $result[$intervalName]['total_due'][$dateIndex] = $totalDue[$dateIndex];

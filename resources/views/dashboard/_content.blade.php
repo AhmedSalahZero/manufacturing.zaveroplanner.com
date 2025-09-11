@@ -2,120 +2,182 @@
 <link href="/css/dashboard.css" rel="stylesheet">
 @endpush
 
-  <div class="div-title">
+<div class="div-title">
 
-      {{ __('Profitability Summary Figs\'000') }}
-  </div>
+    {{ __('Profitability Summary Figs\'000') }}
+</div>
 
-  <div class="formItem pl-4 pr-4">
-
-
-      <div class="row">
-          @include('dashboard._income-statement')
-          @if($withSensitivity)
-          @include('dashboard._income-statement',['formattedResult'=>$sensitivityFormattedResult])
-          @endif
-          @include('dashboard._income-statement-percentage-of',['formattedResult'=>$formattedResult])
-
-          @if($withSensitivity)
-          @include('dashboard._income-statement-percentage-of',['formattedResult'=>$sensitivityFormattedResult])
-          @endif
+<div class="formItem pl-4 pr-4">
 
 
+    <div class="row">
+        @include('dashboard._income-statement')
+        @if($withSensitivity)
+        @include('dashboard._income-statement',['formattedResult'=>$sensitivityFormattedResult])
+        @endif
+        @include('dashboard._income-statement-percentage-of',['formattedResult'=>$formattedResult])
 
-      </div>
-
-  </div>
+        @if($withSensitivity)
+        @include('dashboard._income-statement-percentage-of',['formattedResult'=>$sensitivityFormattedResult])
+        @endif
 
 
 
-  <div class="formItem pl-4 pr-4">
-      <div class="row">
-          @foreach($twoLineChartWithGrowthRates as $chartId => $currentChartData )
+    </div>
 
-          <div class="col-md-6">
-              <div class="div-title">
-                  {{ $chartTitleMapping[$chartId] }}
-              </div>
-              <div class="chartdiv_two_lines" id="{{ $chartId }}two-line-with-growth-rate-chart"></div>
-              <input type="hidden" class="three-line-chart-data-class" data-chart-name="{{ $chartId }}" data-chart-data="{{ json_encode($currentChartData) }}">
-          </div>
-          @endforeach 
-		  
-		  @foreach($oneLineChart as $chartId => $currentChartData )
+</div>
 
-          <div class="col-md-6">
-              <div class="div-title">
-                  {{ $chartTitleMapping[$chartId] }}
-              </div>
-              <div class="chartdiv_two_lines" id="{{ $chartId }}one-line-chart"></div>
-              <input type="hidden" class="three-line-chart-data-class" data-chart-name="{{ $chartId }}" data-chart-data="{{ json_encode($currentChartData) }}">
-          </div>
-          @endforeach @foreach($twoLineChartWithPercentageOfSales as $chartId => $currentChartData )
+<div class="formItem pl-4 pr-4">
+    <div class="row">
+        @php
+        $index = 0 ;
+        @endphp
+        @foreach($twoLineChartWithGrowthRates as $chartId => $currentChartData )
 
-          <div class="col-md-6">
-              <div class="div-title">
-                  {{ $chartTitleMapping[$chartId] }}
-              </div>
-              <div class="chartdiv_two_lines" id="{{ $chartId }}two-line-with-percentage-of-sales-chart"></div>
-              <input type="hidden" class="three-line-chart-data-class" data-chart-name="{{ $chartId }}" data-chart-data="{{ json_encode($currentChartData) }}">
-          </div>
-          @endforeach
-      </div>
-  </div>
+        <div class="col-md-6">
+            <div class="div-title">
+                {{ $chartTitleMapping[$chartId] }}
+            </div>
+            <div class="chartdiv_two_lines {{ $index % 2 == 1 ? 'margin__left' : '' }}" id="{{ $chartId }}two-line-with-growth-rate-chart"></div>
+            <input type="hidden" class="three-line-chart-data-class" data-chart-name="{{ $chartId }}" data-chart-data="{{ json_encode($currentChartData) }}">
+        </div>
+        @php
+        $index++;
+        @endphp
+        @endforeach
 
+        @foreach($oneLineChart as $chartId => $currentChartData )
 
+        <div class="col-md-6">
+            <div class="div-title">
+                {{ $chartTitleMapping[$chartId] }}
+            </div>
+            <div class="chartdiv_two_lines {{ $index % 2 == 1 ? 'margin__left' : '' }}" id="{{ $chartId }}one-line-chart"></div>
+            <input type="hidden" class="three-line-chart-data-class" data-chart-name="{{ $chartId }}" data-chart-data="{{ json_encode($currentChartData) }}">
+        </div>
 
+        @php
+        $index++;
+        @endphp
 
-  <div class="div-title">
-      {{ __('Cost & Expenses Summary Figs\'000' ) }}
-  </div>
+        @endforeach
 
-  <div class="formItem">
-
-      <div class="row pl-4 pr-4">
+    </div>
+</div>
 
 
-          @include('dashboard._expenses',['formattedExpenses'=>$formattedExpenses])
-          @include('dashboard._expenses-percentage-of',['formattedExpenses'=>$formattedExpenses])
-			
-			
-		
 
-      </div>
+ <div class="div-title toggle-show-hide position-relative" data-query=".comment-for-sales-class">
 
+        {{__('Insert Comment')}}
 
-  </div>
+    </div>
+    <div id="myCard" class="formItem comment-for-sales-class">
+        <div class="row justify-content-center">
+            <div class="col-md-11">
+                <div class="form-group ">
+                    <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn" class="fullscreen-btn">⛶</button>
+                    <textarea data-is-ck-editor name="dashboard_comment">{!! $project->dashboard_comment_1 !!}</textarea>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 
 
 <div class="div-title">
-      {{ __('Cost & Expenses' ) }}
-  </div>
-    <div class="formItem">
-	  <div class="row pl-4 pr-4">
-	  	<div class="col-md-12">
-			 <div id="bar-chart-id" class="chartdashboard"></div>
-		</div>
-	  </div>
-	</div>
-  <div class="div-title">
-      {{ __('Discount Cashflow Valuation (DCF)' ) }}
-  </div>
+    {{ __('Cost & Expenses Summary Figs\'000' ) }}
+</div>
 
-  <div class="formItem">
+<div class="formItem">
 
-      <div class="row pl-4 pr-4">
+    <div class="row pl-4 pr-4">
+@php
+	$expensePercentages = [];
+@endphp
+
+        @include('dashboard._expenses',['formattedExpenses'=>$formattedExpenses])
+        @include('dashboard._expenses-percentage-of',['formattedExpenses'=>$formattedExpenses,'expensePercentages'=>&$expensePercentages])
+
+    </div>
 
 
+</div>
 
 
-          @include('dashboard._irr',['formattedDcfMethod'=>$formattedDcfMethod])
+<div class="div-title">
+    {{ __('Cost & Expenses Revenue %' ) }}
+</div>
+<div class="formItem">
+    <div class="row pl-4 pr-4">
+        <div class="col-md-12">
+            <div id="bar-chart-id" class="chartdashboard"></div>
+        </div>
+    </div>
+</div>
 
-      </div>
+        @foreach($twoLineChartWithPercentageOfSales as $chartId => $currentChartData )
+	@if($index % 2 == 0)
+<div class="formItem pl-4 pr-4">
+    <div class="row">
+	@endif
+
+        <div class="col-md-6">
+            <div class="div-title">
+                {{ $chartTitleMapping[$chartId] }}
+            </div>
+            <div class="chartdiv_two_lines {{ $index % 2 == 1 ? 'margin__left' : '' }}" id="{{ $chartId }}two-line-with-percentage-of-sales-chart"></div>
+            <input type="hidden" class="three-line-chart-data-class" data-chart-name="{{ $chartId }}" data-chart-data="{{ json_encode($currentChartData) }}">
+        </div>
+
+        @php
+        $index++;
+        @endphp
+	@if($index % 2 == 0)
+    </div>
+</div>
+	@endif
+        @endforeach
 
 
-  </div>
 
+
+<div class="div-title">
+    {{ __('Discount Cashflow Valuation (DCF) Figs\'000' ) }}
+</div>
+
+<div class="formItem">
+
+    <div class="row pl-4 pr-4">
+
+        @include('dashboard._irr',['formattedDcfMethod'=>$formattedDcfMethod])
+
+    </div>
+
+
+</div>
+
+
+
+
+ <div class="div-title toggle-show-hide position-relative" data-query=".comment-for-sales-class2">
+
+        {{__('Insert Comment')}}
+
+    </div>
+    <div id="myCard" class="formItem comment-for-sales-class2">
+        <div class="row justify-content-center">
+            <div class="col-md-11">
+                <div class="form-group ">
+                    <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn" class="fullscreen-btn">⛶</button>
+                    <textarea data-is-ck-editor name="dashboard_comment">{!! $project->dashboard_comment_1 !!}</textarea>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 
 
 @push('js_end')
@@ -131,7 +193,7 @@
 @foreach($twoLineChartWithGrowthRates as $id => $data)
 <script>
     am4core.ready(function() {
-		
+
 
         // Themes begin
         am4core.useTheme(am4themes_animated);
@@ -213,18 +275,18 @@
         }
 
         createAxisAndSeries("revenue_value", "{{ __('Revenues Value ') }}", false, "circle");
-		createAxisAndSeries("growth_rate", "{{ __('Growth Rate %') }}", true, "triangle");
-	// createAxisAndSeries("revenue_percentage", "{{ __('Revenue %') }}", true, "rectangle");
+        createAxisAndSeries("growth_rate", "{{ __('Growth Rate %') }}", true, "triangle");
+        // createAxisAndSeries("revenue_percentage", "{{ __('Revenue %') }}", true, "rectangle");
 
-	// Add legend
-	chart.legend = new am4charts.Legend();
+        // Add legend
+        chart.legend = new am4charts.Legend();
 
-	// Add cursor
-	chart.cursor = new am4charts.XYCursor();
+        // Add cursor
+        chart.cursor = new am4charts.XYCursor();
 
 
 
-});
+    });
 
 </script>
 
@@ -235,7 +297,7 @@
 @foreach($oneLineChart as $id => $data)
 <script>
     am4core.ready(function() {
-		
+
 
         // Themes begin
         am4core.useTheme(am4themes_animated);
@@ -317,18 +379,18 @@
         }
 
         createAxisAndSeries("revenue_value", "{{ __('Revenues Value ') }}", false, "circle");
-	//	createAxisAndSeries("growth_rate", "{{ __('Growth Rate %') }}", true, "triangle");
-	// createAxisAndSeries("revenue_percentage", "{{ __('Revenue %') }}", true, "rectangle");
+        //	createAxisAndSeries("growth_rate", "{{ __('Growth Rate %') }}", true, "triangle");
+        // createAxisAndSeries("revenue_percentage", "{{ __('Revenue %') }}", true, "rectangle");
 
-	// Add legend
-	chart.legend = new am4charts.Legend();
+        // Add legend
+        chart.legend = new am4charts.Legend();
 
-	// Add cursor
-	chart.cursor = new am4charts.XYCursor();
+        // Add cursor
+        chart.cursor = new am4charts.XYCursor();
 
 
 
-});
+    });
 
 </script>
 
@@ -338,7 +400,7 @@
 @foreach($twoLineChartWithPercentageOfSales as $id => $data)
 <script>
     am4core.ready(function() {
-		
+
 
         // Themes begin
         am4core.useTheme(am4themes_animated);
@@ -420,26 +482,24 @@
         }
 
         createAxisAndSeries("value", "{{ __('Value') }}", false, "circle");
-		createAxisAndSeries("percentage", "{{ __('% Of Sales') }}", true, "triangle");
-	// createAxisAndSeries("revenue_percentage", "{{ __('Revenue %') }}", true, "rectangle");
+        createAxisAndSeries("percentage", "{{ __('% Of Sales') }}", true, "triangle");
+        // createAxisAndSeries("revenue_percentage", "{{ __('Revenue %') }}", true, "rectangle");
 
-	// Add legend
-	chart.legend = new am4charts.Legend();
+        // Add legend
+        chart.legend = new am4charts.Legend();
 
-	// Add cursor
-	chart.cursor = new am4charts.XYCursor();
+        // Add cursor
+        chart.cursor = new am4charts.XYCursor();
 
 
 
-});
+    });
 
-	
 </script>
 
 @endforeach
 <script>
-
-am5.ready(function() {
+    am5.ready(function() {
 
         // Create root element
         // https://www.amcharts.com/docs/v5/getting-started/#Root_element
@@ -471,7 +531,7 @@ am5.ready(function() {
         var chartData = @json($barChart);
 
         var data = chartData;
-	console.log(chartData)
+        console.log(chartData)
 
 
 
@@ -544,20 +604,20 @@ am5.ready(function() {
 
             legend.data.push(series);
         }
-		
+
         makeSeries("Raw Material Cost", "raw-material-cost");
         makeSeries("Labor Cost", "labor-cost");
         makeSeries("Manufacturing Overheads", "manufacturing-overheads");
         makeSeries("Marketing Expenses", "marketing-expense");
         makeSeries("Sales Expense", "sales-expense");
         makeSeries("General Expense", "general-expense");
-    
+
 
         // Make stuff animate on load
         // https://www.amcharts.com/docs/v5/concepts/animations/
         chart.appear(1000, 100);
 
     });
-	
+
 </script>
 @endpush

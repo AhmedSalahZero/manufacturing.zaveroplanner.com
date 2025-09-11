@@ -12,6 +12,7 @@
         "abrigham/laravel-email-exceptions": "^4.0",
         "barryvdh/laravel-dompdf": "^2.2",
         "barryvdh/laravel-snappy": "^1.0",
+        "doctrine/dbal": "^3.0",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
@@ -20,11 +21,11 @@
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.0",
         "maatwebsite/excel": "^1.1",
+        "markrogoyski/math-php": "^2.11",
         "mcamara/laravel-localization": "^1.6",
         "nesbot/carbon": "^2.43",
         "phpoffice/phpspreadsheet": "^5.0",
-        "spatie/browsershot": "^3.61",
-		"doctrine/dbal": "^3.0"
+        "spatie/browsershot": "^3.61"
     },
     "require-dev": {
         "nunomaduro/collision": "^4.1"

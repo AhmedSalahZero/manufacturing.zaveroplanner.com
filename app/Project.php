@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use MathPHP\Finance;
 
 class Project extends Model
 {
@@ -217,9 +218,7 @@ class Project extends Model
                 $totalManpowerSalaries = HArr::sumAtDates($salaryExpenses, $operationDates);
                 foreach ($allocationForManpowerType as $productId => $allocationPercentage) {
 					$product = Product::find($productId);
-					//  if($id != 'direct_labor'){
-						// dd($id,$allocationColumnName,HArr::MultiplyWithNumber($totalManpowerSalaries, $allocationPercentage/100));
-						// }
+				
 						$currentValue = HArr::MultiplyWithNumber($totalManpowerSalaries, $allocationPercentage/100) ;
 						if($isIndirectManpower){
 							$totalIndirectManpowers[$id][$productId]= $currentValue ; 
@@ -455,6 +454,12 @@ class Project extends Model
         
         $fgStatementValues = [];
         $fgValueStatement = [];
+		$allKeys = [
+			'direct_labor_value'=>[],
+			'raw_material_value'=>[],
+			'manufacturing_overheads_value'=>[],
+			'product_depreciation_allocation'=>[]
+		];
         $columnNameMapping = [
             'direct_labor_value'=>'product_manpower_allocation',
             'raw_material_value'=>'product_raw_material_consumed',
@@ -466,8 +471,10 @@ class Project extends Model
             $quantityStatement = $product->product_inventory_qt_statement;
             $totalAvailableQuantity = $quantityStatement['total_quantity_available']??[];
             $salesQuantity = $quantityStatement['sales_quantity']??[];
-            $fgBeginningInventoryBreakdowns = $product->getFgBeginningInventoryBreakdowns() ;
+            $fgBeginningInventoryBreakdowns = count($product->getFgBeginningInventoryBreakdowns()) ? $product->getFgBeginningInventoryBreakdowns() : $columnNameMapping  ;
+		
             $fgBeginningInventoryBreakdowns['product_depreciation_allocation'] = [];
+			
             foreach ($fgBeginningInventoryBreakdowns as $inventoryItemType => $inventoryItemValues) {
                 $fgBeginningInventoryBreakdownValue =  $inventoryItemValues['value']??0	;
                 $currentColumnMapping = $columnNameMapping[$inventoryItemType];
@@ -487,7 +494,6 @@ class Project extends Model
                     $currentCogsAtDate = $fgStatementValues[$productId][$inventoryItemType]['cogs'][$dateAsIndex]??0 ;
                     $fgStatementValues[$productId][$inventoryItemType]['end_balance'][$dateAsIndex] = $totalAvailableValueAtCurrentDateIndex - $currentCogsAtDate ;
                     $currentEndBalanceAtDate = $fgStatementValues[$productId][$inventoryItemType]['end_balance'][$dateAsIndex] ?? [];
-                    // dd($fgBeginningInventoryBreakdowns ,$currentEndBalanceAtDate );
                     $fgBeginningInventoryBreakdownValue = $currentEndBalanceAtDate;
                     // $fgBeginningInventoryBreakdowns = $currentEndBalanceAtDate;
                     
@@ -981,7 +987,6 @@ class Project extends Model
         });
         $totalFixedAssetAdminDepreciation = HArr::sumAtDates(array_merge($fixedAssetAdminDepreciations, $fixedAssetOpeningBalancesAdminDepreciations), $sumKeys);
         $totalDepreciation = HArr::sumAtDates([$formattedDepreciationCogs,$totalFixedAssetAdminDepreciation], $sumKeys);
-        // dd($formattedDepreciationCogs,$totalFixedAssetAdminDepreciation);
         $sum = HArr::sumAtDates([$totalDepreciation,$totalGrossProfit], $sumKeys);
         $editda = HArr::subtractAtDates([$sum,$totalSGANDA], $sumKeys) ;
         $tableDataFormatted[$ebitdaOrderIndex]['main_items']['ebitda']['data'] = $editda;
@@ -2479,7 +2484,7 @@ class Project extends Model
 		$barChart = [];
 		foreach($items  as $key => $arrayItems){
 			foreach($arrayItems as $year => $value){
-					$value = $value / getDivisionNumber();
+					// $value = $value / getDivisionNumber();
 					$barChart[$year][$key] =  isset($barChart[$year][$key]) ? $barChart[$year][$key] + $value : $value;
 					$barChart[$year]['year'] = strval($year);
 			}
@@ -2513,6 +2518,12 @@ class Project extends Model
         $formattedExpenses['marketing-expense'] = $incomeStatement ? $incomeStatement->sganda['marketing']??[] : [];
         $formattedExpenses['sales-expense'] = $incomeStatement ? $incomeStatement->sganda['sales']??[] : [];
         $formattedExpenses['general-expense'] = $incomeStatement ? $incomeStatement->sganda['general-expenses']??[] : [];
+		$formattedExpensesPercentages = [];
+		$formattedExpensesPercentages = $formattedExpenses ; 
+		foreach($formattedExpensesPercentages as $key => $values){
+			$formattedExpensesPercentages[$key] = HArr::calculatePercentageOf($formattedResult['sales_revenue'] , $values);
+		}
+		// dd($formattedExpensesPercentages);
         $years = range(0, $this->duration-1);
         $lineCharts = [
             'two-line-with-growth-rates'=>[
@@ -2533,23 +2544,19 @@ class Project extends Model
                 'EBIT'=>[
                         'value'=>$project->replaceYearIndexWithYear($formattedResult['ebit'], $years) ,
                     'percentage'=>$project->replaceYearIndexWithYear($formattedResult['ebit_percentage_of_sales'], $years)
-                ],
-                    'EBT'=>[
-                        'value'=>$project->replaceYearIndexWithYear($formattedResult['ebt'], $years) ,
-                    'percentage'=>$project->replaceYearIndexWithYear($formattedResult['ebt_percentage_of_sales'], $years)
-                    ],'net-profit'=>[
+                ]
+				// ,
+                //     'EBT'=>[
+                //         'value'=>$project->replaceYearIndexWithYear($formattedResult['ebt'], $years) ,
+                //     'percentage'=>$project->replaceYearIndexWithYear($formattedResult['ebt_percentage_of_sales'], $years)
+                //     ]
+					,'net-profit'=>[
                         'value'=>$project->replaceYearIndexWithYear($formattedResult['net_profit'], $years) ,
                     'percentage'=>$project->replaceYearIndexWithYear($formattedResult['net_profit_percentage_of_sales'], $years)
                     ],
             ]
         ];
-		$barChart = [
-			'expenses'=> [
-				
-			]
-		];
-		$barCharts = $this->formatBarChart($this->replaceYearIndexWithYearInTwoDimArr($formattedExpenses,$years));
-	
+		$barCharts = $this->formatBarChart($this->replaceYearIndexWithYearInTwoDimArr($formattedExpensesPercentages,$years));
         $chartTitleMapping = [
             'revenue-streams'=>__('Revenue Streams'),
             'accumulated-revenue-streams'=>__('Accumulated Revenue Streams'),
@@ -2623,29 +2630,11 @@ class Project extends Model
         }
         $formattedDcfMethod['discount-factor'] = array_values($newWacc) ;
         $formattedDcfMethod['npv'] = [0=>array_sum(HArr::divideTwoArrAtSameIndex($freeCashflowWithTerminal, array_values($newWacc)))] ;
+        $formattedDcfMethod['irr'] = [Finance::irr($freeCashflowWithTerminal)*100] ;
+		
         
         
         
-        
-        // $resultPerRevenueStreamType = [];
-        // $chartsFormatted =$this->formatForTheeLineChart($resultPerRevenueStreamType);
-        // $lineChart = $chartsFormatted['line_chart'];
-        // $barChart = $chartsFormatted['bar_chart'];
-        
-        // $dashboardData = [
-        // 	'formattedResult'=>[],
-        // 	'formattedExpenses'=>[],
-        // 	'lineChart'=>[],
-        // 	'titlesMapping'=>[],
-        // 	'barChart'=>[],
-        // 	'yearWithItsIndexes'=>
-        // ];
-        // $dashboardData = $this->generateDashboardData($project,false);
-        // $formattedResult = $dashboardData['formattedResult'];
-        // $formattedExpenses =$dashboardData['formattedExpenses'];
-        // $lineChart =$dashboardData['lineChart'];
-        // $titlesMapping =$dashboardData['titlesMapping'];
-        // $barChart =$dashboardData['barChart'];
         $yearWithItsIndexes = $project->getOperationDurationPerYearFromIndexes();
         $sensitivityFormattedResult = [];
         $sensitivityFormattedExpenses=[];
@@ -2669,6 +2658,7 @@ class Project extends Model
 		'barChart'=>$barCharts,
         'formattedResult'=>$formattedResult,
         'formattedExpenses'=>$formattedExpenses,
+		'formattedExpensesPercentages'=>$formattedExpensesPercentages,
         // 'lineChart'=>$lineChart,
         // 'lineChart'=>$lineChart,
         // 'barChart'=>$barChart,
@@ -2818,5 +2808,7 @@ class Project extends Model
         $corporateTaxesPayable = DB::table('vat_and_credit_withhold_tax_opening_balances')->where('project_id',$this->id)->first();
         return $corporateTaxesPayable ? $corporateTaxesPayable->corporate_taxes_payable  : 0 ;
     }
+	
+
 
 }

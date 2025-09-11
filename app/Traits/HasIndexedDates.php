@@ -754,4 +754,23 @@ trait HasIndexedDates
 		}
 		return $result;
 	}
+	public function repeatArr(array $arr , bool $isMonthlyColumn)
+	{
+		$directionInYears =count($this->getYearIndexWithYear())-2;
+			$endDateAsIndex = $this->getViewStudyEndDateAsIndex();
+			$config = [
+				true => [
+					'position'=>$endDateAsIndex ,
+					'no_repeats'=>12 
+				],
+				false => [
+					'position'=> $directionInYears,
+					'no_repeats'=>1 
+				]
+			];
+			
+			return  extendArr($arr,$config[$isMonthlyColumn]['position'],$config[$isMonthlyColumn]['no_repeats']);
+			
+	}
+	
 }

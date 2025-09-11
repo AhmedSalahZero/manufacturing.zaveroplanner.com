@@ -210,8 +210,8 @@ common-parent
 
     <div class="max-w-20 pr-2 pl-2 mt-4 closest-parent">
         <label class="form-label font-weight-bold"> {!! __('Payment <br> Term') !!} </label>
-        <x-form.select :selectedValue="isset($fixedAsset) ? $fixedAsset->getPaymentTerm() : 'cash'" :options="getPaymentTerms()" :add-new="false" class="select2-select repeater-select payment_terms " :all="false" name="payment_terms"></x-form.select>
-        <x-modal.custom-collection :title="__('Custom Payment')" :subModel="isset($fixedAsset) ? $fixedAsset : null "></x-modal.custom-collection>
+        <x-form.select :selectedValue="isset($fixedAsset) ? $fixedAsset->getPaymentTerm() : 'cash'" :options="getPaymentTermsForFixedAssets()" :add-new="false" class="select2-select repeater-select payment_terms " :all="false" name="payment_terms"></x-form.select>
+        <x-modal.fixed-asset-custom-collection :title="__('Custom Payment')" :subModel="isset($fixedAsset) ? $fixedAsset : null "></x-modal.fixed-asset-custom-collection>
     </div>
     <div class="col-md-2 pr-2 pl-4 mt-4">
         <label class="form-label font-weight-bold">{{ __('Equity Funding %') }} </label>

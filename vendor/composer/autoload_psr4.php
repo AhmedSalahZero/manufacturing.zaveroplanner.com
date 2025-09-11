@@ -61,6 +61,7 @@ return array(
     'Nette\\' => array($vendorDir . '/nette/utils/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'Matrix\\' => array($vendorDir . '/markbaker/matrix/classes/src'),
+    'MathPHP\\' => array($vendorDir . '/markrogoyski/math-php/src'),
     'Masterminds\\' => array($vendorDir . '/masterminds/html5/src'),
     'League\\MimeTypeDetection\\' => array($vendorDir . '/league/mime-type-detection/src'),
     'League\\Glide\\' => array($vendorDir . '/league/glide/src'),

@@ -990,3 +990,8 @@ $(function(){
 	$('.collapse-before-me').trigger('click')
 	$('.expense-category-class').trigger('change')
 })
+$(document).on('click','.parent-checkbox',function(){
+	 $(this).closest('.closest-parent').find('input[type="checkbox"]').prop('checked',false).trigger('change');
+	$(this).closest('td').find('input[type="checkbox"]').prop('checked',true).trigger('change')
+	
+})

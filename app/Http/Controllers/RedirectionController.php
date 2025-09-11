@@ -65,7 +65,7 @@ class RedirectionController extends Controller
             unset($rawMaterialArr['id']);
             $rawMaterialArr['project_id'] = $project->id;
             $rawMaterialId = $rawMaterialArr['raw_material_id'];
-            $rawMaterialArr['percentages'] = json_encode($rawMaterialArr['percentages']);
+            $rawMaterialArr['percentages'] = json_encode($project->repeatArr($rawMaterialArr['percentages'],false));
             $product->rawMaterials()->attach($rawMaterialId, $rawMaterialArr);
         }
 		
@@ -435,6 +435,10 @@ class RedirectionController extends Controller
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
         }
+		if($project->isNewCompany())
+		{
+			        return redirect()->route('financial.result', ['project'=>$project->id]);
+		}
         return redirect()->route('openingBalances.form', $project->id);
         // return $project->new_company == 0 ? redirect()->route('openingBalances.form',$project->id) : redirect()->route('dashboard.index',$project->id);
         

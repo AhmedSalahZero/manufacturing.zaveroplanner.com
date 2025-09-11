@@ -658,6 +658,7 @@ return $result;
 		}
 		return $result;
 	}
+	
 	public static function addTotalMonthsPerYear(array $items ,array $dateIndexWithDate, array $financialYearsEndMonths):array{
 		$result = [];
 		foreach($items as $index => $itemArr){

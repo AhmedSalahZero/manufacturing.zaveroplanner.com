@@ -388,3 +388,6 @@ input.custom-input-string-width{
         color: black !important;
         font-weight: 400 !important;
     }
+.table-right-border {
+	    border-right: 5px solid #747DDE !important;
+}

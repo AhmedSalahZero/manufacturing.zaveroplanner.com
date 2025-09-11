@@ -75,6 +75,7 @@ class RawMaterial extends Model
 			$monthsToCover = $rawMaterial->getRmInventoryCoverageDays() / 30;
 			$currentInventoryQuantityStatement = $inventoryQuantityStatement->createInventoryQuantityStatement($totalConsumed,$beginningBalance,$monthsToCover); 
 			$manufacturingQuantity = $currentInventoryQuantityStatement['manufacturing_quantity']??[];
+	
 			$collectionPolicyStatement = $rawMaterial->calculateMultiYearsCollectionPolicy($manufacturingQuantity,null);
 			$withholdAmount = $collectionPolicyStatement['monthly']['withhold_amount']??[] ;
 			$rawMaterial->update([
