@@ -1472,11 +1472,11 @@ class Project extends Model
             $totalLoanTermLiabilities = HArr::sumAtDates([$totalLoanTermLiabilities,$payload], $sumKeys);
         }
     
-        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['options'] =array_merge([
+        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Long Term Liabilities')]['options'] =array_merge([
             'title'=>__('Opening Long Term Liabilities'),
         ], $defaultNumericInputClasses);
-        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['data'] = $totalLoanTermLiabilities;
-        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Loan Installments')]['year_total'] = HArr::sumPerYearIndex($totalLoanTermLiabilities, $yearWithItsMonths);
+        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Long Term Liabilities')]['data'] = $totalLoanTermLiabilities;
+        $tableDataFormatted[$currentTabIndex]['sub_items'][__('Opening Long Term Liabilities')]['year_total'] = HArr::sumPerYearIndex($totalLoanTermLiabilities, $yearWithItsMonths);
         
 		
 		
