@@ -8,10 +8,7 @@ class ContractPaymentService
 {
 	public function __calculate(array $executionAmounts ,array $ratesWithDueDays, array $ratesWithIsFromTotal , array $ratesWithIsFromExecution  ,array $dateIndexWithDate, array $dateWithDateIndex)
 	{
-		// $hardTotalConstructionCost = $hardConstructionCost * (1+ ($hardContingencyRate / 100));
-		// $ratesWithDueDays = $this->formatRatesWithDueDays($collectionPolicyValue);
-		// $downPaymentOneAmount = $hardTotalConstructionCost * ($downPaymentRateOne /100);
-		// $collections[$startDateAsIndex] =$downPaymentOneAmount ;
+	
 		$collections = [];
 		$dateValue = $executionAmounts ;
 		$executionStartDateAsIndex = array_key_first($executionAmounts);
@@ -19,10 +16,8 @@ class ContractPaymentService
 		
 		/**
 		 * 
-		 * * From Execution
+		 * * From Total
 		 */
-		
-
 			foreach ($ratesWithIsFromTotal as $dueDay => $false) {
 				$rate = $ratesWithDueDays[$dueDay] ?? 0 ;
 				$rate =  $rate / 100;
@@ -37,7 +32,6 @@ class ContractPaymentService
 				$dateIndex =  $dateWithDateIndex[$fullDate];
 				$collections[$dateIndex] = ($totalAmount * $rate) + ($collections[$dateIndex] ?? 0);
 			}
-			
 			
 		/**
 		 * 
@@ -61,9 +55,9 @@ class ContractPaymentService
 				$collections[$dateIndex] = ($target * $rate) + ($collections[$dateIndex] ?? 0);
 			}
 		}
-		
-		return $collections ;
-	}
+		ksort($collections);
+		return $collections;
+		}
 	
 	protected function formatRatesWithDueDays(array $ratesAndDueDays): array
 	{

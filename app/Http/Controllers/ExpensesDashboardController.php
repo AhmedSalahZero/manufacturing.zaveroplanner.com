@@ -387,7 +387,6 @@ class ExpensesDashboardController extends Controller
                         $end_payment = $total_due - $interest_payment - $installment;
 
                     }
-                // var_dump($installment_with_interest_date .'  '.number_format($installment).'  '.number_format($interest_amount,0) );
                 //ARRAY
                 if ($month == 0 || $month == $down_payment_two_month || $month > $down_payment_two_month) {
                     $installment_distributions [$month]['month'] = $month;

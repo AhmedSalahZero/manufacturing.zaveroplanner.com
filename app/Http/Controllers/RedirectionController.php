@@ -38,14 +38,19 @@ class RedirectionController extends Controller
 			'fg_inventory_value'=>number_unformat($request->get('fg_inventory_value')),
 		]);
         $product->syncSeasonality($request->get('seasonality'));
-        // $request['user_id'] = auth()->user()->id;
         $request['project_id'] = $project->id;
 		$product->update($request->except(['rawMaterials','submit_button','seasonality']));
-        // $request['type'] = $type;
         $rawMaterials = [];
+		$years = $product->getViewYearIndexWithYear();
+		$yearsAsIndexes =array_keys($years);
+	
         foreach ($request->get('rawMaterials') as $index => &$rawMaterialArr) {
-            $rawMaterialArr['product_id'] = $product->id;
+			$rawMaterialArr['product_id'] = $product->id;
+			if(!isset($rawMaterialArr['raw_material_id'])){
+				dd($rawMaterialArr,'raw_material_id');
+			}
             if ($rawMaterialArr['raw_material_id']) {
+				$rawMaterialArr['percentages'] = array_combine($yearsAsIndexes,$rawMaterialArr['percentages']); 
                 $rawMaterials[$index] = $rawMaterialArr;
             }
         }
@@ -269,6 +274,7 @@ class RedirectionController extends Controller
                 if ($tableDataArr['payment_terms'] == 'customize') {
                     $tableDataArr['custom_collection_policy'] = sumDueDayWithPayment($tableDataArr['payment_rate'], $tableDataArr['due_days']);
                 }
+				
                 $customCollectionPolicy = $tableDataArr['custom_collection_policy']??[];
                 if (is_array($isDeductible)) {
                     $tableDataArr['is_deductible'] = $isDeductible[0];
@@ -352,7 +358,6 @@ class RedirectionController extends Controller
                     $tableDataArr['total_vat']  =$vats  ;
                     $amountAfterVat = [$startDateAsIndex => $amountBeforeVat + $amountBeforeVat * $vatRate ];
                     $tableDataArr['total_after_vat']  =$amountAfterVat  ;
-					// dd('d',);
 					$expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productAllocations,$project->products,$oneTimeExpenses['monthly_one_time']??[]);
 					
                     $withholdAmount = $tableDataArr['withhold_tax_rate']/100 ;
@@ -464,7 +469,7 @@ class RedirectionController extends Controller
     ], ['project_id'=>$project->id]);
 	
 	
-	$project->recalculateOpeningBalances();
+		$project->recalculateOpeningBalances();
 	
 		if($request->get('total_liabilities_and_equity_minus_total_assets') != 0){
 			$errorMessage = __('Total Assets Must Be Equal To Total Liabilities + Owners Equity') . ' [ ' . number_format($request->get('total_liabilities_and_equity_minus_total_assets'))  . ' ]';
@@ -563,10 +568,12 @@ class RedirectionController extends Controller
         $collectionPolicyValue = $collectionPolicyType ;
         $dateValue = $totalAfterVat;
         if ($collectionPolicyType == 'customize') {
-            $collectionPolicyValue = $customCollectionPolicy ;
+			$collectionPolicyValue = $customCollectionPolicy ;
         } elseif ($collectionPolicyType == 'system_default' && $paymentTerm=='cash') {
-            $collectionPolicyValue = 'monthly';
-        }
+			$collectionPolicyValue = 'monthly';
+        }elseif($collectionPolicyType == 'system_default'){
+			$collectionPolicyValue = $paymentTerm;
+		}
         $dateValue = convertIndexKeysToString($dateValue, $datesAsIndexAndString);
         $collectionPolicyValue = is_array($collectionPolicyValue) ?  $this->formatDues($collectionPolicyValue) : $collectionPolicyValue;
         $result = (new CollectionPolicyService())->applyCollectionPolicy(true, $collectionPolicyType, $collectionPolicyValue, $dateValue) ;

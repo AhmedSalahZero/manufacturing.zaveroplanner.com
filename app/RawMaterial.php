@@ -47,7 +47,7 @@ class RawMaterial extends Model
 	public function getPercentageAtYearAsIndex($yearAsIndex)
 	{
 		$percentages = $this->pivot->percentages;
-		return json_decode($percentages)[$yearAsIndex]??0;
+		return ((array) json_decode($percentages))[$yearAsIndex]??0;
 	}
 		public function getVatRate():float 
 	{

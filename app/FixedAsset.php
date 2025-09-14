@@ -26,6 +26,7 @@ class FixedAsset extends Model
 		'admin_depreciations'=>'array',
 		'ffe_equity_payment'=>'array',
 		'ffe_loan_withdrawal'=>'array',
+		'ffe_loan_withdrawal_end_balance'=>'array',
 		'ffe_payment'=>'array',
 		'statement'=>'array',
 		'ffe_execution_and_payment'=>'array',
@@ -124,10 +125,15 @@ class FixedAsset extends Model
 	}
 	public function getFromTotalOrExecutions():array
 	{
-		return $this->from_total_or_executions;
+		return $this->from_total_or_executions?:[];
 	}
 	public function getRatesWithIsFromTotal():array
 	{
+		if($this->getPaymentTerm() == 'cash'){
+			return [
+				
+			];
+		}
 		$result = [];
 		foreach($this->getFromTotalOrExecutions() as $dueDate => $isFromTotal){
 			if($isFromTotal){
@@ -138,6 +144,11 @@ class FixedAsset extends Model
 	}
 	public function getRatesWithIsFromExecution():array
 	{
+		if($this->getPaymentTerm() == 'cash'){
+			return [
+				0 => false 
+			];
+		}
 		$result = [];
 		foreach($this->getFromTotalOrExecutions() as $dueDate => $isFromTotal){
 			if(!$isFromTotal){
@@ -308,7 +319,7 @@ class FixedAsset extends Model
 			return [];
 		}
 		$monthlyDepreciations = [];
-		$monthlyDepreciationAtCurrentDate =  ($additions+$replacementCost) / $propertyDepreciationDurationInMonths ;
+		$monthlyDepreciationAtCurrentDate =  $propertyDepreciationDurationInMonths ? ($additions+$replacementCost) / $propertyDepreciationDurationInMonths  : 0;
 		$depreciationDates = generateDatesBetweenTwoIndexedDates($depreciationStartDateAsIndex,$depreciationEndDateAsIndex);
 		foreach ($studyDates as  $dateAsIndex) {
 			$previousDateAsIndex = $dateAsIndex-1;

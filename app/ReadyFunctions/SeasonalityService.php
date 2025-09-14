@@ -68,7 +68,7 @@ class SeasonalityService
 			}
 			$totalSeasonality = array_sum($result);
 			foreach($result as $dateAsIndex => $value){
-				$finalResult[$dateAsIndex] = $value / $totalSeasonality;
+				$finalResult[$dateAsIndex] = $totalSeasonality ? $value / $totalSeasonality : 0;
 			}
 		}
 		return $finalResult;
@@ -118,7 +118,6 @@ class SeasonalityService
 		// 			array_walk($months, function (&$value, $dateAsIndex) use ($total_year_percentages, &$sales_seasonality_rates) {
 		// 				$sales_seasonality_rates[$dateAsIndex] = $total_year_percentages == 0 ? 0 : $value / $total_year_percentages;
 		// 			});
-		// 			dd($sales_seasonality_rates,array_sum($sales_seasonality_rates));
 		// 		}
 		// 		// In case of Flate Distribute Quarterly
 		// 		elseif ($seasonality_type == "quarterly") {

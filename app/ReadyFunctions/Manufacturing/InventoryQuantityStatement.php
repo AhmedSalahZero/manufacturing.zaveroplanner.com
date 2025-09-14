@@ -33,9 +33,9 @@ class InventoryQuantityStatement
         $currentSales = $salesData[$currentDate];
 
         // Store beginning balance
-        $inventoryStatement['beginning_balance'][] = $currentBalance;
-        $inventoryStatement['dates'][] = $currentDate;
-        $inventoryStatement['sales_quantity'][] = $currentSales;
+        $inventoryStatement['beginning_balance'][$currentDate] = $currentBalance;
+        $inventoryStatement['dates'][$currentDate] = $currentDate;
+        $inventoryStatement['sales_quantity'][$currentDate] = $currentSales;
 
         // Calculate required quantity for future months
         $requiredForFuture = 0;
@@ -57,13 +57,13 @@ class InventoryQuantityStatement
         $totalNeeded = $currentSales + $requiredForFuture;
         $manufacturing_quantity = max(0, $totalNeeded - $currentBalance);
 
-        $inventoryStatement['manufacturing_quantity'][] = $manufacturing_quantity;
+        $inventoryStatement['manufacturing_quantity'][$currentDate] = $manufacturing_quantity;
         $totalAvailable = $currentBalance + $manufacturing_quantity;
-        $inventoryStatement['total_quantity_available'][] = $totalAvailable;
+        $inventoryStatement['total_quantity_available'][$currentDate] = $totalAvailable;
 
         // Calculate ending balance
         $endBalance = $totalAvailable - $currentSales;
-        $inventoryStatement['end_balance'][] = $endBalance;
+        $inventoryStatement['end_balance'][$currentDate] = $endBalance;
 
         // Set beginning balance for next iteration
         $currentBalance = $endBalance;

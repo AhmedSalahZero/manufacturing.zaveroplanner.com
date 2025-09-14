@@ -9,6 +9,7 @@ class StraightMethodService
     {
         $steadyGrowthCount = [];
         if ($duration == 0) {
+			
             return [
                 $startDateAsIndex => $amount
             ];

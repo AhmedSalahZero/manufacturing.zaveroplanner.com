@@ -66,6 +66,7 @@ class FixedAssetOpeningBalance extends Model
 	}
     public function getMonthlyDepreciation():float 
 	{
+		
 		return $this->monthly_depreciation;
 	}  public function getAdminDepreciationPercentage()
 	{

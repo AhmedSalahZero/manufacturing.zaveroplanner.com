@@ -524,7 +524,7 @@ trait HasIndexedDates
         $dateIndexWithYearIndex = $this->getDatesIndexWithYearIndex();
         $result = [];
         foreach ($dateIndexWithYearIndex as $dateAsIndex => $yearAsIndex) {
-            $result[$yearAsIndex][] = $this->getDateFromDateIndex($dateAsIndex);
+            $result[$yearAsIndex][$dateAsIndex] = $this->getDateFromDateIndex($dateAsIndex);
         }
         return $result;
     }
@@ -772,5 +772,10 @@ trait HasIndexedDates
 			return  extendArr($arr,$config[$isMonthlyColumn]['position'],$config[$isMonthlyColumn]['no_repeats']);
 			
 	}
+	
+	
+	
+	
+	
 	
 }

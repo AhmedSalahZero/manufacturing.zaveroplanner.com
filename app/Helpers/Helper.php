@@ -224,18 +224,35 @@ function removeDateFrom(array $dateIndexWithDate)
 function extendArr(array $arr, int $pos, int $repeat): array
 {
 
-    $arr = array_values($arr);
+//    $arr = array_values($arr);
+	if(count($arr)){
+		// if(!isset($arr[$pos])){
+		// 	dd($arr , $pos);
+		// }
+		$arr[$pos+1] = $arr[$pos];
+		// for($i = 1 ; $i<= $repeat ; $i++){
+		
+		// }
+		return $arr;
+	}
+	return [];
+	// dd('array position',);
+	// dd($arr , $pos,$repeat);
+    // if (!isset($arr[$pos])) {
+	// 	// return $arr;
+	// 	dd('error position',$arr,$pos,$repeat);
+    //     throw new Exception("Position $pos not found in array");
+    // }
 
-    if (!isset($arr[$pos])) {
-        throw new Exception("Position $pos not found in array");
-    }
+    // $value = $arr[$pos];
+	// dd('q',$arr,$pos + 1);
+    // $arr = array_slice($arr, 0, $pos + 1);
 
-    $value = $arr[$pos];
-    $arr = array_slice($arr, 0, $pos + 1);
-    for ($i = 1; $i <= $repeat; $i++) {
-        $arr[] = $value;
-    }
-    return $arr;
+    // for ($i = 1; $i <= $repeat; $i++) {
+    //     $arr[] = $value;
+    // }
+	// dd($arr);
+    // return $arr;
 }
 function convertIndexKeysToString(array $items, array $datesAsIndexAndString)
 {

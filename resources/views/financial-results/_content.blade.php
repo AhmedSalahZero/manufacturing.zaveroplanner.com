@@ -12,7 +12,6 @@
 
 
 
-
                     <x-tables.repeater-table :tableClasses="'table-condensed table-row-spacing income-class-table'" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden scrollable-table'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="'food'" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
                         <x-slot name="ths">
                             <x-tables.repeater-table-th :subParentClass="'plus-max-width-class'" class="  header-border-down plus-max-width-class" :title="__('+/-')"></x-tables.repeater-table-th>

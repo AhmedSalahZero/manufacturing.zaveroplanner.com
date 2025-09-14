@@ -944,4 +944,23 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 		}
 		return $result;
 	}
+	public static function fillArr($collection):array{
+		$firstKey = array_key_first($collection);
+		$lastKey = array_key_last($collection);
+		$dates = range($firstKey,$lastKey);
+		$result = [];
+		foreach($dates as $dateAsIndex){
+			$result[$dateAsIndex] = $collection[$dateAsIndex]??0;
+		}
+		return $result;
+	}
+	public static function getLastNonZeroKey(array $items){
+		$result = null ;
+		foreach($items as $key => $value){
+			if($value != 0 ){
+				$result = $key;
+			}
+		}
+		return $result;
+	}
 }

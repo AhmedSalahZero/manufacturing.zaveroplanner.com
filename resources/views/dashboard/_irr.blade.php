@@ -150,6 +150,7 @@ $tableClasses =  'col-md-12';
                         <i data-toggle="modal" data-target="#{{ $currentModalId }}" class="flaticon2-information kt-font-primary exclude-icon ml-2 cursor-pointer "></i>
                         @include('dashboard._expense-modal',['currentModalId'=>$currentModalId,'modalTitle'=>$currentModalTitle,'modalData'=>$formattedDcfMethod[$key] ?? []])
                     </div>
+				
 
 
 
@@ -164,6 +165,7 @@ $tableClasses =  'col-md-12';
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0)/ getDivisionNumber() ;
             @endphp
+				
             <td>
                 <div class="d-flex align-items-center justify-content-center">
                     <x-repeat-right-dot-inputs :disabled="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="$currentVal" :classes="'only-greater-than-or-equal-zero-allowed total-loans-hidden js-recalculate-equity-funding-value'" :is-percentage="false" :mark="' '" :name="''" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>

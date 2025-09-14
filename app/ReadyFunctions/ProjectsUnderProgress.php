@@ -32,10 +32,13 @@ class ProjectsUnderProgress
 		// $finalFFEExecutionDateAsIndex = $project->convertDateStringToDateIndex($finalFFEExecutionDateAsIndex);
 		$dateBeforeOperation = $operationStartDateAsIndex == 0 ? $operationStartDateAsIndex : $operationStartDateAsIndex- 1;
 		$dateBeforeOperation = $dateBeforeOperation < 0 ? 0 : $dateBeforeOperation ;
-		$dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ? $dateBeforeOperation : $ffeEndDateAsIndex;
+		$dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ?   $ffeEndDateAsIndex:$dateBeforeOperation;
 		$finalCapitalizedInterestDateAsIndex = $dateBeforeOperation >= $finalFFEExecutionDateAsIndex ? $dateBeforeOperation : $finalFFEExecutionDateAsIndex;
 		$transferredToFixedAssetDateAsIndex = $finalCapitalizedInterestDateAsIndex;
 		$capitalizedInterest = $project->sumTwoArrayUntilIndex($ffeLoanWithdrawalInterestAmounts, $ffeLoanInterestAmount, $finalCapitalizedInterestDateAsIndex);
+		// if(count($capitalizedInterest)){
+		// 	dd($capitalizedInterest);
+		// }
 		foreach ($studyDates as  $dateAsIndex) {
 			$result['beginning_balance'][$dateAsIndex] = $beginningBalance;
 			$additionsAtDate = $additions[$dateAsIndex] ?? 0;

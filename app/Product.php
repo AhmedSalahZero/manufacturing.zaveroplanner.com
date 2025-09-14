@@ -38,15 +38,16 @@ class Product extends Model
 				'local_price_per_unit'=>false ,
 				'export_price_per_unit'=>false ,
 				'sales_target_values'=>false ,
-				'monthly_sales_target_values'=>true,
-				'sensitivity_monthly_sales_target_values'=>true,	
-				'monthly_sales_target_quantities'=>true,
-				'sensitivity_monthly_sales_target_quantities'=>true
+				// 'monthly_sales_target_values'=>true,
+				// 'sensitivity_monthly_sales_target_values'=>true,	
+				// 'monthly_sales_target_quantities'=>true,
+				// 'sensitivity_monthly_sales_target_quantities'=>true
 				
 				// is monthly column ? 
 			] as $columnName => $isMonthlyColumn){
 				if($product->isDirty($columnName)){
 					$currentPayload = (array) $product->{$columnName} ;
+				
 					$product->{$columnName} = $project->repeatArr($currentPayload ,$isMonthlyColumn );
 				}
 			}
@@ -314,8 +315,8 @@ class Product extends Model
 		$datesIndexWithYearIndex = $this->project->getDatesIndexWithYearIndex();
 		foreach($seasonalityArray as $dateAsIndex => $seasonalityValue){
 			$currentYearIndex = $datesIndexWithYearIndex[$dateAsIndex];
-			$localTargetSellingQuantityForThisYear = $localTargetSellingArray[$currentYearIndex] ;
-			$localPricePerUnitForThisYear = $localPricePerUnit[$currentYearIndex];
+			$localTargetSellingQuantityForThisYear = $localTargetSellingArray[$currentYearIndex]??0 ;
+			$localPricePerUnitForThisYear = $localPricePerUnit[$currentYearIndex]??0;
 			$localPricePerUnitForThisYear = $isSensitivity ? ($localPricePerUnitForThisYear*(1+$sensitivityPriceRate / 100)) : $localPricePerUnitForThisYear;
 			$localMonthlySalesTargetQuantity = $seasonalityValue * $localTargetSellingQuantityForThisYear ; 
 			$localMonthlySalesTargetQuantities[$dateAsIndex] = $localMonthlySalesTargetQuantity;
@@ -323,8 +324,8 @@ class Product extends Model
 		}
 		foreach($seasonalityArray as $dateAsIndex => $seasonalityValue){
 			$currentYearIndex = $datesIndexWithYearIndex[$dateAsIndex];
-			$exportTargetSellingQuantityForThisYear = $exportTargetSellingArray[$currentYearIndex] ;
-			$exportPricePerUnitForThisYear = $exportPricePerUnit[$currentYearIndex];
+			$exportTargetSellingQuantityForThisYear = $exportTargetSellingArray[$currentYearIndex]??0 ;
+			$exportPricePerUnitForThisYear = $exportPricePerUnit[$currentYearIndex]??0;
 			$exportPricePerUnitForThisYear = $isSensitivity ? ($exportPricePerUnitForThisYear*(1+$sensitivityPriceRate / 100)) : $exportPricePerUnitForThisYear;
 			$exportMonthlySalesTargetQuantity = $seasonalityValue * $exportTargetSellingQuantityForThisYear ; 
 			$exportMonthlySalesTargetQuantities[$dateAsIndex] = $exportMonthlySalesTargetQuantity;
@@ -335,7 +336,6 @@ class Product extends Model
 		$monthlySalesTargetValueColumnName = $isSensitivity ? 'sensitivity_monthly_sales_target_values' :  'monthly_sales_target_values';
 		$monthlySalesTargetQuantityColumnName = $isSensitivity ? 'sensitivity_monthly_sales_target_quantities' :  'monthly_sales_target_quantities';
 		$beginningBalance = $this->getFgInventoryQuantity();
-		
 		$monthsToCover = $this->getMonthsToCover();
 		$inventoryQuantityStatement  = (new InventoryQuantityStatement())->createInventoryQuantityStatement($monthlySalesTargetQuantities,$beginningBalance,$monthsToCover);
 		$productRawMaterialConsumed = [];
@@ -345,7 +345,9 @@ class Product extends Model
 			$currentManufacturingQuantity = $inventoryQuantityStatement['manufacturing_quantity'][$dateAsIndex]??1;
 			foreach($this->rawMaterials as $rawMaterial ){
 				$percentagesForCurrentDateIndex = (json_decode($rawMaterial->getPercentageAtYearAsIndex($currentYearIndex))) / 100;
-				$productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex]  = ($percentagesForCurrentDateIndex * $monthlySalesValue) / $currentSalesQuantity *  $currentManufacturingQuantity;
+				$currentSalesQuantity =  $currentSalesQuantity ? $currentSalesQuantity : 1;   ;
+				// $salesQuantityMultipliedByManufacturingQuantity = $salesQuantityMultipliedByManufacturingQuantity == 0 ? 1 : $salesQuantityMultipliedByManufacturingQuantity;
+				$productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex]  = (($percentagesForCurrentDateIndex * $monthlySalesValue / $currentSalesQuantity) * $currentManufacturingQuantity);
 				$productRawMaterialConsumed['total'][$dateAsIndex] = isset($productRawMaterialConsumed['total'][$dateAsIndex]) ? $productRawMaterialConsumed['total'][$dateAsIndex] + $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex] : $productRawMaterialConsumed[$rawMaterial->id][$dateAsIndex];
 			}
 		}

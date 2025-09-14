@@ -1,9 +1,8 @@
 <?php 
 namespace App\ReadyFunctions ;
 
-use App\Models\HospitalitySector;
+use App\Helpers\HArr;
 use Carbon\Carbon;
-use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Support\Arr;
 
 class CalculateLoanWithdrawal 
@@ -15,8 +14,10 @@ class CalculateLoanWithdrawal
 		$interestFactor = $this->calcInterestFactorForWithdrawal($daysDifference,$pricing);
 		$withdrawalWithInterest = $this->calculateWithdrawalWithInterest($loanWithdrawal,$interestFactor,$dateWithDateIndex);
 		$withdrawalEndBalance =Arr::last($withdrawalWithInterest['withdrawalEndBalance'] ?? []) ;  
+		
 		$withdrawalEndBalance  = $withdrawalEndBalance  ?: 0;
-		$withdrawalEndBalanceDate =array_key_last($loanWithdrawal) ;  
+		$withdrawalEndBalanceDate =HArr::getLastNonZeroKey($loanWithdrawal) ;  
+
 		return [
 			'withdrawal_interest_amounts'=>$withdrawalWithInterest['interestAmount']??[],
 			'withdrawalEndBalance'=>$withdrawalWithInterest['withdrawalEndBalance']??[],
@@ -67,8 +68,9 @@ class CalculateLoanWithdrawal
 	{
 		$result['loanWithdrawal'] = $loanWithdrawalArray ;
 		$indexes = array_keys($interestFactor['interestFactor']);
+		// dd($indexes);
+		// dd($indexes,$loanWithdrawalArray);
 		$finalResult = ['loanWithdrawal'=>$loanWithdrawalArray];
-
 		$date = null ;
 		foreach ($indexes as $i) {
 			$date = array_keys($loanWithdrawalArray)[$i];

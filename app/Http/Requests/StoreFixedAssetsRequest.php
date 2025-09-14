@@ -40,16 +40,31 @@ class StoreFixedAssetsRequest extends FormRequest
             $fixedAssetArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
             unset($fixedAssetArr['product_id']);
             unset($fixedAssetArr['percentage']);
+			$fixedAssetArr['due_days'] = array_unique($fixedAssetArr['due_days']);
+			// if($fixedAssetArr['depreciation_duration'] == 0){
+			// 	$fixedAssetArr
+			// }
 			
         
             //
             foreach ($fixedAssetArr['due_days']??[] as $index => $dueDay) {
                 $paymentRate = $fixedAssetArr['payment_rate'][$index];
-                $fixedAssetArr['custom_collection_policy'][$dueDay] = $paymentRate;
+                $fixedAssetArr['custom_collection_policy'][$dueDay] = isset($fixedAssetArr['custom_collection_policy'][$dueDay]) ? $fixedAssetArr['custom_collection_policy'][$dueDay]+ $paymentRate :$paymentRate;
 				$isFromTotal = $fixedAssetArr['from_total_or_executions'][$index] ?? 0 ;
 				unset($fixedAssetArr['from_total_or_executions'][$index]);
+				// dd($fixedAssetArr['from_total_or_executions'],$dueDay);
 				$fixedAssetArr['from_total_or_executions'][$dueDay] = $isFromTotal;
+				
             }
+			foreach($fixedAssetArr['from_total_or_executions'] as $currentDueDate => $isFromTotal){
+				if(!in_array($currentDueDate,$fixedAssetArr['due_days'])){
+					unset($fixedAssetArr['from_total_or_executions'][$currentDueDate]);	
+				}
+			}
+			// foreach($fixedAssetArr['from_total_or_executions'] as )
+			// if(!in_array($index,$fixedAssetArr['due_days'])){
+			// 		unset([$index]);
+			// 	}
         }
         $this->merge([
             'fixedAssets'=>$fixedAssets
