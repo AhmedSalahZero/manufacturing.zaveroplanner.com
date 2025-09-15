@@ -40,7 +40,7 @@ class StoreFixedAssetsRequest extends FormRequest
             $fixedAssetArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
             unset($fixedAssetArr['product_id']);
             unset($fixedAssetArr['percentage']);
-			$fixedAssetArr['due_days'] = array_unique($fixedAssetArr['due_days']);
+			$fixedAssetArr['due_days'] = array_unique($fixedAssetArr['due_days']??[]);
 			// if($fixedAssetArr['depreciation_duration'] == 0){
 			// 	$fixedAssetArr
 			// }
@@ -56,7 +56,7 @@ class StoreFixedAssetsRequest extends FormRequest
 				$fixedAssetArr['from_total_or_executions'][$dueDay] = $isFromTotal;
 				
             }
-			foreach($fixedAssetArr['from_total_or_executions'] as $currentDueDate => $isFromTotal){
+			foreach($fixedAssetArr['from_total_or_executions']??[] as $currentDueDate => $isFromTotal){
 				if(!in_array($currentDueDate,$fixedAssetArr['due_days'])){
 					unset($fixedAssetArr['from_total_or_executions'][$currentDueDate]);	
 				}

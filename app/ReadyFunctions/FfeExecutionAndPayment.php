@@ -2,6 +2,7 @@
 
 namespace App\ReadyFunctions;
 
+use App\Helpers\HArr;
 
 class FfeExecutionAndPayment
 {
@@ -98,7 +99,21 @@ class FfeExecutionAndPayment
 		if (array_sum($ffeLoanWithdrawal) > -1 && array_sum($ffeLoanWithdrawal) < 1) {
 			return [];
 		}
-
+	//	$ffeLoanWithdrawal  = [0=>1000,2=>3000];
+		// $ffeLoanWithdrawal  = [];
+		$firstKey = array_key_first($ffeLoanWithdrawal);
+		$lastKey = array_key_last($ffeLoanWithdrawal);
+		if($firstKey !== null){
+			$newDateIndexes = range($firstKey,$lastKey);
+			foreach($newDateIndexes as $currentDateAsIndex){
+				if(!array_key_exists($currentDateAsIndex,$ffeLoanWithdrawal)){
+					$ffeLoanWithdrawal[$currentDateAsIndex] = 0;
+				}
+			}
+			
+			// foreach($ffeLoanWithdrawal as $dateAsIndex)
+		}
+		ksort($ffeLoanWithdrawal);
 		return $ffeLoanWithdrawal;
 	}
 	

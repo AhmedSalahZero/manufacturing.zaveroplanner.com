@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\HArr;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -38,12 +39,21 @@ class TestCommand extends Command
      */
     public function handle()
     {
-		DB::table('business_sectors')->delete();
-       foreach(getBusinessSectors() as $sectorName){
-		DB::table('business_sectors')->insert([
-			'name_en'=>$sectorName,
-			'name_ar'=>$sectorName,
-		]);
-	   }
+		$arr = [
+			4 => 0 ,
+			5=>100,
+			6=>200,
+			7=>300
+		];
+		
+		$offset = 6 ;
+		// dd();
+	// 	DB::table('business_sectors')->delete();
+    //    foreach(getBusinessSectors() as $sectorName){
+	// 	DB::table('business_sectors')->insert([
+	// 		'name_en'=>$sectorName,
+	// 		'name_ar'=>$sectorName,
+	// 	]);
+	//    }
     }
 }

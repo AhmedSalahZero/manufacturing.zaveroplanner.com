@@ -342,7 +342,7 @@ class CalculateFixedLoanAtEndService
 			$ffeEquityFundingRate = $ffe->getEquityFunding();
 			$executionAndPayment =$ffeExecutionAndPaymentService->__calculate($totalFFECost, $ffeStartDateAsIndex, $duration,$dateIndexWithDate);
 			$contractPayments['FFE Payment'] = $contractPaymentService->__calculate( $executionAndPayment, $ffeCollectionPolicyValue,$ratesWithIsFromTotal,$ratesWithIsFromExecution,$dateIndexWithDate, $dateWithDateIndex);
-				$ffeEquityPayment['FFE Equity Injection'] = $ffeExecutionAndPaymentService->calculateFFEEquityPayment($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
+			$ffeEquityPayment['FFE Equity Injection'] = $ffeExecutionAndPaymentService->calculateFFEEquityPayment($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
 			$ffeLoanWithdrawal['FFE Loan Withdrawal'] = $ffeExecutionAndPaymentService->calculateFFELoanWithdrawal($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
 			
 			$equityFunding = $ffe->getEquityFundingRate();
@@ -359,11 +359,12 @@ class CalculateFixedLoanAtEndService
 				$ffeStepDownIntervalName='annually';
 				$ffeGracePeriod=$ffe->getGracePeriod();
 				$ffeLoanPricing = $ffe->getPricing();
-				$loanWithdrawalService = new CalculateLoanWithdrawal();
+			//	$loanWithdrawalService = new CalculateLoanWithdrawal();
 				
 				$ffeLoanWithdrawalInterest=$loanWithdrawalService->__calculate($project->replaceIndexWithItsStringDate($ffeLoanWithdrawal['FFE Loan Withdrawal'],$dateIndexWithDate), $ffeBaseRate, $ffeMarginRate, $dateWithDateIndex);
 				$ffeLoanWithdrawalInterestAmounts =$ffeLoanWithdrawalInterest['withdrawal_interest_amounts']??[];
 				$ffeLoanWithdrawalEndBalance = $ffeLoanWithdrawalInterest['withdrawalEndBalance']??[];
+			//	dd('looo',$ffeLoanWithdrawalEndBalance);
 				// dd('loan ',$ffeLoanWithdrawalEndBalance);
 				$ffeLoanWithdrawalAmounts = $ffeLoanWithdrawalInterest['loanWithdrawal']??[];
 				$ffeLoanStartDate =array_key_last($ffeLoanWithdrawalInterest);

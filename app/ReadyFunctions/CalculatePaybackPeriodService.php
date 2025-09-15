@@ -17,11 +17,11 @@ class CalculatePaybackPeriodService
 					$paybackDate = (Carbon::make($studyStartDate)->addMonths($paybackPeriod - 1)->format('M Y'));
                     break;
                 } else {
+					$paybackDate = (Carbon::make($studyStartDate)->addMonths($paybackPeriod - 1)->format('M Y'));
                     $paybackPeriod++;
                 }
             }
         }
-		
 		$paybackPeriod = number_format($paybackPeriod/ 12 , 1) . ' Years' ;
 		
 		return [

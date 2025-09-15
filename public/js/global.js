@@ -920,6 +920,15 @@ if (btn) {
 	})
 }
 
+const card2= document.getElementById("myCard2")
+const btn2 = document.getElementById("toggleBtn2")
+if (btn2) {
+	btn2.addEventListener("click", () => {
+		card2.classList.toggle("fullscreen")
+		btn2.textContent = card.classList.contains("fullscreen") ? "✖" : "⛶"
+	})
+}
+
 $(document).on('change', '.fg-beginning-inventory-original-value-class', function () {
 	const value = number_unformat($(this).val())
 	console.log(value)

@@ -17,7 +17,15 @@ class BalanceSheet extends Model
 	         'change_in_other_creditors'=>'array',
 	         'net_change_in_working_capital'=>'array',        
 	         'equity_funding_percentages'=>'array',        
-	         'debit_funding_percentages'=>'array',        
+	         'debit_funding_percentages'=>'array',
+			 'total_current_assets'=>'array'  , 
+			 'total_current_liabilities'=>'array'  , 
+			 'cash_and_banks'=>'array'  , 
+			 'customer_receivables'=>'array'  , 
+			 'total_fgs'=>'array'  , 
+			 'raw_material_inventory'=>'array'  , 
+			 'other_debtors'=>'array'  , 
+			 'supplier_payables'=>'array'  , 
     ];
     
     public function project():BelongsTo

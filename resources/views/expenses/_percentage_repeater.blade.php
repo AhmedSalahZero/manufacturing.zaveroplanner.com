@@ -31,7 +31,7 @@ common-parent
         <label class="form-label font-weight-bold">{{ __('Expense %') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="number" class="form-control only-percentage-allowed " name="monthly_percentage" value="{{ isset($expense) ? $expense->getMonthlyPercentage() : old('monthly_percentage') }}" step="0.5">
+                <input type="number" class="form-control only-percentage-allowed " name="monthly_percentage" value="{{ isset($expense) ? $expense->getMonthlyPercentage() : old('monthly_percentage') }}" step="any">
             </div>
         </div>
     </div>

@@ -488,6 +488,62 @@ $tableClasses =  'col-md-12';
 
         </tr>
 		
+		
+		
+		 <tr data-repeat-formatting-decimals="2" data-repeater-style>
+            @php
+            $key ='payback';
+            $currentModalId = $key.'-modal-id';
+            $currentModalTitle = __('Payback Period') ;
+            @endphp
+            <td>
+                <div class="d-flex align-items-center ">
+                    <input value="{{ __('Payback Period') }}" disabled class="form-control text-left " type="text">
+                    <div>
+                        <i data-toggle="modal" data-target="#{{ $currentModalId }}" class="flaticon2-information kt-font-primary exclude-icon ml-2 cursor-pointer "></i>
+                        @include('dashboard._expense-modal',['currentModalId'=>$currentModalId,'modalTitle'=>$currentModalTitle,'modalData'=>$formattedDcfMethod[$key] ?? []])
+                    </div>
+
+
+
+                </div>
+            </td>
+
+
+            @php
+            $columnIndex = 0 ;
+			$isFirstLoop=true;
+            @endphp
+            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @php
+            $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0);
+            @endphp
+            <td>
+			@if($isFirstLoop)
+                <div class="d-flex align-items-center justify-content-center">
+				@php
+					$month = array_key_first($currentVal) ;
+					$duration =$currentVal[$month]??null ;
+					$currentVal = $month ? $month .' [ '.$duration.' ]' : '';
+				@endphp
+                    <x-repeat-right-dot-inputs :isNumber="false" :disabled="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="$currentVal" :classes="''" :is-percentage="false" :mark="' '" :name="''" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                </div>
+				@php
+					$isFirstLoop = false;
+				@endphp
+            @endif 
+			</td>
+			
+            @php
+            $columnIndex++ ;
+            @endphp
+
+            @endforeach
+
+
+        </tr>
+		
+		
 		@endif 
 		
 		

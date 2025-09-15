@@ -27,6 +27,8 @@ class FixedAsset extends Model
 		'ffe_equity_payment'=>'array',
 		'ffe_loan_withdrawal'=>'array',
 		'ffe_loan_withdrawal_end_balance'=>'array',
+		'capitalized_interests'=>'array',
+		'income_statement_capitalized_interests'=>'array',
 		'ffe_payment'=>'array',
 		'statement'=>'array',
 		'ffe_execution_and_payment'=>'array',
@@ -284,6 +286,10 @@ class FixedAsset extends Model
 			$buildingAssets['initial_total_gross'][$dateAsIndex] =  $buildingAssets['additions'][$dateAsIndex] +  $beginningBalance;
 			$currentInitialTotalGross = $buildingAssets['initial_total_gross'][$dateAsIndex] ??0;
 			$replacementCost[$dateAsIndex] =    in_array($dateAsIndex ,$replacementDates)  ? $this->calculateReplacementCost($currentInitialTotalGross,$propertyReplacementCostRate) : 0;
+			// if($this->id == 51){
+			// 	dd($currentInitialTotalGross,$propertyReplacementCostRate);
+				
+			// }
 			/**
 			 * ! Issue Here
 			 */
@@ -294,7 +300,16 @@ class FixedAsset extends Model
 			$replacementValueAtCurrentDate = $replacementCost[$dateAsIndex] ?? 0;
 			$buildingAssets['replacement_cost'][$dateAsIndex] = $replacementCost[$dateAsIndex] ;
 			$buildingAssets['final_total_gross'][$dateAsIndex] = $buildingAssets['initial_total_gross'][$dateAsIndex]  + $replacementValueAtCurrentDate;
-			$depreciation[$dateAsIndex]=$this->calculateMonthlyDepreciation($buildingAssets['additions'][$dateAsIndex],$replacementValueAtCurrentDate,$propertyDepreciationDurationInMonths, $depreciationStartDateAsIndex, $depreciationEndDateAsIndex, $totalMonthlyDepreciation, $accumulatedDepreciation,$studyDates);
+			$depreciation[$dateAsIndex]=$this->calculateMonthlyDepreciation($dateAsIndex,$buildingAssets['additions'][$dateAsIndex],$replacementValueAtCurrentDate,$propertyDepreciationDurationInMonths, $depreciationStartDateAsIndex, $depreciationEndDateAsIndex, $totalMonthlyDepreciation, $accumulatedDepreciation,$studyDates);
+			if($this->id == 51 && $dateAsIndex == 18){
+				// dd($buildingAssets['final_total_gross']);
+			}
+			if($this->id == 51 && $dateAsIndex ==18){
+				// dump($depreciation);
+			}
+			// if($this->id == 51){
+			// dump('q',$totalMonthlyDepreciation);
+		// }
 			$accumulatedDepreciation = calculateAccumulatedDepreciation($totalMonthlyDepreciation,$studyDates);
 			$buildingAssets['total_monthly_depreciation'] =$totalMonthlyDepreciation;
 			$buildingAssets['accumulated_depreciation'] =$accumulatedDepreciation;
@@ -303,6 +318,10 @@ class FixedAsset extends Model
 			$beginningBalance = $buildingAssets['final_total_gross'][$dateAsIndex];
 			$index++;
 		}
+		// if($this->id == 51){
+			// dd('q');
+			// dd('finall',$buildingAssets);
+		// }
 		return $buildingAssets ;
 	}
 	
@@ -313,7 +332,7 @@ class FixedAsset extends Model
 		return $totalGross * $propertyReplacementCostRate ;
 	}
 	
-	protected function calculateMonthlyDepreciation(float $additions,float $replacementCost,int $propertyDepreciationDurationInMonths, ?int $depreciationStartDateAsIndex, ?int $depreciationEndDateAsIndex, &$totalMonthlyDepreciation, &$accumulatedDepreciation,array $studyDates)
+	protected function calculateMonthlyDepreciation(int $replacementDate ,float $additions,float $replacementCost,int $propertyDepreciationDurationInMonths, ?int $depreciationStartDateAsIndex, ?int $depreciationEndDateAsIndex, &$totalMonthlyDepreciation, &$accumulatedDepreciation,array $studyDates)
 	{
 		if (is_null($depreciationStartDateAsIndex) || is_null($depreciationEndDateAsIndex)) {
 			return [];
@@ -321,19 +340,21 @@ class FixedAsset extends Model
 		$monthlyDepreciations = [];
 		$monthlyDepreciationAtCurrentDate =  $propertyDepreciationDurationInMonths ? ($additions+$replacementCost) / $propertyDepreciationDurationInMonths  : 0;
 		$depreciationDates = generateDatesBetweenTwoIndexedDates($depreciationStartDateAsIndex,$depreciationEndDateAsIndex);
+
 		foreach ($studyDates as  $dateAsIndex) {
+			if($dateAsIndex <= $replacementDate){
+				continue;
+			}
 			$previousDateAsIndex = $dateAsIndex-1;
 			if(in_array($dateAsIndex,$depreciationDates)){
 				$monthlyDepreciations[$dateAsIndex] = $monthlyDepreciationAtCurrentDate;
 				$totalMonthlyDepreciation[$dateAsIndex] = isset($totalMonthlyDepreciation[$dateAsIndex]) ? $totalMonthlyDepreciation[$dateAsIndex] +$monthlyDepreciationAtCurrentDate : $monthlyDepreciationAtCurrentDate;
-				$accumulatedDepreciation[$dateAsIndex] = $previousDateAsIndex >=0 ? ($totalMonthlyDepreciation[$dateAsIndex] + $accumulatedDepreciation[$previousDateAsIndex]) : $totalMonthlyDepreciation[$dateAsIndex];
+				$currentAccumulatedDepreciation = $accumulatedDepreciation[$previousDateAsIndex]??0;
+				$accumulatedDepreciation[$dateAsIndex] = $previousDateAsIndex >=0 ? ($totalMonthlyDepreciation[$dateAsIndex] + $currentAccumulatedDepreciation ) : $totalMonthlyDepreciation[$dateAsIndex];
 			}else{
-				// $monthlyDepreciations[$dateAsString] = 0;
-				// $totalMonthlyDepreciation[$dateAsString]  = 0 ;
 				$accumulatedDepreciation[$dateAsIndex] = $accumulatedDepreciation[$previousDateAsIndex] ?? 0 ;
 			}
 		}
-
 		return $monthlyDepreciations;
 	}
 	public function getLoanType():string

@@ -38,6 +38,24 @@ class StoreExpensesRequest extends FormRequest
 					$expensesFormatted['expenses'][$currentIndex][$key] = $value;					
 				}
 				$expensesFormatted['expenses'][$currentIndex]['type'] = $expenseTypeId;					
+				
+				if($currentExpenseArr['payment_terms'] == 'customize'){
+					$newDueDays = [];
+					$newPaymentRates = [];
+					foreach($currentExpenseArr['due_days'] as $index => $dueDay){
+						$currentPaymentRate = $currentExpenseArr['payment_rate'][$index]??0;
+						if($currentPaymentRate){
+							$newDueDays[$dueDay] = $dueDay ;
+							$newPaymentRates[$dueDay] = isset($newPaymentRates[$dueDay]) ? $newPaymentRates[$dueDay]  +  $currentPaymentRate : $currentPaymentRate ;
+						}
+						 
+					}
+					$newDueDays = array_values($newDueDays);
+					$newPaymentRates = array_values($newPaymentRates);
+					$expensesFormatted['expenses'][$currentIndex]['due_days'] = $newDueDays;
+					$expensesFormatted['expenses'][$currentIndex]['payment_rate'] = $newPaymentRates;
+				}
+				
 				$currentIndex++;
 			}
 		}

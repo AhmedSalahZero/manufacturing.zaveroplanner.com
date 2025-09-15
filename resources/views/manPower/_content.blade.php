@@ -63,7 +63,7 @@
 
                             <div class="col-2">
                                 <label>{{ __('Existing Count') }}</label>
-                                <input type="text" name="existing_count" class="form-control only-greater-than-or-equal-zero-allowed" value="{{ $currentManpower ? $currentManpower->getExistingCount() : 0 }}">
+                                <input @if($project->isNewCompany()) readonly @endif type="text" name="existing_count" class="form-control only-greater-than-or-equal-zero-allowed" value="{{ $currentManpower ? $currentManpower->getExistingCount() : 0 }}">
                             </div>
 
                             <div class="col-3 common-parent">

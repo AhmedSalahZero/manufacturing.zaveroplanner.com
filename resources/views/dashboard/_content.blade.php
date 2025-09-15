@@ -77,7 +77,7 @@
             <div class="col-md-11">
                 <div class="form-group ">
                     <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn" class="fullscreen-btn">⛶</button>
-                    <textarea data-is-ck-editor name="dashboard_comment">{!! $project->dashboard_comment_1 !!}</textarea>
+                    <textarea data-is-ck-editor name="dashboard_comment_1">{!! $project->dashboard_comment_1 !!}</textarea>
                 </div>
             </div>
 
@@ -142,6 +142,19 @@
 
 
 
+<div class="div-title">
+    {{ __('Liquidity Ratios Analysis' ) }}
+</div>
+
+<div class="formItem">
+
+    <div class="row pl-4 pr-4">
+        @include('dashboard._ration_analysis',['formattedDcfMethod'=>$liquidityRatio])
+    </div>
+
+
+</div>
+
 
 <div class="div-title">
     {{ __('Discount Cashflow Valuation (DCF) Figs\'000' ) }}
@@ -166,12 +179,12 @@
         {{__('Insert Comment')}}
 
     </div>
-    <div id="myCard" class="formItem comment-for-sales-class2">
+    <div id="myCard2" class="formItem comment-for-sales-class2">
         <div class="row justify-content-center">
             <div class="col-md-11">
                 <div class="form-group ">
-                    <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn" class="fullscreen-btn">⛶</button>
-                    <textarea data-is-ck-editor name="dashboard_comment">{!! $project->dashboard_comment_1 !!}</textarea>
+                    <button title="{{ __('Full Screen') }}" type="button" id="toggleBtn2" class="fullscreen-btn">⛶</button>
+                    <textarea data-is-ck-editor name="dashboard_comment_2">{!! $project->dashboard_comment_2 !!}</textarea>
                 </div>
             </div>
 

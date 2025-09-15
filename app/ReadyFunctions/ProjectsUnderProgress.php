@@ -2,11 +2,12 @@
 
 namespace App\ReadyFunctions;
 
+use App\FixedAsset;
 use App\Project;
 
 class ProjectsUnderProgress
 {
-	public function calculateForFFE(int $ffeStartDateAsIndex,int $ffeEndDateAsIndex,array $ffeExecutionAndPayment,array $ffeLoanInterestAmount,array $ffeLoanWithdrawalInterestAmounts,Project $project,int $operationStartDateAsIndex,array $datesAsStringAndIndex,array $datesIndexWithYearIndex,array $yearIndexWithYear,array $dateIndexWithDate,array $dateWithMonthNumber):array
+	public function calculateForFFE(FixedAsset $fixedAsset,int $ffeStartDateAsIndex,int $ffeEndDateAsIndex,array $ffeExecutionAndPayment,array $ffeLoanInterestAmount,array $ffeLoanWithdrawalInterestAmounts,Project $project,int $operationStartDateAsIndex,array $datesAsStringAndIndex,array $datesIndexWithYearIndex,array $yearIndexWithYear,array $dateIndexWithDate,array $dateWithMonthNumber):array
 	{
 		$fixedStartDateISEqualToFixedEndDate = $ffeEndDateAsIndex == $ffeStartDateAsIndex ;
 		$transferDateFactor = $fixedStartDateISEqualToFixedEndDate ? 0 : 1 ;
@@ -35,6 +36,8 @@ class ProjectsUnderProgress
 		$dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ?   $ffeEndDateAsIndex:$dateBeforeOperation;
 		$finalCapitalizedInterestDateAsIndex = $dateBeforeOperation >= $finalFFEExecutionDateAsIndex ? $dateBeforeOperation : $finalFFEExecutionDateAsIndex;
 		$transferredToFixedAssetDateAsIndex = $finalCapitalizedInterestDateAsIndex;
+		// dd($fixedAsset->);
+		// dd('dddddddd',$transferredToFixedAssetDateAsIndex);
 		$capitalizedInterest = $project->sumTwoArrayUntilIndex($ffeLoanWithdrawalInterestAmounts, $ffeLoanInterestAmount, $finalCapitalizedInterestDateAsIndex);
 		// if(count($capitalizedInterest)){
 		// 	dd($capitalizedInterest);
@@ -58,6 +61,9 @@ class ProjectsUnderProgress
 				$result['end_balance'][$dateAsIndex] =$total;
 			}
 		}
+		// dd('q',$result);
+		// ddd
+		// dd('lol',$result);
 		return $result;
 	}
 }

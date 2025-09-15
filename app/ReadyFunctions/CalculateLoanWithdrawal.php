@@ -14,6 +14,7 @@ class CalculateLoanWithdrawal
 		$interestFactor = $this->calcInterestFactorForWithdrawal($daysDifference,$pricing);
 		$withdrawalWithInterest = $this->calculateWithdrawalWithInterest($loanWithdrawal,$interestFactor,$dateWithDateIndex);
 		$withdrawalEndBalance =Arr::last($withdrawalWithInterest['withdrawalEndBalance'] ?? []) ;  
+
 		
 		$withdrawalEndBalance  = $withdrawalEndBalance  ?: 0;
 		$withdrawalEndBalanceDate =HArr::getLastNonZeroKey($loanWithdrawal) ;  
@@ -68,8 +69,8 @@ class CalculateLoanWithdrawal
 	{
 		$result['loanWithdrawal'] = $loanWithdrawalArray ;
 		$indexes = array_keys($interestFactor['interestFactor']);
-		// dd($indexes);
-		// dd($indexes,$loanWithdrawalArray);
+		// interestAmount
+		// ddddd
 		$finalResult = ['loanWithdrawal'=>$loanWithdrawalArray];
 		$date = null ;
 		foreach ($indexes as $i) {
@@ -86,6 +87,11 @@ class CalculateLoanWithdrawal
 			 
 
 		}
+		// $fixedAsset->update([
+			
+		// ]);
+		
+		// dd();
 		return $finalResult ;
 	}
 	

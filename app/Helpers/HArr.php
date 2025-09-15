@@ -60,7 +60,7 @@ class HArr
 		}
 		return $result;
 	}
-	public static function subtractAtDates(array $items, array $dates)
+	public static function subtractAtDates(array $items, array $dates = [])
 	{
 		$itemsCount = count($items);
 		if (!$itemsCount) {
@@ -69,7 +69,7 @@ class HArr
 		if (!isset($items[0])) {
 			throw new Exception('Custom Exception .. First Parameter Must Be Indexes Array That Contains Arrays like [ [] , [] , [] ]');
 		}
-
+		$dates = count($dates) ? $dates : array_keys($items[0]);
 		$total = [];
 		foreach ($dates as $date) {
 			$currenTotal = 0;
@@ -908,7 +908,7 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 		}	
 		return $result;
 	}
-	public static function calculateChangeInAfter(array $customerReceivables , float $openingBalance ,array $yearIndexWithLastMonth){
+	public static function calculateChangeInAfter(array $customerReceivables , float $openingBalance ,array $yearIndexWithLastMonth,$debug=false){
 		
 		$isFirst = true ; 
 		$result = [];
@@ -916,14 +916,17 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 			$currentCustomerReceivables = $customerReceivables[$lastMonthAsDateIndex]??0;
 			if($isFirst){
 				$currentCustomerReceivables= $openingBalance - $currentCustomerReceivables ;
+				$isFirst = false ; 
 			}else{
-				$nextIndex = $lastMonthAsDateIndex + 12 ;
+				$nextIndex = $lastMonthAsDateIndex - 12 ;
 				$nextYearValue = $customerReceivables[$nextIndex]??0;
-				$currentCustomerReceivables = $currentCustomerReceivables - $nextYearValue;
+				$currentCustomerReceivables = $nextYearValue - $currentCustomerReceivables ;
 			}
+				
 			$result[$lastMonthAsDateIndex] = $currentCustomerReceivables ;
-			$isFirst = false ; 
+			
 		}
+		
 		return $result;
 	}
 	public static function calculateChangeInBefore(array $customerReceivables , float $openingBalance ,array $yearIndexWithLastMonth){
@@ -933,16 +936,20 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 		foreach($yearIndexWithLastMonth as $yearIndex => $lastMonthAsDateIndex){
 			$currentCustomerReceivables = $customerReceivables[$lastMonthAsDateIndex]??0;
 			if($isFirst){
-				$currentCustomerReceivables= $currentCustomerReceivables-$openingBalance ;
+				$currentCustomerReceivables= $currentCustomerReceivables- $openingBalance  ;
+				$isFirst = false ; 
 			}else{
-				$beforeIndex = $lastMonthAsDateIndex-12 ;
-				$beforeYearValue = $customerReceivables[$beforeIndex]??0;
-				$currentCustomerReceivables = $currentCustomerReceivables-$beforeYearValue  ;
+				$nextIndex = $lastMonthAsDateIndex - 12 ;
+				$nextYearValue = $customerReceivables[$nextIndex]??0;
+				$currentCustomerReceivables = $currentCustomerReceivables- $nextYearValue  ;
 			}
+				
 			$result[$lastMonthAsDateIndex] = $currentCustomerReceivables ;
-			$isFirst = false ; 
+			
 		}
+		
 		return $result;
+		
 	}
 	public static function fillArr($collection):array{
 		$firstKey = array_key_first($collection);
@@ -962,5 +969,35 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 			}
 		}
 		return $result;
+	}
+	public static function slice_from_index(array $arr , int $index)
+	{
+		$result = [];
+		foreach($arr as $currentIndex => $value){
+			if($currentIndex >= $index){
+				$result[$currentIndex] = $value;
+			}
+		}
+		return $result;
+	}
+	public static function extendFreeCashflowTenYears(array $freeCashFlowForEquity,float $perptual)
+	{
+		
+		$length = count($freeCashFlowForEquity);
+		if($length == 0){
+			return [];
+		}
+		$lengthMinus12 = $length-12;
+		$last12CashFlow = array_slice($freeCashFlowForEquity , $lengthMinus12,null,true);
+		$lastIndex = $length -1 ;
+		foreach($last12CashFlow as $dateAsIndex => $value){
+			$lastIndex+=1;
+			$freeCashFlowForEquity[$lastIndex] = $value * (1+$perptual) ;
+		}
+		if(count($freeCashFlowForEquity) >=180){
+			return $freeCashFlowForEquity;
+		}
+		return self::extendFreeCashflowTenYears($freeCashFlowForEquity,$perptual);
+		// foreach()
 	}
 }

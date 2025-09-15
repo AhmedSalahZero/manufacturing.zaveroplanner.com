@@ -123,6 +123,7 @@ Route::group(
 					 Route::get('/cash-in-out-flow', 'RedirectionController@cashInOutFlowGet')->name('cash.in.out.flow.result');
 					 Route::get('/balance-sheet', 'RedirectionController@balanceSheetGet')->name('balance.sheet.result');
 					 route::get('dashboard','DashboardController@view')->name('view.results.dashboard');
+					 route::post('dashboard','DashboardController@submit')->name('submit.results.dashboard');
 					 route::get('dashboard-with-sensitivity','DashboardController@view')->name('view.results.dashboard.with.sensitivity');
 						 
                     // Route::get('/assets', 'RedirectionController@assetsGet')->name('assets.form');

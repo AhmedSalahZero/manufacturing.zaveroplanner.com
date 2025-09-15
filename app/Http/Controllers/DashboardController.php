@@ -19,4 +19,18 @@ class DashboardController extends Controller
 		
 		return view('dashboard.dashboard',$project->getDashboardViewVars());
 	}
+	public function submit(Request $request ,Project $project)
+	{
+		$project->update([
+			'dashboard_comment_1'=>$request->get('dashboard_comment_1'),
+			'dashboard_comment_2'=>$request->get('dashboard_comment_2'),
+		]);
+		
+		 if ($request->get('submit_button') == 'save') {
+            return redirect()->route('view.results.dashboard', ['project'=>$project->id]);
+        }
+		return redirect()->route('main.project.page', ['project'=>$project->id]);
+		
+	}
+	
 }

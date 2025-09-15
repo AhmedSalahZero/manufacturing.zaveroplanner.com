@@ -126,6 +126,8 @@ class RedirectionController extends Controller
             $rawMaterial->update($dataArr);
         }
 		RawMaterial::calculateInventoryQuantityStatement($project->id);
+		$project->recalculateVatStatements();
+		
 		// foreach($project)
 		unset($rawMaterial);
         if ($request->get('submit_button') != 'next') {
@@ -191,7 +193,7 @@ class RedirectionController extends Controller
         $request->merge($manpowers);
         $project->storeRepeaterRelations($request, ['manpowers'], ['project_id'=>$project->id]);
         $project->reallocateProductsOnManpowers();
-        
+        $project->recalculateFgInventoryValueStatement();
 
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
@@ -225,9 +227,8 @@ class RedirectionController extends Controller
         $studyExtendedEndDateAsIndex = Arr::last($datesAsStringDateIndex);
         $expenseAllocations = [];
         foreach ($expenseTypes as $expenseType) {
-            $project->generateRelationDynamically($expenseType)->delete();
+           $project->generateRelationDynamically($expenseType)->delete();
             $tableId = $expenseType;
-             
             foreach ((array)$request->get($tableId) as $tableDataArr) {
             
                 $withholdRate = $tableDataArr['withhold_tax_rate']??0;
@@ -261,9 +262,10 @@ class RedirectionController extends Controller
                  * * to repeat 2 years inside json
                  */
                 $loopEndDate = $tableDataArr['end_date'] >=  $studyEndDateAsIndex ? $studyExtendedEndDateAsIndex : $tableDataArr['end_date'];
-                $loopEndDate = $loopEndDate ==  0 ? $studyEndDateAsIndex : $loopEndDate ;
+				
+                $loopEndDate = $loopEndDate ==  0 && $tableId == 'one_time_expense' ? $studyEndDateAsIndex : $loopEndDate ;
+	
 
-                //        $monthsAsIndexes = range(0, $studyEndDateAsIndex) ;
                 $tableDataArr['relation_name']  = $expenseType ;
                 /**
                  * * Fixed Repeating
@@ -285,7 +287,8 @@ class RedirectionController extends Controller
                 if (isset($tableDataArr['amount']) && $tableId == 'fixed_monthly_repeating_amount') {
 					$amount = $tableDataArr['amount']??0 ;
                     $increaseInterval = $tableDataArr['increase_interval'] ?? 'annually' ;
-                    $monthlyFixedRepeatingResults = $monthlyFixedRepeatingAmountEquation->calculate($amount, $tableDataArr['start_date'], $loopEndDate, $increaseInterval, $tableDataArr['increase_rate'], $isDeductible, $vatRate, $withholdRate);
+					$increaseRate = $tableDataArr['increase_rate'] ?? 0 ;
+                    $monthlyFixedRepeatingResults = $monthlyFixedRepeatingAmountEquation->calculate($amount, $tableDataArr['start_date'], $loopEndDate, $increaseInterval, $increaseRate, $isDeductible, $vatRate, $withholdRate);
 				
                     $withholdAmounts  = $monthlyFixedRepeatingResults['withhold_amounts'];
                     $tableDataArr['monthly_repeating_amounts']  = $monthlyFixedRepeatingResults['total_before_vat'];
