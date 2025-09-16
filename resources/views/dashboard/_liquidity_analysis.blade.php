@@ -10,7 +10,7 @@ $tableClasses =  'col-md-12';
         @endforeach
     </x-slot>
     <x-slot name="trs">
-		@foreach($liquidityRatio as $key => $arrItem)
+		@foreach($formattedDcfMethod as $key => $arrItem)
 		 @php
             $currentModalId = $key.'-modal-id';
             $currentModalTitle = $arrItem['title'] ;

@@ -12,7 +12,7 @@
                         </div>
                     </div>
 
-                    <div class="col-5">
+                    <div class="col-4">
                         <label>{{ __('Company Type') }}</label>
                         <div class="form-group">
 
@@ -31,6 +31,22 @@
                             <span class="red">{{"* ".__('Backlog & Opening Balances Will Be Deleted Upon Saving Or Clicking Next')}}</span>
                         </div> --}}
                     </div>
+					
+					
+					 <div class="col-md-2">
+                        <div class="form-group">
+                            <label>{{__('Study Currency')}}</label>
+                            <select name="main_functional_currency" id="main_functional_currency"  class="form-control   ">
+
+                                <?php $mainFunctionalCurrency = isset($project->main_functional_currency) ? $project->main_functional_currency :old('main_functional_currency') ?>
+                                @foreach( mainFunctionalCurrency() as $id => $title)
+                                <?php $name =  "name_".app()->getLocale();?>
+                                <option value="{{ $id }}" @if($mainFunctionalCurrency == $id ) selected @endif >{{ $title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+					
                 </div>
 
             </div>

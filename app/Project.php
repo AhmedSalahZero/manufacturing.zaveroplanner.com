@@ -941,14 +941,14 @@ class Project extends Model
             $currentAmount = (array)$amount ;
             $resultPerCategory[$categoryId] = isset($resultPerCategory[$categoryId]) ? HArr::sumAtDates([$currentAmount,$resultPerCategory[$categoryId]], $sumKeys):$currentAmount ;
         }
-        $manpowers = DB::table('manpowers')->whereIn('type', ['sales','general'])->where('project_id', $this->id)->get();
+		// dd($manpowers);
+        $manpowers = DB::table('manpowers')->whereIn('type', ['sales','marketing','general','operational_salaries'])->where('project_id', $this->id)->get();
         foreach ($manpowers as $manpower) {
-            $categoryId = $manpower->type ;
-            if ($categoryId == 'general') {
-                $categoryId = 'general-expenses';
+			$categoryId = $manpower->type ;
+            if ($categoryId == 'general' || $categoryId == 'operational_salaries') {
+				$categoryId = 'general-expenses';
             }
             $currentAmount =  (array)json_decode($manpower->salary_expenses);
-			
             $resultPerCategory[$categoryId] = isset($resultPerCategory[$categoryId]) ? HArr::sumAtDates([$currentAmount,$resultPerCategory[$categoryId]], $sumKeys):$currentAmount;
         }
         foreach ($this->fixedAssets as $fixedAsset) {
@@ -1618,10 +1618,61 @@ class Project extends Model
             
         ];
     }
+    public function getTotalSupplierPayables(array $sumKeys)
+	{
+		$projectId = $this->id ;
+		 $supplierOpening = DB::table('supplier_payable_opening_balances')->where('project_id', $this->id)->pluck('statement')->toArray()[0]??'';
+        $supplierOpeningEndBalance = @((array)(((array) json_decode($supplierOpening))['monthly']))['end_balance']??[];
+        $supplierOpeningEndBalance = $supplierOpeningEndBalance?:[];
+            
+            
+        $totalRawMaterialsEndBalance = [];
+        $rawMaterialEndBalances =  DB::table('raw_materials')->where('project_id', $projectId)->pluck('collection_statement')->toArray();
+        foreach ($rawMaterialEndBalances as $rawMaterial) {
+            $rawMaterial= @((array)(((array)((array)json_decode($rawMaterial))['monthly']??[]))['end_balance']??[]);
+            $rawMaterial = $rawMaterial?:[];
+            $totalRawMaterialsEndBalance = HArr::sumAtDates([$rawMaterial,$totalRawMaterialsEndBalance], $sumKeys);
+        }
+        return  HArr::sumAtDates([$supplierOpeningEndBalance,$totalRawMaterialsEndBalance], $sumKeys);
+	}
+    public function getTotalFGs(array $sumKeys):array 
+	{
+		$projectId = $this->id ;
+		$totalFGs = [];
+        $fgInventories =  DB::table('products')->where('project_id', $projectId)->pluck('product_inventory_value_statement')->toArray();
+	
+        foreach ($fgInventories as $fgInventory) {
+            $fgInventory= @((array)((array)json_decode($fgInventory))['end_balance']??[]);
+		
+            $fgInventory = $fgInventory?:[];
+            $totalFGs = HArr::sumAtDates([$fgInventory,$totalFGs], $sumKeys);
+        }
+		return $totalFGs;
+	}
     
-    
-    
-    
+    public function getTotalCustomerReceivables(array $sumKeys)
+	{
+		$projectId  = $this->id;
+		  $totalCustomerReceivablesOpening = [];
+        $customerReceivablesOpeningBalanceEndBalances =  DB::table('cash_and_bank_opening_balances')->where('project_id', $projectId)->pluck('statement')->toArray();
+        foreach ($customerReceivablesOpeningBalanceEndBalances as $customerReceivablesOpeningBalanceEndBalance) {
+            $customerReceivablesOpeningBalanceEndBalance= ((array)((array)json_decode($customerReceivablesOpeningBalanceEndBalance))['monthly']??[])['end_balance']??[];
+            $totalCustomerReceivablesOpening = HArr::sumAtDates([$totalCustomerReceivablesOpening,$customerReceivablesOpeningBalanceEndBalance], $sumKeys);
+        }
+		
+		$totalCustomerReceivables = [];
+        $collectionStatements =  DB::table('products')->where('project_id', $projectId)->pluck('collection_statement')->toArray();
+		
+        foreach ($collectionStatements as $collectionStatementEndBalance) {
+			$collectionStatementEndBalance = (array)json_decode($collectionStatementEndBalance) ;
+			$collectionStatementEndBalance = $collectionStatementEndBalance ? (array)$collectionStatementEndBalance['monthly'] : '';
+			$collectionStatementEndBalance = (array)($collectionStatementEndBalance['end_balance'] ?? []);
+			$collectionStatementEndBalance = (array) ($collectionStatementEndBalance);
+            $totalCustomerReceivables = HArr::sumAtDates([$totalCustomerReceivables,$collectionStatementEndBalance], $sumKeys);
+        }
+		return HArr::sumAtDates([$totalCustomerReceivablesOpening,$totalCustomerReceivables], $sumKeys);
+		
+	}
     public function getBalanceSheetViewVars():array
     {
         $project = $this ;
@@ -1756,23 +1807,12 @@ class Project extends Model
         
         
         
-        $totalCustomerReceivablesOpening = [];
-        $customerReceivablesOpeningBalanceEndBalances =  DB::table('cash_and_bank_opening_balances')->where('project_id', $projectId)->pluck('statement')->toArray();
-        foreach ($customerReceivablesOpeningBalanceEndBalances as $customerReceivablesOpeningBalanceEndBalance) {
-            $customerReceivablesOpeningBalanceEndBalance= ((array)((array)json_decode($customerReceivablesOpeningBalanceEndBalance))['monthly']??[])['end_balance']??[];
-            $totalCustomerReceivablesOpening = HArr::sumAtDates([$totalCustomerReceivablesOpening,$customerReceivablesOpeningBalanceEndBalance], $sumKeys);
-        }
+      
         
-        $totalCustomerReceivables = [];
-        $collectionStatements =  DB::table('products')->where('project_id', $projectId)->pluck('collection_statement')->toArray();
-        foreach ($collectionStatements as $collectionStatementEndBalance) {
-			$collectionStatementEndBalance = (array)json_decode($collectionStatementEndBalance) ;
-			$collectionStatementEndBalance = $collectionStatementEndBalance ? (array)$collectionStatementEndBalance['monthly'] : '';
-			$collectionStatementEndBalance = (array)($collectionStatementEndBalance['end_balance'] ?? []);
-			$collectionStatementEndBalance = (array) ($collectionStatementEndBalance);
-            $totalCustomerReceivables = HArr::sumAtDates([$totalCustomerReceivables,$collectionStatementEndBalance], $sumKeys);
-        }
-        $customerReceivables = HArr::sumAtDates([$totalCustomerReceivablesOpening,$totalCustomerReceivables], $sumKeys);
+		$customerReceivables = $this->getTotalCustomerReceivables($sumKeys);
+
+        
+
         $currentDataArr = $customerReceivables;
         $title = __('Customer Receivables');
         $currentTabId = $title ;
@@ -1798,15 +1838,7 @@ class Project extends Model
         
         
     
-        $totalFGs = [];
-        $fgInventories =  DB::table('products')->where('project_id', $projectId)->pluck('product_inventory_value_statement')->toArray();
-	
-        foreach ($fgInventories as $fgInventory) {
-            $fgInventory= @((array)((array)json_decode($fgInventory))['end_balance']??[]);
-		
-            $fgInventory = $fgInventory?:[];
-            $totalFGs = HArr::sumAtDates([$fgInventory,$totalFGs], $sumKeys);
-        }
+        $totalFGs = $this->getTotalFGs($sumKeys); 
         $currentDataArr = $totalFGs ;
         $title = __('Finished Goods Inventory');
         $currentTabId = $title ;
@@ -1831,13 +1863,7 @@ class Project extends Model
         
         
     
-        $totalRawMaterials = [];
-        $rmInventories =  DB::table('raw_materials')->where('project_id', $projectId)->pluck('inventory_value_statement')->toArray();
-        foreach ($rmInventories as $rmInventory) {
-            $rmInventory= @((array)((array)json_decode($rmInventory))['end_balance']??[]);
-            $rmInventory = $rmInventory?:[];
-            $totalRawMaterials = HArr::sumAtDates([$rmInventory,$totalRawMaterials], $sumKeys);
-        }
+        $totalRawMaterials = $this->getTotalRawMaterials($sumKeys);
         $currentDataArr = $totalRawMaterials   ;
         $title = __('Raw Material Inventory');
         $currentTabId = $title ;
@@ -1939,19 +1965,7 @@ class Project extends Model
          * * Start Key
          */
         
-        $supplierOpening = DB::table('supplier_payable_opening_balances')->where('project_id', $this->id)->pluck('statement')->toArray()[0]??'';
-        $supplierOpeningEndBalance = @((array)(((array) json_decode($supplierOpening))['monthly']))['end_balance']??[];
-        $supplierOpeningEndBalance = $supplierOpeningEndBalance?:[];
-            
-            
-        $totalRawMaterialsEndBalance = [];
-        $rawMaterialEndBalances =  DB::table('raw_materials')->where('project_id', $projectId)->pluck('collection_statement')->toArray();
-        foreach ($rawMaterialEndBalances as $rawMaterial) {
-            $rawMaterial= @((array)(((array)((array)json_decode($rawMaterial))['monthly']??[]))['end_balance']??[]);
-            $rawMaterial = $rawMaterial?:[];
-            $totalRawMaterialsEndBalance = HArr::sumAtDates([$rawMaterial,$totalRawMaterialsEndBalance], $sumKeys);
-        }
-        $supplierPayables = HArr::sumAtDates([$supplierOpeningEndBalance,$totalRawMaterialsEndBalance], $sumKeys);
+		$supplierPayables = $this->getTotalSupplierPayables($sumKeys);
         $currentDataArr = $supplierPayables ;
         $title = __('Supplier Payables');
         $currentTabId = $title ;
@@ -2780,14 +2794,116 @@ class Project extends Model
 				'title'=>__('Working Capital = Current Assets - Current Liabilities'),
 				'data'=>array_values($workingCapital),
 				'is_divided'=>true ,
-				'mark'=>' EGP'
+				'mark'=>' '. $project->getMainFunctionalCurrencyFormatted()
 			],
 			
 			
 			
 		];
+		// $openingCustomerReceivables = 10000000 ;
+		$openingCustomerReceivables = $this->getCustomerReceivableOpeningBalanceAmount();
+		$customerReceivables[0] = isset($customerReceivables[0]) ? $openingCustomerReceivables +  ($customerReceivables[0]??0) :$openingCustomerReceivables ;
+		ksort($customerReceivables);
+		$yearsWithItsActiveMonths = $this->getYearIndexWithItsMonthsAsIndexAndString();
+		$daysYearsWithItsActiveMonths = $this->getYearIndexWithItsMonthsAsIndexAndString();
+			array_walk($yearsWithItsActiveMonths,function(&$value,$key){
+				$value = count($value) ;
+			});array_walk($daysYearsWithItsActiveMonths,function(&$value,$key){
+				$value = count($value) * 30 ;
+			});
+		$avgWithOpening = array_values(HArr::avgWithOpening($customerReceivables));
+		
+		// dd($yearsWithItsActiveMonths);
+		// $avgWithOpening = array_values()
+		$annuallySalesRevenue = $incomeStatement ? $incomeStatement->total_sales_revenues : [];
+		// dd();
+		// $customerBalances = $customerReceivables;
+		// $dso = HArr::divideTwoArrAtSameIndex($avgWithOpening,$annuallySalesRevenue);
+
+				/**
+				 * * DSO
+				 */
+				$customerReceivables = $this->getTotalCustomerReceivables($sumKeys);
+				$customerReceivables = HArr::sumPerYearIndex($customerReceivables,$yearWithItsIndexes);
+				$avgCustomerReceivables = HArr::divideTwoArrAtSameIndex(array_values($customerReceivables),$yearsWithItsActiveMonths);
+				$avgCustomerReceivables = HArr::divideTwoArrAtSameIndex($avgCustomerReceivables,$annuallySalesRevenue);
+				$dso = HArr::multipleTwoArrAtSameIndex($avgCustomerReceivables,$daysYearsWithItsActiveMonths);
+				
+				
+				
+				/**
+				 * * DIO
+				 */
+				 $totalFGs = $this->getTotalFGs($sumKeys); 
+				 $totalRawMaterials = $this->getTotalRawMaterials($sumKeys);
+				 $grossProfit = $incomeStatement  ? $incomeStatement->gross_profit : [];
+				 $annuallyTotalCogs = HArr::subtractAtDates([$annuallySalesRevenue,$grossProfit]);
+				$inventory = HArr::sumAtDates([$totalFGs,$totalRawMaterials],$sumKeys);
+				$inventory = HArr::sumPerYearIndex($inventory,$yearWithItsIndexes);
+				$avgInventory = HArr::divideTwoArrAtSameIndex(array_values($inventory),$yearsWithItsActiveMonths);
+				$avgInventory = HArr::divideTwoArrAtSameIndex($avgInventory,$annuallyTotalCogs);
+				$dio = HArr::multipleTwoArrAtSameIndex($avgInventory,$daysYearsWithItsActiveMonths);
+				
+				
+				/**
+				 * * DPO
+				 */
+				 $supplierPayable = $this->getTotalSupplierPayables($sumKeys);
+				 $grossProfit = $incomeStatement  ? $incomeStatement->gross_profit : [];
+				 $annuallyTotalCogs = HArr::subtractAtDates([$annuallySalesRevenue,$grossProfit]);
+				// $supplierPayable = HArr::sumAtDates([$totalFGs,$totalRawMaterials],$sumKeys);
+				$supplierPayable = HArr::sumPerYearIndex($supplierPayable,$yearWithItsIndexes);
+				$avgSupplier = HArr::divideTwoArrAtSameIndex(array_values($supplierPayable),$yearsWithItsActiveMonths);
+				$avgSupplier = HArr::divideTwoArrAtSameIndex($avgSupplier,$annuallyTotalCogs);
+				$dpo = HArr::multipleTwoArrAtSameIndex($avgSupplier,$daysYearsWithItsActiveMonths);
+				
+				/**
+				 * * CCC
+				 */
+				
+				$ccc = HArr::subtractAtDates([HArr::sumAtDates([$dso,$dio]),$dpo]);
+		
+		$activityRatio = [
+			'dso'=>[
+				'number-format'=>2 ,
+				'is_number'=>true ,
+				'title'=>__('Days Sales Outstanding (DSO) = Av. Receivables ÷ Net Sales × 360'),
+				'data'=>array_values($dso),
+				'is_divided'=>false ,
+				'mark'=>' days'
+			],
+			'dio'=>[
+				'number-format'=>2 ,
+				'is_number'=>true ,
+				'title'=>__('Days Inventory Outstanding (DIO) = Av. Inventory ÷ COGS × 360'),
+				'data'=>array_values($dio),
+				'is_divided'=>false ,
+				'mark'=>' days'
+			],
+			'dpo'=>[
+				'number-format'=>2 ,
+				'is_number'=>true ,
+				'title'=>__('Days Payable Outstanding (DPO) = Av. Payables ÷ COGS × 360'),
+				'data'=>array_values($dpo),
+				'is_divided'=>false ,
+				'mark'=>' days'
+			],
+			'ccc'=>[
+				'number-format'=>2 ,
+				'is_number'=>true ,
+				'title'=>__('Cash Conversion Cycle (CCC) = DSO + DIO - DPO'),
+				'data'=>array_values($ccc),
+				'is_divided'=>false ,
+				'mark'=>' days'
+			],
+			
+			
+			
+		];
+		
         return [
 			'liquidityRatio'=>$liquidityRatio,
+			'activityRatio'=>$activityRatio,
         'yearsWithItsMonths' => $project->getOperationDurationPerYearFromIndexes(),
         'model'=>$project,
         'project'=>$project,
@@ -2881,6 +2997,11 @@ class Project extends Model
         $cashAndBankAmount   = $this->cashAndBankOpeningBalances->first();
         return $cashAndBankAmount ? $cashAndBankAmount->cash_and_bank_amount : 0 ;
     }
+	 public function getCustomerReceivableOpeningBalanceAmount():float
+    {
+        $cashAndBankAmount   = $this->cashAndBankOpeningBalances->first();
+        return $cashAndBankAmount ? $cashAndBankAmount->customer_receivable_amount : 0 ;
+    }
     public function convertArrayOfIndexKeysToIndexAsDateStringWithItsOriginalValue(array $items, array $datesAsStringAndIndex)
     {
         $newItems = [];
@@ -2909,6 +3030,17 @@ class Project extends Model
         $operationEndDate = $this->end_date;
         return Carbon::make($operationEndDate)->format('Y-m');
     }
+	public function getTotalRawMaterials(array $sumKeys)
+	{
+		$projectId = $this->id;
+		$totalRawMaterials = [];
+        $rmInventories =  DB::table('raw_materials')->where('project_id', $projectId)->pluck('inventory_value_statement')->toArray();
+        foreach ($rmInventories as $rmInventory) {
+            $rmInventory= @((array)((array)json_decode($rmInventory))['end_balance']??[]);
+            $rmInventory = $rmInventory?:[];
+            $totalRawMaterials = HArr::sumAtDates([$rmInventory,$totalRawMaterials], $sumKeys);
+        }
+	}
     public function getInventoryAmount():float
     {
         $fgInventoryAmount = $this->getTotalFgInventoryValue();
@@ -2948,7 +3080,13 @@ class Project extends Model
         $corporateTaxesPayable = DB::table('vat_and_credit_withhold_tax_opening_balances')->where('project_id',$this->id)->first();
         return $corporateTaxesPayable ? $corporateTaxesPayable->corporate_taxes_payable  : 0 ;
     }
-		
-
+	public function getMainFunctionalCurrency():string 
+	{
+		return $this->main_functional_currency?:'egp';
+	}		
+	public function getMainFunctionalCurrencyFormatted():string 
+	{
+		return mainFunctionalCurrency()[$this->getMainFunctionalCurrency()];
+	}
 
 }

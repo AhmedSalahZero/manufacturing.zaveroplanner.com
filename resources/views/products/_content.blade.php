@@ -414,7 +414,8 @@
 
             {{-- Sales Seasonality --}}
             <div class="div-title">
-                {{__('Sales Seasonality')}}
+			{{ $product->getName() }}
+			[{{__('Sales Seasonality')}}]
             </div>
             <div class="formItem">
                 <div class="col-12">
@@ -538,7 +539,8 @@
             </div>
 
             <div class="div-title">
-                {{__('Raw Material Cost Rate %')}}
+				{{ $product->getName() }}
+                [ {{__('Raw Material Cost Rate %')}} ]
             </div>
             <div class="formItem">
                 <div class="col-12">
@@ -759,7 +761,9 @@
 
 
             <div class="div-title">
-                {{__('Collections Plan ')}}<span class="red">*</span>
+			{{ $product->getName() }}
+			[{{__('Collections Plan ')}}]
+                <span class="red">*</span>
             </div>
             <div class="formItem ">
                 <div class="row">

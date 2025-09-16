@@ -88,9 +88,13 @@ function getManpowerTypes():array
             'has_allocation'=>false ,
           ],
           'sales'=>[
-            'title'=>__('Sales And Marketing Salaries'),
+            'title'=>__('Sales Salaries'),
             'has_allocation'=>false
           ],
+		  'marketing'=>[
+			'title'=>__('Marketing Salaries'),
+			'has_allocation'=>false
+		  ],
            'general'=>[
             'title'=>__('General Salaries'),
             'has_allocation'=>false
@@ -349,6 +353,10 @@ function getPaymentTermsForFixedAssets(): array
             'value' => 'customize',
             'title' => __('Customize')
         ],
+		[
+			'value'=>'installment',
+			'title'=>__('Installment')
+		],
         [
             'value' => 'cash',
             'title' => __('Cash')
@@ -584,4 +592,30 @@ function convertStringToClass(string $str): string
     $reg = " /^[\d]+|[!\"#$%&'\(\)\*\+,\.\/:;<=>\?\@\~\{\|\}\^ ]/ ";
 
     return preg_replace($reg, '-', $str);
+}
+function mainFunctionalCurrency():array 
+{
+	return [
+		'egp'=>__('EGP'),
+		'usd'=>__('USD'),
+		'euro'=>__('EURO'),
+		'AED'=>__('AED'),
+		'sar'=>__('SAR'),
+		'qar'=>__('QAR'),
+	];
+}
+function getNextKey(array $array, $key) {
+    // Get all keys from the array
+    $keys = array_keys($array);
+    
+    // Find the position of the given key
+    $currentKeyIndex = array_search($key, $keys, true);
+    
+    // If the key doesn't exist or is the last key, return null
+    if ($currentKeyIndex === false || $currentKeyIndex === count($keys) - 1) {
+        return null;
+    }
+    
+    // Return the next key
+    return $keys[$currentKeyIndex + 1];
 }

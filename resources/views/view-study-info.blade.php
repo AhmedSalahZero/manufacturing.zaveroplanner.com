@@ -23,7 +23,7 @@
 	@include('manPower._content',$project->getManpowerViewVars())
 	     @include('expenses._content',$project->getExpensesViewVars())
 		 @include('fixed-assets._content',$project->getFixedAssetsViewVars())
-		 
+		 @if(!$project->isNewCompany())
 		    <div class="div-title">
                 {{ __('Opening Balances') }}
             </div>
@@ -32,7 +32,7 @@
 		   <div class="div-title">
                 {{ __('Income Statement') }}
             </div>
-
+		@endif
   @include('financial-results._content',$project->calculateIncomeStatement())
   
   

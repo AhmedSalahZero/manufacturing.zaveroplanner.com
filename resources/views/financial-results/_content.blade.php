@@ -151,7 +151,7 @@
                                                 </div>
 
                                                 <span class="ml-2 currency-class">
-                                                    EGP
+                                                    {{ $project->getMainFunctionalCurrencyFormatted() }}
                                                 </span>
 
                                             </div>

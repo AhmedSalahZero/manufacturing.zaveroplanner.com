@@ -394,4 +394,43 @@ class FixedAsset extends Model
 		return $this->ffe_execution_and_payment?:[];
 	}
 	
+	
+	
+	public function getReservationRate():float
+	{
+		return $this->reservation_rate ?: 0; 
+	}
+	public function getContractualRate():float 
+	{
+		return $this->contractual_rate?:0;
+	}
+	public function getAfterMonths():int 
+	{
+		return $this->after_months?:0;
+	}
+	public function getRemainingBalanceRate():float
+	{
+		return 100 - $this->getReservationRate() - $this->getContractualRate() ;
+	}		
+	public function getInstallmentGracePeriod():int
+	{
+		return $this->installment_grace_period?:0;
+	}
+	public function getInstallmentCount():int
+	{
+		return $this->installment_count?:1;
+	}
+	
+	public function getInstallmentInterestRate():float 
+	{
+		return $this->installment_interest_rate?:0;
+	}
+	public function getPaymentInstallmentInterval():string 
+	{
+		return $this->payment_installment_interval?:'monthly';
+	}
+	public function isInstallmentPayment():bool 
+	{
+		return $this->payment_terms === 'installment';
+	}
 }

@@ -704,3 +704,6 @@ td > .kt-radio.kt-radio--single {
 .font-size-18px {
     font-size: 18px !important;
 }
+.row-gap{
+	row-gap: 10px;
+}

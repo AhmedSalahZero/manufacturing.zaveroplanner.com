@@ -844,19 +844,26 @@ $(document).on('change', '.hundred-minus-number', function () {
 	$(parent).find('.hundred-minus-number-result'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
 })
 
-
+$(document).on('change', '.hundred-minus-number1,.hundred-minus-number2', function () {
+	let parent = $(this).closest('.closest-parent')
+	const columnIndex = $(this).attr('data-column-index')
+	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
+	let number1 = number_unformat($(parent).find('.hundred-minus-number1'+appendColumnIndex).val())
+	let number2 = number_unformat($(parent).find('.hundred-minus-number2'+appendColumnIndex).val())
+	let debtFunding = 100 - number1-number2
+	$(parent).find('.hundred-minus-two-number-result'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
+})
 
 
 const handlePaymentTermModal = function () {
-	console.log('inside')
 	const parentTermsType = $(this).closest('select').val()
 	const tableId = $(this).closest('table').attr('id')
 	if (parentTermsType == 'customize') {
 		$(this).closest('.closest-parent').find('.collection-modal').modal('show')
 	}
-
-
-
+	if (parentTermsType == 'installment') {
+		$(this).closest('.closest-parent').find('.installment-modal').modal('show')
+	}
 }
 $(document).on('change', 'select.payment_terms', handlePaymentTermModal)
 

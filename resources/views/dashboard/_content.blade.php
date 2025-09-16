@@ -149,7 +149,22 @@
 <div class="formItem">
 
     <div class="row pl-4 pr-4">
-        @include('dashboard._ration_analysis',['formattedDcfMethod'=>$liquidityRatio])
+        @include('dashboard._liquidity_analysis',['formattedDcfMethod'=>$liquidityRatio])
+    </div>
+
+
+</div>
+
+
+
+<div class="div-title">
+    {{ __('Activity Ratios Analysis' ) }}
+</div>
+<div class="formItem">
+
+    <div class="row pl-4 pr-4">
+               @include('dashboard._liquidity_analysis',['formattedDcfMethod'=>$activityRatio])
+
     </div>
 
 

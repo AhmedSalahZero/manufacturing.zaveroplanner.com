@@ -341,7 +341,8 @@ class CalculateFixedLoanAtEndService
 			$ratesWithIsFromExecution  = $ffe->getRatesWithIsFromExecution();
 			$ffeEquityFundingRate = $ffe->getEquityFunding();
 			$executionAndPayment =$ffeExecutionAndPaymentService->__calculate($totalFFECost, $ffeStartDateAsIndex, $duration,$dateIndexWithDate);
-			$contractPayments['FFE Payment'] = $contractPaymentService->__calculate( $executionAndPayment, $ffeCollectionPolicyValue,$ratesWithIsFromTotal,$ratesWithIsFromExecution,$dateIndexWithDate, $dateWithDateIndex);
+			$ffePayment = $ffe->isInstallmentPayment() ? (new InstallmentWithGraceMethod)->__calculate($ffe->getStartDateAsIndex(),$ffe->getTotalCost(),$ffe->getReservationRate(),$ffe->getRemainingBalanceRate(),$ffe->getInstallmentGracePeriod(),$ffe->getInstallmentCount(),$ffe->getPaymentInstallmentInterval(),$ffe->getContractualRate(),$ffe->getAfterMonths())  : $contractPaymentService->__calculate( $executionAndPayment, $ffeCollectionPolicyValue,$ratesWithIsFromTotal,$ratesWithIsFromExecution,$dateIndexWithDate, $dateWithDateIndex);
+			$contractPayments['FFE Payment'] = $ffePayment;
 			$ffeEquityPayment['FFE Equity Injection'] = $ffeExecutionAndPaymentService->calculateFFEEquityPayment($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
 			$ffeLoanWithdrawal['FFE Loan Withdrawal'] = $ffeExecutionAndPaymentService->calculateFFELoanWithdrawal($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
 			

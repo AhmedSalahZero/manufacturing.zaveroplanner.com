@@ -13,6 +13,7 @@ use App\Http\Requests\StoreFixedAssetsRequest;
 use App\Http\Requests\StoreManpowerRequest;
 use App\Http\Requests\StoreOpeningBalancesRequest;
 use App\Http\Requests\StoreProductsRequest;
+use App\Http\Requests\StoreRawMaterialPaymentsRequest;
 use App\Product;
 use App\Project;
 use App\RawMaterial;
@@ -33,6 +34,7 @@ class RedirectionController extends Controller
 
     public function productsPost(StoreProductsRequest $request, Project $project, Product $product)
     {
+
 		$request->merge([
 			'fg_inventory_quantity'=>number_unformat($request->get('fg_inventory_quantity')),
 			'fg_inventory_value'=>number_unformat($request->get('fg_inventory_value')),
@@ -40,23 +42,8 @@ class RedirectionController extends Controller
         $product->syncSeasonality($request->get('seasonality'));
         $request['project_id'] = $project->id;
 		$product->update($request->except(['rawMaterials','submit_button','seasonality']));
-        $rawMaterials = [];
-		$years = $product->getViewYearIndexWithYear();
-		$yearsAsIndexes =array_keys($years);
-	
-        foreach ($request->get('rawMaterials') as $index => &$rawMaterialArr) {
-			$rawMaterialArr['product_id'] = $product->id;
-			if(!isset($rawMaterialArr['raw_material_id'])){
-				dd($rawMaterialArr,'raw_material_id');
-			}
-            if ($rawMaterialArr['raw_material_id']) {
-				$rawMaterialArr['percentages'] = array_combine($yearsAsIndexes,$rawMaterialArr['percentages']); 
-                $rawMaterials[$index] = $rawMaterialArr;
-            }
-        }
-        $request->merge([
-            'rawMaterials'=>$rawMaterials
-        ]);
+        
+       
         $request->merge([
             'fg_inventory_quantity'=>number_unformat($request->get('fg_inventory_quantity'))
         ]);
@@ -64,7 +51,7 @@ class RedirectionController extends Controller
         /**
          * monthly_sal target value
          */
-		
+		$rawMaterials = $request->get('rawMaterials');
 		 $product->rawMaterials()->detach();
         foreach ($rawMaterials as $rawMaterialArr) {
             unset($rawMaterialArr['id']);
@@ -79,10 +66,10 @@ class RedirectionController extends Controller
 		// here 
         $localMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['localMonthlySalesTargetValue'];
         $exportMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['exportMonthlySalesTargetValue'];
-		
-		$localCollectionStatement = $product->calculateMultiYearsCollectionPolicy($localMonthlySalesTargetValueBeforeVat,'local');
+		$localCollectionStatement = $product->calculateMultiYearsCollectionPolicy($localMonthlySalesTargetValueBeforeVat,'local',true);
 		$exportCollectionStatement = $product->calculateMultiYearsCollectionPolicy($exportMonthlySalesTargetValueBeforeVat,'export');
 		$collectionStatement = HArr::sumTwoIntervalArrays($localCollectionStatement,$exportCollectionStatement);
+
         $product->update([
 			'local_collection_statement'=> $localCollectionStatement ,
 			'export_collection_statement'=> $exportCollectionStatement,
@@ -111,9 +98,8 @@ class RedirectionController extends Controller
         return view('raw-material-payments.form', $project->getRawMaterialViewVars());
     }
 
-    public function rawMaterialPaymentsPost(Request $request, Project $project)
+    public function rawMaterialPaymentsPost(StoreRawMaterialPaymentsRequest $request, Project $project)
     {
-	
 		$project->update([
 			'comment_for_raw_materials'=>$request->get('comment_for_raw_materials')
 		]);
@@ -456,8 +442,9 @@ class RedirectionController extends Controller
     
     public function openingBalancesGet(Project $project)
     {
-       
-
+		if($project->isNewCompany()){
+			abort(404);
+		}       
         return view(
             'openingBalances.form',
             $project->getOpeningBalancesViewVars()

@@ -1000,4 +1000,18 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 		return self::extendFreeCashflowTenYears($freeCashFlowForEquity,$perptual);
 		// foreach()
 	}
+	public static function avgWithOpening(array $items)
+	{
+		
+		$result = [];
+		foreach($items as $dateAsIndex => $value){
+			$nextIndex = getNextKey($items,$dateAsIndex);
+			if(!is_null($nextIndex)){
+				$currentValue = $value ;
+				$nextValue = $items[$nextIndex];
+				$result[$nextIndex] = ($nextValue + $currentValue) / 2 ;
+			}
+		}
+		return $result;
+	}
 }
