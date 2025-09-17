@@ -36,9 +36,7 @@ class FixedAssetOpeningBalance extends Model
 				$extendedStudyEndDate = $model->project->convertDateStringToDateIndex($model->project->getEndDate()) ;
 				$dates = range(0,$extendedStudyEndDate);
 				$debug = false ;
-				if($model->id == 8){
-					$debug=true;
-				}
+				
 				$model->statement = self::calculateSettlementStatement($dates,$statementPayload,[],$openingBalance,$dateIndexWithDate,true,$debug);
 			});
 	}

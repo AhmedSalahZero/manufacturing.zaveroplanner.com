@@ -100,6 +100,7 @@ trait HasCollectionOrPaymentStatement {
         foreach (getIntervalFormatted() as $intervalName=>$intervalNameFormatted) {
             $beginningBalance = $initialBeginningBalance;
             foreach ($dates as $dateIndex) {
+		
 				$settlementAtDate = $settlementsForInterval[$intervalName][$dateIndex]??0;
                 $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
 				$addition = $withholdForIntervals[$intervalName][$dateIndex]??0;
@@ -112,9 +113,7 @@ trait HasCollectionOrPaymentStatement {
                 $result[$intervalName]['end_balance'][$dateIndex] =$endBalance[$dateIndex];
             }
         }
-		if($debug){
-			dd('lol',$result);
-		}
+	
         return $result;
     
         
@@ -252,6 +251,7 @@ trait HasCollectionOrPaymentStatement {
 				$isFirstLoop=false ;
             }
         }
+		
         return $result;
     
         

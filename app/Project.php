@@ -605,6 +605,12 @@ class Project extends Model
     }
     public function calculateFixedAssetOpeningBalances()
     {
+		$studyMonthsForViews = $this->getStudyDates();
+		$studyMonthsForViews = array_slice($studyMonthsForViews,0,$this->getViewStudyEndDateAsIndex()+1);
+        $yearWithItsMonths=$this->getYearIndexWithItsMonths();
+		unset($yearWithItsMonths[array_key_last($yearWithItsMonths)]);
+		        $sumKeys = array_keys($studyMonthsForViews);
+				
         $fixedAssetOpeningBalances  = $this->fixedAssetOpeningBalances;
 		    $datesAsStringAndIndex = $this->getDateWithDateIndex();
         $operationStartDateFormatted = $this->getOperationStartDateFormatted();
@@ -614,7 +620,10 @@ class Project extends Model
         DB::table('product_expense_allocations')->where('is_opening_depreciation', 1)->where('project_id', $this->id)->delete();
     //    $productExpensesForAllFixedAssets = [];
 		           $productExpenses = [];
+				     $adminAllocationPercentages = [];
+            $manufacturingAllocationPercentages = [];
         foreach ($fixedAssetOpeningBalances as $fixedAssetOpeningBalance) {
+			// dd();
 			$dateIndexWithMonthlyDepreciation =[];
             $openingId  = $fixedAssetOpeningBalance->id ;
             $monthlyDepreciation = $fixedAssetOpeningBalance->getMonthlyDepreciation();
@@ -633,11 +642,10 @@ class Project extends Model
 			
             $adminDepreciationPercentage = $fixedAssetOpeningBalance->getAdminDepreciationPercentage();
             $manufacturingDepreciationPercentage = $fixedAssetOpeningBalance->getManufacturingDepreciationPercentage();
-            $adminAllocationPercentages = [];
-            $manufacturingAllocationPercentages = [];
+          
            
-                $adminAllocationPercentages=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $adminDepreciationPercentage/100);
-                $manufacturingAllocationPercentages=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $manufacturingDepreciationPercentage/100);
+                $adminAllocationPercentages[$openingId]=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $adminDepreciationPercentage/100);
+                $manufacturingAllocationPercentages[$openingId]=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $manufacturingDepreciationPercentage/100);
 				// if($openingId == 8){
 				// 	dd($manufacturingAllocationPercentages);
 				// }
@@ -650,8 +658,7 @@ class Project extends Model
 				// dd($manufacturingAllocationPercentages);
 				// dd($allocationPercentage);
                 foreach ($allocationPercentage as $productId => $percentage) {
-					
-                    foreach ($manufacturingAllocationPercentages as $dateIndex => $value) {
+                    foreach ($manufacturingAllocationPercentages[$openingId]??[] as $dateIndex => $value) {
                         $productExpenses[$openingId][$productId][$dateIndex] = $value  * ($percentage/100);
                     }
                 }
@@ -663,12 +670,18 @@ class Project extends Model
             $fixedAssetOpeningBalance  = FixedAssetOpeningBalance::find($fixedAssetOpeningBalanceId);
             $adminDepreciation = $adminAllocationPercentages[$fixedAssetOpeningBalanceId]??[];
             $manufacturingDepreciation = $manufacturingAllocationPercentages[$fixedAssetOpeningBalanceId]??[] ;
-		
-		
-            $monthlyAccumulatedDepreciations = HArr::sumAtDates([$adminDepreciation,$manufacturingDepreciation]) ;
+			// if($fixedAssetOpeningBalanceId == 8){
+			// 	// dD($adminDepreciation,$manufacturingAllocationPercentages);
+				
+			// }
+            $monthlyAccumulatedDepreciations = HArr::sumAtDates([$adminDepreciation,$manufacturingDepreciation],$sumKeys) ;
 			
             $monthlyAccumulatedDepreciations[0] = ($monthlyAccumulatedDepreciations[0]??0) +  $fixedAssetOpeningBalance->getAccumulatedDepreciation();
             $monthlyAccumulatedDepreciations = HArr::accumulateArray($monthlyAccumulatedDepreciations);
+			if($fixedAssetOpeningBalance->id ==9){
+			//	dd($monthlyAccumulatedDepreciations);
+				
+			}
             $fixedAssetOpeningBalance->update([
                 'admin_depreciations'=>$adminDepreciation	,
                 'manufacturing_depreciations'=>$manufacturingDepreciation,
@@ -1754,6 +1767,7 @@ class Project extends Model
         }
 		// dd($totalFixedAssetOpening , $totalFixedAsset);
 		// dd($totalFixedAssetOpening,$totalFixedAsset);
+		// dd($totalFixedAssetOpening , $totalFixedAsset);
         $netFixedAsset =  HArr::sumAtDates([$totalFixedAssetOpening,$totalFixedAsset], $sumKeys) ;
         $currentDataArr =$netFixedAsset;
         $title = __('Net Fixed Asset');
