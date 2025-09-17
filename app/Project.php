@@ -2750,10 +2750,10 @@ class Project extends Model
     
         $isYearsStudy = true;
 		
-		$currentAssets = $balanceSheet ? $balanceSheet->total_current_assets : [];
-		$currentLiabilities = $balanceSheet ? $balanceSheet->total_current_liabilities : [];
-		$cashAndBanks = $balanceSheet ? $balanceSheet->cash_and_banks : [];
-		$customerReceivables = $balanceSheet ? $balanceSheet->customer_receivables : [];
+		$currentAssets = $balanceSheet ? (array)$balanceSheet->total_current_assets : [];
+		$currentLiabilities = $balanceSheet ? (array)$balanceSheet->total_current_liabilities : [];
+		$cashAndBanks = $balanceSheet ? (array)$balanceSheet->cash_and_banks : [];
+		$customerReceivables = $balanceSheet ? (array)$balanceSheet->customer_receivables : [];
 		
 		$currentRatio = HArr::divideTwoArrAtSameIndex($currentAssets,$currentLiabilities);
 		$quickAssets = HArr::sumAtDates([$cashAndBanks,$customerReceivables]);
@@ -3030,7 +3030,7 @@ class Project extends Model
         $operationEndDate = $this->end_date;
         return Carbon::make($operationEndDate)->format('Y-m');
     }
-	public function getTotalRawMaterials(array $sumKeys)
+	public function getTotalRawMaterials(array $sumKeys):array
 	{
 		$projectId = $this->id;
 		$totalRawMaterials = [];
@@ -3040,6 +3040,7 @@ class Project extends Model
             $rmInventory = $rmInventory?:[];
             $totalRawMaterials = HArr::sumAtDates([$rmInventory,$totalRawMaterials], $sumKeys);
         }
+		return $totalRawMaterials;
 	}
     public function getInventoryAmount():float
     {
