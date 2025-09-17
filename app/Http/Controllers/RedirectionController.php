@@ -61,23 +61,23 @@ class RedirectionController extends Controller
             $product->rawMaterials()->attach($rawMaterialId, $rawMaterialArr);
         }
 		
-        $monthlySalesTargetValueBeforeVat  = $product->calculateMonthlySalesTargetValue();
+        // $monthlySalesTargetValueBeforeVat  = $product->calculateMonthlySalesTargetValue();
 		
-		// here 
-        $localMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['localMonthlySalesTargetValue'];
-        $exportMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['exportMonthlySalesTargetValue'];
-		$localCollectionStatement = $product->calculateMultiYearsCollectionPolicy($localMonthlySalesTargetValueBeforeVat,'local',true);
-		$exportCollectionStatement = $product->calculateMultiYearsCollectionPolicy($exportMonthlySalesTargetValueBeforeVat,'export');
-		$collectionStatement = HArr::sumTwoIntervalArrays($localCollectionStatement,$exportCollectionStatement);
 
-        $product->update([
-			'local_collection_statement'=> $localCollectionStatement ,
-			'export_collection_statement'=> $exportCollectionStatement,
-			'collection_statement'=>$collectionStatement
-		]);
+        // $localMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['localMonthlySalesTargetValue'];
+        // $exportMonthlySalesTargetValueBeforeVat  = $monthlySalesTargetValueBeforeVat['exportMonthlySalesTargetValue'];
+		// $localCollectionStatement = $product->calculateMultiYearsCollectionPolicy($localMonthlySalesTargetValueBeforeVat,'local',true);
+		// $exportCollectionStatement = $product->calculateMultiYearsCollectionPolicy($exportMonthlySalesTargetValueBeforeVat,'export');
+		// $collectionStatement = HArr::sumTwoIntervalArrays($localCollectionStatement,$exportCollectionStatement);
+
+        // $product->update([
+		// 	'local_collection_statement'=> $localCollectionStatement ,
+		// 	'export_collection_statement'=> $exportCollectionStatement,
+		// 	'collection_statement'=>$collectionStatement
+		// ]);
        
-        $project->recalculateFgInventoryValueStatement();
-		$project->recalculateVatStatements();
+        // $project->recalculateFgInventoryValueStatement();
+		// $project->recalculateVatStatements();
         $nextProduct = $product->getNextProduct();
         
         if ($request->get('submit_button') != 'next') {
@@ -111,8 +111,8 @@ class RedirectionController extends Controller
             $rawMaterial = RawMaterial::find($rawMaterialId);
             $rawMaterial->update($dataArr);
         }
-		RawMaterial::calculateInventoryQuantityStatement($project->id);
-		$project->recalculateVatStatements();
+		// RawMaterial::calculateInventoryQuantityStatement($project->id);
+		// $project->recalculateVatStatements();
 		
 		// foreach($project)
 		unset($rawMaterial);
@@ -151,7 +151,7 @@ class RedirectionController extends Controller
             'salaries_tax_rate'=>$request->get('salaries_tax_rate'),
             'social_insurance_rate'=>$request->get('social_insurance_rate')
         ]);
-        $dateAsIndexes = $project->getDateWithDateIndex();
+       
         // $existingCount =
         foreach (getManpowerTypes() as $id => $manpowerOptionArr) {
             foreach ($request->get($id) as $i => $items) {
@@ -160,26 +160,27 @@ class RedirectionController extends Controller
                     foreach ($items as $name => $value) {
                         $manpowers['manpowers'][$index][$name] = $value ;
                     }
-                    $existingCount = $items['existing_count'];
-                    $hiringCounts  = $items['hirings']??[];
-                    
-                    $monthlyNetSalary = $items['avg_salary'] ;
-                    $salaryTaxesRate = $project->getSalaryTaxRate() / 100;
-                    $socialInsuranceRate = $project->getSocialInsuranceRate() /100;
-                    $manpowers['manpowers'][$index]['type'] = $id;
-                    $salaryExpenses=$project->calculateManpowerResult($dateAsIndexes, $existingCount, $hiringCounts, $monthlyNetSalary, $salaryTaxesRate, $socialInsuranceRate);
-                    foreach ($salaryExpenses as $columnName => $resultArr) {
-                        $manpowers['manpowers'][$index][$columnName] = $resultArr;
-                    }
+                    // $existingCount = $items['existing_count'];
+                    // $hiringCounts  = $items['hirings']??[];
+                    // $monthlyNetSalary = $items['avg_salary'] ;
+                    // $salaryTaxesRate = $project->getSalaryTaxRate() / 100;
+                    // $socialInsuranceRate = $project->getSocialInsuranceRate() /100;
+                    // $manpowers['manpowers'][$index]['type'] = $id;
+                    // $salaryExpenses=$project->calculateManpowerResult($dateAsIndexes, $existingCount, $hiringCounts, $monthlyNetSalary, $salaryTaxesRate, $socialInsuranceRate);
+                    // foreach ($salaryExpenses as $columnName => $resultArr) {
+                    //     $manpowers['manpowers'][$index][$columnName] = $resultArr;
+                    // }
                             
                 }
                 $index++;
             }
         }
+		// dd($manpowers);
         $request->merge($manpowers);
         $project->storeRepeaterRelations($request, ['manpowers'], ['project_id'=>$project->id]);
-        $project->reallocateProductsOnManpowers();
-        $project->recalculateFgInventoryValueStatement();
+		// $project->recalculateManpowers();
+        // $project->reallocateProductsOnManpowers();
+        // $project->recalculateFgInventoryValueStatement();
 
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
@@ -198,32 +199,30 @@ class RedirectionController extends Controller
     public function expensesPost(
         StoreExpensesRequest $request,
         Project $project,
-        MonthlyFixedRepeatingAmountEquation $monthlyFixedRepeatingAmountEquation,
-        ExpenseAsPercentageEquation $expenseAsPercentageEquation,
-        OneTimeExpenseEquation $oneTimeExpenseEquation
+       
     ) {
         $expenseTypes =getExpensesTypes();
         $modelName = 'Project';
-        $dateIndexWithDate = $project->getDateIndexWithDate();
+     
         $datesAsStringDateIndex = $project->getDatesAsStringAndIndex();
-        $datesAsIndexAndString = array_flip($datesAsStringDateIndex);
+     
         $operationStartDateAsIndex = $datesAsStringDateIndex[$project->getOperationStartDate()];
-        $studyEndDateAsIndex = $project->getStudyEndDateAsIndex();
-        $datesAsStringDateIndex = $project->getDatesAsStringAndIndex();
-        $studyExtendedEndDateAsIndex = Arr::last($datesAsStringDateIndex);
-        $expenseAllocations = [];
+    
+       
+        
         foreach ($expenseTypes as $expenseType) {
            $project->generateRelationDynamically($expenseType)->delete();
             $tableId = $expenseType;
             foreach ((array)$request->get($tableId) as $tableDataArr) {
-            
+	             $expenseCategoryId =$tableDataArr['category_id'];
+		 	   $name = $tableDataArr['name']??null;
+			       $tableDataArr['relation_name']  = $expenseType;
                 $withholdRate = $tableDataArr['withhold_tax_rate']??0;
                 $tableDataArr['withhold_tax_rate'] = $withholdRate;
                 $productIds = $tableDataArr['product_id'];
                 $allocationPercentages = $tableDataArr['percentage'];
                 $tableDataArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
-                $productAllocations = $tableDataArr['product_allocations'] ;
-                $expenseCategoryId =$tableDataArr['category_id'];
+             
                 if (isset($tableDataArr['start_date']) && count(explode('-', $tableDataArr['start_date'])) == 2) {
                     $tableDataArr['start_date'] = $tableDataArr['start_date'].'-01';
                     
@@ -232,7 +231,7 @@ class RedirectionController extends Controller
                     
                 }
                 $tableDataArr['expense_type'] = 'Expense';
-                $name = $tableDataArr['name']??null;
+         
                     
                 if (isset($tableDataArr['start_date'])) {
                     $tableDataArr['start_date'] = $datesAsStringDateIndex[$tableDataArr['start_date']];
@@ -244,164 +243,27 @@ class RedirectionController extends Controller
                 } else {
                     $tableDataArr['end_date'] = $operationStartDateAsIndex;
                 }
-                /**
-                 * * to repeat 2 years inside json
-                 */
-                $loopEndDate = $tableDataArr['end_date'] >=  $studyEndDateAsIndex ? $studyExtendedEndDateAsIndex : $tableDataArr['end_date'];
-				
-                $loopEndDate = $loopEndDate ==  0 && $tableId == 'one_time_expense' ? $studyEndDateAsIndex : $loopEndDate ;
-	
-
-                $tableDataArr['relation_name']  = $expenseType ;
-                /**
-                 * * Fixed Repeating
-                 */
-                $vatRate = $tableDataArr['vat_rate']??0;
-                $isDeductible = $tableDataArr['is_deductible'] ?? false;
-            
-                if ($tableDataArr['payment_terms'] == 'customize') {
-                    $tableDataArr['custom_collection_policy'] = sumDueDayWithPayment($tableDataArr['payment_rate'], $tableDataArr['due_days']);
-                }
-				
-                $customCollectionPolicy = $tableDataArr['custom_collection_policy']??[];
-                if (is_array($isDeductible)) {
-                    $tableDataArr['is_deductible'] = $isDeductible[0];
-                    $isDeductible= $isDeductible[0];
-                }
-                $expenseAsPercentageResult = [];
              
-                if (isset($tableDataArr['amount']) && $tableId == 'fixed_monthly_repeating_amount') {
-					$amount = $tableDataArr['amount']??0 ;
-                    $increaseInterval = $tableDataArr['increase_interval'] ?? 'annually' ;
-					$increaseRate = $tableDataArr['increase_rate'] ?? 0 ;
-                    $monthlyFixedRepeatingResults = $monthlyFixedRepeatingAmountEquation->calculate($amount, $tableDataArr['start_date'], $loopEndDate, $increaseInterval, $increaseRate, $isDeductible, $vatRate, $withholdRate);
 				
-                    $withholdAmounts  = $monthlyFixedRepeatingResults['withhold_amounts'];
-                    $tableDataArr['monthly_repeating_amounts']  = $monthlyFixedRepeatingResults['total_before_vat'];
-                    $tableDataArr['total_vat']  = $monthlyFixedRepeatingResults['total_vat'];
-                    $tableDataArr['total_after_vat']  = $monthlyFixedRepeatingResults['total_after_vat'];
-					$expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productAllocations,$project->products,$tableDataArr['total_after_vat']);
-					
-					
-                    $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy,true) ;
-                    $withholdPayments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $withholdAmounts, $datesAsIndexAndString, $customCollectionPolicy) ;
-                    $netPaymentsAfterWithhold = HArr::subtractAtDates([$payments,$withholdPayments], array_keys($payments));
-                    $tableDataArr['withhold_amounts'] = $withholdAmounts ;
-                    $tableDataArr['withhold_payments']=$withholdPayments;
-                    $tableDataArr['payment_amounts'] = $payments;
-                    $tableDataArr['net_payments_after_withhold']=$netPaymentsAfterWithhold;
-                    $tableDataArr['collection_statements']   =Expense::calculateStatement($tableDataArr['monthly_repeating_amounts'], $tableDataArr['total_vat'], $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
-        
-                }
-                /**
-                 * * Expense As Percentage
-                 */
-                /**
-                 * 	$beginning = 0 ;
-                 * $expense
-                 * $vat
-                 * $total due = $begiining + $expense + $vat
-                 * $collection
-                 * $withhold
-                 * $endBalance = $totalDie - $collection - $withhold
-                 * $begiinign = $endBalance
-
-                 */
-                if ($tableId =='expense_as_percentage' && $name) {
-         
-                    $expenseAsPercentageResult = $expenseAsPercentageEquation->calculate($expenseCategoryId, $expenseType, $name, $project->products, $productAllocations, $tableDataArr['start_date'], $loopEndDate, $tableDataArr['monthly_percentage'], $vatRate, $isDeductible, $tableDataArr['withhold_tax_rate']) ;
-                    $expenseAmounts = $expenseAsPercentageResult['expense_amounts'];
-                    
-                    
-                
-                    $tableDataArr['expense_as_percentages']  =$expenseAmounts  ;
-                    // expense_as_percentages
-                    $tableDataArr['total_vat']  =[]  ;
-                    $tableDataArr['total_after_vat']  =$expenseAmounts  ;
-                    $withholdAmounts  = [];
-                    $tableDataArr['payment_amounts'] = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy) ;
-                    $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy) ;
-                    $withholdPayments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $withholdAmounts, $datesAsIndexAndString, $customCollectionPolicy) ;
-                    $netPaymentsAfterWithhold = HArr::subtractAtDates([$payments,$withholdPayments], array_keys($payments));
-                    $tableDataArr['withhold_amounts'] = $withholdAmounts ;
-                    $tableDataArr['withhold_payments']=$withholdPayments;
-                    $tableDataArr['payment_amounts'] = $payments;
-                    $tableDataArr['net_payments_after_withhold']=$netPaymentsAfterWithhold;
-                    $tableDataArr['collection_statements']   =Expense::calculateStatement($tableDataArr['expense_as_percentages'], $tableDataArr['total_vat'], $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
-                }
-                
-                /**
-                 * * One Time Expense
-                */
-                if ($tableId == 'one_time_expense') {
-                    $startDateAsIndex = $tableDataArr['start_date'] ;
-                    $amountBeforeVat = $tableDataArr['amount']??0 ;
-                    $withholdAmount = $tableDataArr['withhold_tax_rate'] / 100 * $amountBeforeVat ;
-                    $oneTimeExpenses = $oneTimeExpenseEquation->calculate($amountBeforeVat, $startDateAsIndex, $isDeductible, $vatRate);
-                    $tableDataArr['payload']  = $oneTimeExpenses ;
-                    $amountBeforeVatPayload = [$startDateAsIndex=>$amountBeforeVat] ;
-                    $vatRate = $tableDataArr['vat_rate'] ??0 ;
-                    $vatRate =  $vatRate / 100 ;
-                    $vats = [$startDateAsIndex=>$amountBeforeVat * $vatRate];
-                    
-                    $tableDataArr['total_vat']  =$vats  ;
-                    $amountAfterVat = [$startDateAsIndex => $amountBeforeVat + $amountBeforeVat * $vatRate ];
-                    $tableDataArr['total_after_vat']  =$amountAfterVat  ;
-					$expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productAllocations,$project->products,$oneTimeExpenses['monthly_one_time']??[]);
-					
-                    $withholdAmount = $tableDataArr['withhold_tax_rate']/100 ;
-                    $withholdAmounts  = [$startDateAsIndex =>  $amountBeforeVat * $withholdAmount ] ;
-                    $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $amountAfterVat, $datesAsIndexAndString, $customCollectionPolicy, true) ;
-                    $withholdPayments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $withholdAmounts, $datesAsIndexAndString, $customCollectionPolicy) ;
-                    $netPaymentsAfterWithhold = HArr::subtractAtDates([$payments,$withholdPayments], array_keys($payments));
-                    $tableDataArr['withhold_amounts'] = $withholdAmounts ;
-                    $tableDataArr['withhold_payments']=$withholdPayments;
-                    $tableDataArr['payment_amounts'] = $payments;
-                    $tableDataArr['net_payments_after_withhold']=$netPaymentsAfterWithhold;
-                    $tableDataArr['collection_statements']   =Expense::calculateStatement($amountBeforeVatPayload, $tableDataArr['total_vat'], $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
-					// $tableDataArr['prepaid_expense_statement'] = Expense::calculatePrepaidExpenseStatement();
-                }
-                $tableDataArr['project_id']  = $project->id ;
+				 $tableDataArr['project_id']  = $project->id ;
                 $tableDataArr['model_id']   = $project->id ;
                 $tableDataArr['model_name']   = $modelName ;
-                //	$tableDataArr['collection_statements'] = [];
-                if ($name) {
-					if($project->expenseHasAllocation($expenseCategoryId)){
-						$expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
-					}
-                    $project->generateRelationDynamically($tableId, $expenseType)->create($tableDataArr);
+				
+				  if ($name) {
+					// if($project->expenseHasAllocation($expenseCategoryId)){
+					// //	$expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
+					// }
+					$tableDataArr['collection_statements'] = [];
+                   $project->generateRelationDynamically($tableId, $expenseType)->create($tableDataArr);
                     
                 }
-                    
+				
                 
             }
             
         }
-        $expenseAllocationFormatted = [];
-        foreach ($expenseAllocations as $expenseType => $arr1) {
-			foreach ($arr1 as $expenseCategoryId => $expenseCategoryNameAndValues) {
-				$hasAllocation = $project->getExpenseCategories()[$expenseCategoryId]['has_allocation'];
-				if($hasAllocation){
-					foreach ($expenseCategoryNameAndValues as $expenseName => $productIdWithPayload) {
-                    foreach ($productIdWithPayload as $productId => $payload) {
-                        $expenseAllocationFormatted[] = [
-                            'expense_type'=>$expenseType,
-                            'expense_category'=>$expenseCategoryId,
-                            'expense_name'=>$expenseName,
-                            'product_id'=>$productId,
-                            'payload'=>json_encode($payload),
-                            'is_expense'=>1,
-                            'project_id'=>$project->id
-                        ];
-                    }
-                }
-				}
-                
-            }
-        }
-        DB::table('product_expense_allocations')->where('is_expense', 1)->where('project_id', $project->id)->delete();
-        DB::table('product_expense_allocations')->insert($expenseAllocationFormatted);
-        $project->recalculateAllProductsOverheadExpenses();
+      
+		
         
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
@@ -423,7 +285,7 @@ class RedirectionController extends Controller
     public function fixedAssetsPost(StoreFixedAssetsRequest $request, Project $project)
     {
         $project->storeRepeaterRelations($request, ['fixedAssets'], ['project_id'=>$project->id]);
-        $project->recalculateFixedAsset();
+        
         
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
@@ -457,7 +319,7 @@ class RedirectionController extends Controller
     ], ['project_id'=>$project->id]);
 	
 	
-		$project->recalculateOpeningBalances();
+		
 	
 		if($request->get('total_liabilities_and_equity_minus_total_assets') != 0){
 			$errorMessage = __('Total Assets Must Be Equal To Total Liabilities + Owners Equity') . ' [ ' . number_format($request->get('total_liabilities_and_equity_minus_total_assets'))  . ' ]';
@@ -476,7 +338,7 @@ class RedirectionController extends Controller
       
         
         
-  
+		$project->recalculateFinancialResult();
         
         
         return view(

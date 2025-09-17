@@ -109,7 +109,7 @@ class ProjectController extends Controller
 			
 			
 			
-			// $project->recalculateVatStatements();
+		
 			
 			if ($request->new_company == 1) {
 				isset($project->openingBalance) ? $project->openingBalance()->delete() : '';

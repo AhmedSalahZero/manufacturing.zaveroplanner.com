@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helpers\HArr;
+use App\Project;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -39,14 +40,16 @@ class TestCommand extends Command
      */
     public function handle()
     {
-		$arr = [
-			4 => 0 ,
-			5=>100,
-			6=>200,
-			7=>300
-		];
+		$project = Project::find(140);
+		dd($project->recalculateManpowers());
+		// $arr = [
+		// 	4 => 0 ,
+		// 	5=>100,
+		// 	6=>200,
+		// 	7=>300
+		// ];
 		
-		$offset = 6 ;
+		// $offset = 6 ;
 		// dd();
 	// 	DB::table('business_sectors')->delete();
     //    foreach(getBusinessSectors() as $sectorName){

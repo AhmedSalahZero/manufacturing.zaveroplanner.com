@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class ExpenseAsPercentageEquation
 {
-	public function calculate(string $expenseCategoryId,string $expenseType,string $expenseName,$products,array $productAllocations,int $startDateAsIndex  , int $loopEndDateAsIndex , float $monthlyPercentage , float $vatRate ,bool $isDeductible , float $withholdTaxRate ):array 
+	public function calculate($products,array $productAllocations,int $startDateAsIndex  , int $loopEndDateAsIndex , float $monthlyPercentage , float $vatRate ,bool $isDeductible , float $withholdTaxRate ):array 
 	{
 			$resultAsDateIndexAndValue = [];
 			$expenseAllocations = [];
