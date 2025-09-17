@@ -52,4 +52,8 @@ class EquityOpeningBalance extends Model
     {
         return $this->retained_earnings ;
     }
+	public function getTotalShareholdersEquity():float
+	{
+		return $this->getRetainedEarningAmount() + $this->getLegalReserveAmount() + $this->getPaidUpCapitalAmount();
+	}
 }

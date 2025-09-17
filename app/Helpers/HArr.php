@@ -117,7 +117,7 @@ class HArr
 		return $finalResult;
 	}
 	
-	public static function MultiplyWithNumber(array $items , float $number)
+	public static function MultiplyWithNumber(array $items , float $number):array
 	{
 		$newItems = [];
 		foreach($items as $key=>$value){

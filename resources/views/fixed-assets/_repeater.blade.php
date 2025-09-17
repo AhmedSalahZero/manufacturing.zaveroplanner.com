@@ -11,7 +11,7 @@ common-parent
         <label class="form-label ">{{ __('Name') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control " name="name" value="{{ isset($fixedAsset) ? $fixedAsset->getName() : old('name') }}">
+                <input type="text" class="form-control "  required name="name" value="{{ isset($fixedAsset) ? $fixedAsset->getName() : old('name') }}">
             </div>
         </div>
     </div>
@@ -20,7 +20,7 @@ common-parent
         <label class="form-label ">{{ __('Count') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="number" class="form-control number_field_1 only-greater-than-or-equal-zero-allowed " name="counts" value="{{ isset($fixedAsset) ? $fixedAsset->getCounts() : old('counts') }}" step="1">
+                <input type="text" class="form-control number_field_1 only-greater-than-or-equal-zero-allowed " name="counts" value="{{ isset($fixedAsset) ? $fixedAsset->getCounts() : old('counts') }}" step="1">
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@ common-parent
         <label class="form-label "> {!! __('Administration <br> Depreciation %') !!} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="number" class="form-control only-greater-than-or-equal-zero-allowed " name="admin_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getAdminDepreciationPercentage() : old('admin_depreciation_percentage',0) }}" step="0.5">
+                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed " name="admin_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getAdminDepreciationPercentage() : old('admin_depreciation_percentage',0) }}" step="0.5">
             </div>
         </div>
     </div>
@@ -93,7 +93,7 @@ common-parent
         <label class="form-label ">{!! __('Manufacturing <br> Depreciation %') !!} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="number" class="form-control  only-greater-than-or-equal-zero-allowed " name="manufacturing_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getManufacturingDepreciationPercentage() : old('manufacturing_depreciation_percentage',0) }}" step="0.5">
+                <input type="text" class="form-control  only-greater-than-or-equal-zero-allowed " name="manufacturing_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getManufacturingDepreciationPercentage() : old('manufacturing_depreciation_percentage',0) }}" step="0.5">
             </div>
         </div>
     </div>

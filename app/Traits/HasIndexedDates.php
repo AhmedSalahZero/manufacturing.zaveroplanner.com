@@ -563,7 +563,6 @@ trait HasIndexedDates
 	 */
 	 public function getOperationDatesAsDateAndDateAsIndex()
     {
-        
 		$operationsYearAndItsMonths = $this->getOperationDurationPerYearFromIndexesForAllStudyInfo();
 		$result =[];
 		foreach($operationsYearAndItsMonths as $yearAsIndex => $itsMonths){

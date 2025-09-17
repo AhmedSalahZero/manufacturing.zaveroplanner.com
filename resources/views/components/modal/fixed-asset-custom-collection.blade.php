@@ -150,7 +150,7 @@
                         <label class="form-label">{{ __('Installment Count') }} </label>
                         <div class="kt-input-icon">
                             <div class="input-group">
-                                <input type="numeric" step="any" class="form-control only-greater-than-zero-allowed" name="installment_count" value="{{ isset($subModel) ? $subModel->getInstallmentCount() : 1 }}">
+                                <input type="text"  class="form-control only-greater-than-zero-allowed" name="installment_count" value="{{ isset($subModel) ? $subModel->getInstallmentCount() : 1 }}">
                             </div>
                         </div>
                     </div>

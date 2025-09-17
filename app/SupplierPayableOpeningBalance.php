@@ -30,8 +30,10 @@ class SupplierPayableOpeningBalance extends Model
         static::saving(function (self $model) {
             $openingBalance = $model->{self::getOpeningBalanceColumnName()};
             $statementPayload = $model->{self::getPayloadStatementColumn()};
-            $dateIndexWithDate = $model->project->getDateIndexWithDatE();
-            $model->statement = self::calculateSettlementStatement($statementPayload, [], $openingBalance, $dateIndexWithDate);
+            $dateIndexWithDate = $model->project->getDateIndexWithDate();
+					$extendedStudyEndDate = $model->project->convertDateStringToDateIndex($model->project->getEndDate()) ;
+				$dates = range(0,$extendedStudyEndDate);
+            $model->statement = self::calculateSettlementStatement($dates,$statementPayload, [], $openingBalance, $dateIndexWithDate);
         });
     }
     public function project():BelongsTo

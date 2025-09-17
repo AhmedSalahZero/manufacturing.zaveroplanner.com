@@ -4,7 +4,6 @@ $(document).on('change', '.percentage_field,.number_field', function () {
 	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
 	const number = number_unformat($(parent).find('.number_field' + appendColumnIndex).val())
 	const percentage = number_unformat($(parent).find('.percentage_field' + appendColumnIndex).val())
-	console.log(number,percentage);
 	const result = number * percentage / 100
 	$(parent).find('.number_multiple_percentage' + appendColumnIndex).val(result).trigger('change')
 })
@@ -93,7 +92,6 @@ $(document).on('change', '.number_growth_amount', function (event) {
 
 $(document).on('change', '.growth_percentage_in_diff_parent', function (event) {
 
-	console.log($('.parent-for-salary-amount .number_growth_amount_in_diff_parent').length)
 	$('.parent-for-salary-amount .number_growth_amount_in_diff_parent').each(function (index, input) {
 		$(input).trigger('change')
 	})
@@ -105,7 +103,6 @@ $(document).on('change', '.number_growth_amount_in_diff_parent', function (event
 	let previousParent = parent.prev('.closest-parent').val()
 
 	let percentage = $('.growth_percentage_in_diff_parent').val()
-	console.log(previousParent)
 	percentage = percentage ? percentage : 0
 	if (previousParent) {
 		let previousAmount = previousParent.find('.number_growth_amount').val()
@@ -152,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				allRows.slice(currentRowIndex + 1).forEach(row => {
 
 					let targetInput = row.querySelector(`input[name*="${suffix}"]`)
-					console.log(row, suffix, targetInput)
 					if (targetInput) {
 						targetInput.value = valueToCopy
 						targetInput.dispatchEvent(new Event('input', { bubbles: true }))
@@ -176,10 +172,8 @@ $(document).ready(function () {
 
 		// Find the closest row (.closest-parent)
 		var currentRow = $(this).closest('.closest-parent')
-		console.log(this, currentRow)
 		// Find all inputs in the same row, excluding the source input
 		var targetInputs = currentRow.find('input').not(sourceInput)
-		console.log(targetInputs)
 		// Copy the value to all other inputs in the row
 		targetInputs.each(function () {
 			$(this).val(valueToCopy)
@@ -195,7 +189,6 @@ $(document).on('click', '.toggle-show-hide', function () {
 document.querySelectorAll('[data-is-ck-editor]').forEach(function (textArea) {
 
 	CKEDITOR.ClassicEditor.create(textArea, {
-		// https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/toolbar/toolbar.html#extended-toolbar-configuration-format
 		toolbar: {
 			items: [
 
@@ -212,8 +205,7 @@ document.querySelectorAll('[data-is-ck-editor]').forEach(function (textArea) {
 				'link', 'uploadImage', 'blockQuote', 'insertTable', 'mediaEmbed', 'codeBlock', 'htmlEmbed', '|',
 				'specialCharacters', 'horizontalLine', 'pageBreak', '|',
 				'textPartLanguage', '|',
-				'sourceEditing', '|',
-				'fullscreen' // full screen button added here
+				'sourceEditing', '|'
 
 			],
 			shouldNotGroupWhenFull: true
@@ -744,7 +736,6 @@ $(document).on('change', 'select.department-class', function () {
 			for (var positionId in positionArr) {
 				positionId = positionId
 				var selected = currentSelected.includes(positionId)
-				console.log(currentSelected, positionId, selected, '--')
 				options += `<option ${selected ? 'selected' : ''} value="${positionId}">${positionArr[positionId]}</option>`
 			}
 			if (positionRow != '[]') {
@@ -774,7 +765,6 @@ $(document).ready(function () {
 		const table = $('#fixedAssets_repeater')
 		const isReadonly = table.hasClass('readonly')
 
-		// console.log('save form',saveForm);
 
 		if (isReadonly) {
 			table.removeClass('readonly').addClass('editable')
@@ -938,7 +928,6 @@ if (btn2) {
 
 $(document).on('change', '.fg-beginning-inventory-original-value-class', function () {
 	const value = number_unformat($(this).val())
-	console.log(value)
 	$('.fg-beginning-inventory-value-class').val(value).trigger('change')
 })
 function replaceRepeaterIndex(element) {

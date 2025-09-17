@@ -559,7 +559,6 @@
         var chartData = @json($barChart);
 
         var data = chartData;
-        console.log(chartData)
 
 
 

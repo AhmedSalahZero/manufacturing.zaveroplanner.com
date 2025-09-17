@@ -80,7 +80,7 @@ trait HasCollectionOrPaymentStatement {
 	
 	
 	
-	 public static function calculateSettlementStatement(array $settlements ,array $additions = [] , float $initialBeginningBalance = 0 , array $dateIndexWithDate , bool $notUpdateBeginning =false)
+	 public static function calculateSettlementStatement(array $dates,array $settlements ,array $additions = [] , float $initialBeginningBalance = 0 , array $dateIndexWithDate , bool $notUpdateBeginning =false , $debug = false )
     {
 		$financialYearStartMonth = 'january';
         $withholdForIntervals = [
@@ -99,14 +99,12 @@ trait HasCollectionOrPaymentStatement {
         $result = [];
         foreach (getIntervalFormatted() as $intervalName=>$intervalNameFormatted) {
             $beginningBalance = $initialBeginningBalance;
-            foreach ($settlementsForInterval[$intervalName] as $dateIndex=>$settlementAtDate) {
-                $dateIndex;
+            foreach ($dates as $dateIndex) {
+				$settlementAtDate = $settlementsForInterval[$intervalName][$dateIndex]??0;
                 $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
 				$addition = $withholdForIntervals[$intervalName][$dateIndex]??0;
                 $totalDue[$dateIndex] =  $addition+$beginningBalance;
-       //         $settlementAtDate = $settlementsForInterval[$intervalName][$dateIndex]??0 ;
                 $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
-	
                 $beginningBalance = $notUpdateBeginning ? $beginningBalance :  $endBalance[$dateIndex] ;
                 $result[$intervalName]['addition'][$dateIndex] =  $addition ;
                 $result[$intervalName]['total_due'][$dateIndex] = $totalDue[$dateIndex];
@@ -114,7 +112,9 @@ trait HasCollectionOrPaymentStatement {
                 $result[$intervalName]['end_balance'][$dateIndex] =$endBalance[$dateIndex];
             }
         }
-	
+		if($debug){
+			dd('lol',$result);
+		}
         return $result;
     
         

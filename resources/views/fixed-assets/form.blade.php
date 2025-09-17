@@ -64,11 +64,25 @@
     
 	 $(document).ready(function() {
         var selector = "#fixedAssets_repeater";
+		
         $(selector).repeater({
             initEmpty: false
             , defaultValues: {
                 'category_id': 'manufacturing-expenses'
                 , 'payment_terms': 'cash',
+                'counts': 1,
+				'grace_period':0,
+				'manufacturing_depreciation_percentage':0,
+				'manufacturing_depreciation_percentage':0,
+				'admin_depreciation_percentage':0,
+				'reservation_rate':0,
+				'contractual_rate':0,
+				'after_months':0,
+				'installment_grace_period':0,
+				'installment_count':1,
+				'payment_installment_interval':'monthly',
+			
+		
 				'equity_funding_rate':0,
 				'replacement_cost_rate':1,
 				'depreciation_duration':5,
@@ -83,7 +97,7 @@
 				$('.js-select2-with-one-selection').select2({});
 				$('.hundred-minus-number').trigger('change')
 				recalculateAllocations(this);
-				// $('.hundred-minus-number').trigger('change')
+				
             }
             , ready: function(setIndexes) {
 					

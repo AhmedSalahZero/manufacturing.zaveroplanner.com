@@ -375,6 +375,7 @@ class Project extends Model
 			// }
             $adminDepreciationPercentage = $fixedAsset->getAdminDepreciationPercentage() /100;
             $manufacturingDepreciationPercentage = $fixedAsset->getManufacturingDepreciationPercentage() /100;
+			
             $manufacturingDepreciations = [];
             $adminDepreciations = [];
             foreach ($totalMonthlyDepreciation as $dateAsIndex => $monthDepreciationValue) {
@@ -608,46 +609,64 @@ class Project extends Model
 		    $datesAsStringAndIndex = $this->getDateWithDateIndex();
         $operationStartDateFormatted = $this->getOperationStartDateFormatted();
 		$operationStartDateAsIndex = $this->getOperationStartDateAsIndex($datesAsStringAndIndex,$operationStartDateFormatted);
-	
+
         $operationDates  = array_values($this->getOperationDatesAsDateAndDateAsIndex());
         DB::table('product_expense_allocations')->where('is_opening_depreciation', 1)->where('project_id', $this->id)->delete();
-        $productExpensesForAllFixedAssets = [];
+    //    $productExpensesForAllFixedAssets = [];
+		           $productExpenses = [];
         foreach ($fixedAssetOpeningBalances as $fixedAssetOpeningBalance) {
+			$dateIndexWithMonthlyDepreciation =[];
             $openingId  = $fixedAssetOpeningBalance->id ;
             $monthlyDepreciation = $fixedAssetOpeningBalance->getMonthlyDepreciation();
             $allocationPercentage = $fixedAssetOpeningBalance->getProductAllocations();
             $monthlyCount = $fixedAssetOpeningBalance->getMonthlyCounts();
-            for ($i = $operationStartDateAsIndex ; $i<= $monthlyCount ; $i++) {
+			
+            for ($i = $operationStartDateAsIndex ; $i< $operationStartDateAsIndex+$monthlyCount ; $i++) {
                 $currentDateAsIndex = $operationDates[$i]??null;
                 if (!is_null($currentDateAsIndex)) {
-                    $result[$openingId][$currentDateAsIndex] = $monthlyDepreciation  ;
+                    $dateIndexWithMonthlyDepreciation[$currentDateAsIndex] = $monthlyDepreciation  ;
                 }
             }
+			// if($fixedAssetOpeningBalance -> id == 11){
+			// 	dd($result,$operationStartDateAsIndex,$monthlyCount);
+			// }
+			
             $adminDepreciationPercentage = $fixedAssetOpeningBalance->getAdminDepreciationPercentage();
             $manufacturingDepreciationPercentage = $fixedAssetOpeningBalance->getManufacturingDepreciationPercentage();
             $adminAllocationPercentages = [];
             $manufacturingAllocationPercentages = [];
-            foreach ($result as $openingId => $dateIndexWithMonthlyDepreciation) {
-                $adminAllocationPercentages[$openingId]=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $adminDepreciationPercentage/100);
-                $manufacturingAllocationPercentages[$openingId]=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $manufacturingDepreciationPercentage/100);
-            }
-            $productExpenses = [];
-            foreach ($manufacturingAllocationPercentages as $openingId => $dateAsIndexAndValue) {
+           
+                $adminAllocationPercentages=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $adminDepreciationPercentage/100);
+                $manufacturingAllocationPercentages=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $manufacturingDepreciationPercentage/100);
+				// if($openingId == 8){
+				// 	dd($manufacturingAllocationPercentages);
+				// }
+           
+ 
+			// if(count($manufacturingAllocationPercentages)){
+			// 	dd($manufacturingAllocationPercentages);
+			// }
+            // foreach ($manufacturingAllocationPercentages as $dateAsIndexAndValue) {
+				// dd($manufacturingAllocationPercentages);
+				// dd($allocationPercentage);
                 foreach ($allocationPercentage as $productId => $percentage) {
-                    foreach ($dateAsIndexAndValue as $dateIndex => $value) {
+					
+                    foreach ($manufacturingAllocationPercentages as $dateIndex => $value) {
                         $productExpenses[$openingId][$productId][$dateIndex] = $value  * ($percentage/100);
                     }
                 }
-            }
+            // }
             
         }
         $finalResult =[];
-        foreach ($productExpenses as $fixedAssetOpeningBalanceId => $hisProductAllocations) {
+        foreach ($productExpenses as  $fixedAssetOpeningBalanceId => $hisProductAllocations) {
             $fixedAssetOpeningBalance  = FixedAssetOpeningBalance::find($fixedAssetOpeningBalanceId);
             $adminDepreciation = $adminAllocationPercentages[$fixedAssetOpeningBalanceId]??[];
             $manufacturingDepreciation = $manufacturingAllocationPercentages[$fixedAssetOpeningBalanceId]??[] ;
-        
+		
+		
             $monthlyAccumulatedDepreciations = HArr::sumAtDates([$adminDepreciation,$manufacturingDepreciation]) ;
+			
             $monthlyAccumulatedDepreciations[0] = ($monthlyAccumulatedDepreciations[0]??0) +  $fixedAssetOpeningBalance->getAccumulatedDepreciation();
             $monthlyAccumulatedDepreciations = HArr::accumulateArray($monthlyAccumulatedDepreciations);
             $fixedAssetOpeningBalance->update([
@@ -925,8 +944,10 @@ class Project extends Model
         $tableDataFormatted[$salesOrderIndex]['main_items']['sganda']['options'] = array_merge([
            'title'=>__('Sales, Marketing & General Exp.')
         ], $defaultNumericInputClasses);
+		$isNewCompany = $this->isNewCompany();
+		$additionalExpensesArr = $isNewCompany ?  [ ] : ['start-up-expenses','pre-operating-expenses'];
         // dd(DB::table('expenses')->whereNotIn('category_id', ['general-expenses','sales','marketing','start-up-expenses',''])->get());
-        $expenses = DB::table('expenses')->whereIn('category_id', ['general-expenses','sales','marketing','start-up-expenses','pre-operating-expenses'])->where('project_id', $project->id)->get();
+        $expenses = DB::table('expenses')->whereIn('category_id', array_merge(['general-expenses','sales','marketing'],$additionalExpensesArr) )->where('project_id', $project->id)->get();
         $columnName = [
             'expense_as_percentage'=>'expense_as_percentages',
             'fixed_monthly_repeating_amount'=>'monthly_repeating_amounts',
@@ -978,11 +999,12 @@ class Project extends Model
         $tableDataFormatted[$salesOrderIndex]['main_items']['revenues-percentage']['options'] = array_merge([
             'title'=>__('%/Revenues')
         ], $defaultPercentageInputClasses);
-        foreach (['sales'=>__('Sales Expenses') , 'marketing'=>__('Marketing Expenses') , 'general-expenses'=>__('General Expenses')
-			,'start-up-expenses'=>__('Start Up Cost'),
-		'pre-operating-expenses'=>__('Pre-Operating Expenses')
-			
-			] as $id => $title) {
+		
+		$additionalTypes = $isNewCompany ? []  : ['start-up-expenses'=>__('Start Up Cost'),
+		'pre-operating-expenses'=>__('Pre-Operating Expenses')];
+		
+        foreach ( array_merge(['sales'=>__('Sales Expenses') , 'marketing'=>__('Marketing Expenses') , 'general-expenses'=>__('General Expenses')
+		],$additionalTypes) as $id => $title) {
         //    $orderId = $orderIndexPerExpenseCategory[$id];
             $tableDataFormatted[$salesOrderIndex]['sub_items'][$id]['options'] =array_merge([
                 'title'=>$title,
@@ -1730,6 +1752,8 @@ class Project extends Model
             $fixedAssetBalanceEndBalance= ((array)((array)json_decode($fixedAssetBalanceEndBalance))['end_balance']??[]);
             $totalFixedAsset = HArr::sumAtDates([$totalFixedAsset,$fixedAssetBalanceEndBalance], $sumKeys);
         }
+		// dd($totalFixedAssetOpening , $totalFixedAsset);
+		// dd($totalFixedAssetOpening,$totalFixedAsset);
         $netFixedAsset =  HArr::sumAtDates([$totalFixedAssetOpening,$totalFixedAsset], $sumKeys) ;
         $currentDataArr =$netFixedAsset;
         $title = __('Net Fixed Asset');
@@ -2754,14 +2778,10 @@ class Project extends Model
 		$currentLiabilities = $balanceSheet ? (array)$balanceSheet->total_current_liabilities : [];
 		$cashAndBanks = $balanceSheet ? (array)$balanceSheet->cash_and_banks : [];
 		$customerReceivables = $balanceSheet ? (array)$balanceSheet->customer_receivables : [];
-		
 		$currentRatio = HArr::divideTwoArrAtSameIndex($currentAssets,$currentLiabilities);
 		$quickAssets = HArr::sumAtDates([$cashAndBanks,$customerReceivables]);
 		$quickRatio =HArr::divideTwoArrAtSameIndex($quickAssets,$currentLiabilities);
-		
-		
 		$cashRatio =HArr::divideTwoArrAtSameIndex($cashAndBanks,$currentLiabilities);
-	//	 $studyYears = range(0, $this->duration-1);
 		$workingCapital =HArr::subtractAtDates([$currentAssets,$currentLiabilities]);
 		$liquidityRatio = [
 			'current-ratio'=>[

@@ -32,8 +32,14 @@ class FixedAssetOpeningBalance extends Model
 			static::saving(function(self $model){
 				$statementPayload = $model->{self::getPayloadStatementColumn()} ?: [];
 				$openingBalance = $model->{self::getOpeningBalanceColumnName()};
-				$dateIndexWithDate = $model->project->getDateIndexWithDatE();
-				$model->statement = self::calculateSettlementStatement($statementPayload,[],$openingBalance,$dateIndexWithDate,true);
+				$dateIndexWithDate = $model->project->getDateIndexWithDate();
+				$extendedStudyEndDate = $model->project->convertDateStringToDateIndex($model->project->getEndDate()) ;
+				$dates = range(0,$extendedStudyEndDate);
+				$debug = false ;
+				if($model->id == 8){
+					$debug=true;
+				}
+				$model->statement = self::calculateSettlementStatement($dates,$statementPayload,[],$openingBalance,$dateIndexWithDate,true,$debug);
 			});
 	}
 	

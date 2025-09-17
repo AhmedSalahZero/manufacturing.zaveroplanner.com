@@ -111,8 +111,8 @@ Route::group(
                     Route::get('/expenses', 'RedirectionController@expensesGet')->name('expenses.form');
                     Route::post('/expenses', 'RedirectionController@expensesPost')->name('expenses.submit');
 					 # Fixed Assets
-					 Route::get('/fixed-assets', 'RedirectionController@assetsGet')->name('assets.form');
-					 Route::post('/fixed-assets', 'RedirectionController@assetsPost')->name('assets.submit');
+					 Route::get('/fixed-assets', 'RedirectionController@fixedAssetsGet')->name('fixed.assets.form');
+					 Route::post('/fixed-assets', 'RedirectionController@fixedAssetsPost')->name('assets.submit');
 					 
 					          # Opening Balances
                     Route::get('/opening-balances', 'RedirectionController@openingBalancesGet')->name('openingBalances.form');
@@ -125,9 +125,7 @@ Route::group(
 					 route::get('dashboard','DashboardController@view')->name('view.results.dashboard');
 					 route::post('dashboard','DashboardController@submit')->name('submit.results.dashboard');
 					 route::get('dashboard-with-sensitivity','DashboardController@view')->name('view.results.dashboard.with.sensitivity');
-						 
-                    // Route::get('/assets', 'RedirectionController@assetsGet')->name('assets.form');
-                    // Route::post('/assets', 'RedirectionController@assetsPost')->name('assets.submit');
+	
            
                     # Man Power
                     Route::get('/manPower', 'RedirectionController@manPowerGet')->name('manPower.form');

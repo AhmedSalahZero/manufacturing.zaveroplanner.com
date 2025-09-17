@@ -31,7 +31,9 @@ class LongTermLoanOpeningBalance extends Model
             $statementPayload = $model->{self::getPayloadStatementColumn()};
             $dateIndexWithDate = $model->project->getDateIndexWithDate();
 			if(!is_null($openingBalance)){
-				$model->statement = self::calculateSettlementStatement($statementPayload, [], $openingBalance, $dateIndexWithDate);
+				$extendedStudyEndDate = $model->project->convertDateStringToDateIndex($model->project->getEndDate()) ;
+				$dates = range(0,$extendedStudyEndDate);
+				$model->statement = self::calculateSettlementStatement($dates,$statementPayload, [], $openingBalance, $dateIndexWithDate);
 			}
         });
     }

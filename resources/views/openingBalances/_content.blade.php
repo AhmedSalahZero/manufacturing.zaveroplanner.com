@@ -670,7 +670,7 @@
                             </div>
 							 <div class="col-2">
                                 <label>{{ __('Total Shareholders Equity') }}</label>
-                                <input readonly type="text"  data-number-format="0" class="form-control readonly sum-three-column-result" value="{{ $model ? $model->getRetainedEarningAmount() : 0 }}">
+                                <input readonly type="text"  data-number-format="0" class="form-control readonly sum-three-column-result" value="{{ $model ? $model->getTotalShareholdersEquity() : 0 }}">
                             </div>
 
                         </div>

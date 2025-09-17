@@ -121,7 +121,7 @@
                 $asset_complete =(isset($assets)&&($assets->fixed_assets_value > 0 && $assets->fixed_assets_value !== null && (( $assets->down_payment  + $assets->balance_rate) != 100)||
                 ($assets->fixed_assets_value_two > 0 && $assets->fixed_assets_value_two !== null && (( $assets->down_payment_two  + $assets->balance_rate_two) != 100)))) ?0:1;
             ?>
-            <a  @if($project_complete == 0 ) data-toggle="modal" data-target="#exampleModal"  @else href="{{route('assets.form', $project->id)}}" @endif>
+            <a  @if($project_complete == 0 ) data-toggle="modal" data-target="#exampleModal"  @else href="{{route('fixed.assets.form', $project->id)}}" @endif>
                 <div class="projectItem {{$project_complete == 0  ? "disabled-class" : ""}}" >
                     {{__("Assets Plan")}}  {{ $asset_complete == 0  ?  " - ". __('Incomplete') : "" }}
                 </div>

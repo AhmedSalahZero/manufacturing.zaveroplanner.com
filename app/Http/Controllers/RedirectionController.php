@@ -406,11 +406,11 @@ class RedirectionController extends Controller
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
         }
-        return redirect()->route('assets.form', $project->id);
+        return redirect()->route('fixed.assets.form', $project->id);
     }
 
     /**************** Assets **********************/
-    public function assetsGet(Project $project)
+    public function fixedAssetsGet(Project $project)
     {
       
 
@@ -418,10 +418,9 @@ class RedirectionController extends Controller
             'fixed-assets.form',
             $project->getFixedAssetsViewVars()
         );
-        // return view('assets.form',compact('assets','project','step_data','years'));
     }
 
-    public function assetsPost(StoreFixedAssetsRequest $request, Project $project)
+    public function fixedAssetsPost(StoreFixedAssetsRequest $request, Project $project)
     {
         $project->storeRepeaterRelations($request, ['fixedAssets'], ['project_id'=>$project->id]);
         $project->recalculateFixedAsset();
@@ -449,7 +448,6 @@ class RedirectionController extends Controller
             'openingBalances.form',
             $project->getOpeningBalancesViewVars()
         );
-        // return view('assets.form',compact('assets','project','step_data','years'));
     }
 
     public function openingBalancesPost(StoreOpeningBalancesRequest $request, Project $project)
@@ -496,7 +494,6 @@ class RedirectionController extends Controller
             'financial-results.index',
 			$project->getCashInOutFlowViewVars()
         );
-        // return view('assets.form',compact('assets','project','step_data','years'));
     } 
 	public function balanceSheetGet(Project $project)
     {
@@ -505,7 +502,6 @@ class RedirectionController extends Controller
             'financial-results.index',
 			$project->getBalanceSheetViewVars()
         );
-        // return view('assets.form',compact('assets','project','step_data','years'));
     }
 
     

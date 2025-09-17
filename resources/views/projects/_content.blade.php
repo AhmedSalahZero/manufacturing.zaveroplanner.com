@@ -522,7 +522,6 @@
             , dataType: 'json'
             , accepts: 'application/json'
         }).done(function(data) {
-            console.log(data);
             if (view_input != null) {
                 $('#' + view_input).val(data.view_date);
                 $('#full_end_date').val(data.end_date);

@@ -29,7 +29,9 @@ class OtherLongTermLiabilitiesOpeningBalance extends Model
             $openingBalance = $model->{self::getOpeningBalanceColumnName()};
             $statementPayload = $model->{self::getPayloadStatementColumn()};
             $dateIndexWithDate = $model->project->getDateIndexWithDatE();
-            $model->statement = self::calculateSettlementStatement($statementPayload, [], $openingBalance, $dateIndexWithDate);
+				$extendedStudyEndDate = $model->project->convertDateStringToDateIndex($model->project->getEndDate()) ;
+				$dates = range(0,$extendedStudyEndDate);
+            $model->statement = self::calculateSettlementStatement($dates,$statementPayload, [], $openingBalance, $dateIndexWithDate);
         });
     }
 	
