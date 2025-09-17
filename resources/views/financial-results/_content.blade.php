@@ -15,7 +15,7 @@
                     <x-tables.repeater-table :tableClasses="'table-condensed table-row-spacing income-class-table'" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden scrollable-table'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="'food'" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
                         <x-slot name="ths">
                             <x-tables.repeater-table-th :subParentClass="'plus-max-width-class'" class="  header-border-down plus-max-width-class" :title="__('+/-')"></x-tables.repeater-table-th>
-                            <x-tables.repeater-table-th :subParentClass="'name-max-width-class'" class="  header-border-down name-max-width-class" :title="__('Name')"></x-tables.repeater-table-th>
+                            <x-tables.repeater-table-th :subParentClass="'name-max-width-class'" class="  header-border-down name-max-width-class exclude-from-collapse" :title="__('Name')"></x-tables.repeater-table-th>
                             {{-- <x-tables.repeater-table-th class=" interval-class header-border-down " :title="__('')"></x-tables.repeater-table-th> --}}
                             @foreach($studyMonthsForViews as $dateAsIndex=>$dateAsString)
                             @php
@@ -59,9 +59,9 @@
                                         @endphp
                                         @foreach($currentTableData['main_items'] as $mainItemId => $mainItemArr)
                                         <div class="input-hidden-parent">
-                                            <input readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control text-left copy-value-to-his-input-hidden 
+                                            <input readonly data-number-of-decimals="0" onchange="this.style.width = ((this.value.length + 1) * 10) + 'px';" class="form-control exclude-from-collapse text-left copy-value-to-his-input-hidden 
 
-						 						  			  repeat-to-right-input-formatted  custom-input-string-width input-text-left  text-left" type="text" value="{{ $mainItemArr['options']['title']??$mainItemId }}" data-column-index="-1">
+						 						  			  repeat-to-right-input-formatted  exclude-from-collapse custom-input-string-width input-text-left  text-left" type="text" value="{{ $mainItemArr['options']['title']??$mainItemId }}" data-column-index="-1">
                                         </div>
                                         @php
                                         $currentIndex++;
