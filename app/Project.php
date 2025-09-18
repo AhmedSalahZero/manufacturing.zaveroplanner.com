@@ -1598,7 +1598,7 @@ class Project extends Model
 		$netCashBeforeWorkingCapitalPerYear = HArr::subtractAtDates([$totalCashInAndCashAndBankPerYear,$totalCashOutFlowPerYear]);
 		$tableDataFormatted[2]['main_items']['net-cash-before-working-capital']['year_total'] =  $netCashBeforeWorkingCapitalPerYear;
 				
-		$tableDataFormatted[4]['main_items']['cash-and-bank-end-balance']['year_total'] =  HArr::subtractAtDates([$netCashBeforeWorkingCapitalPerYear,$totalWorkingCapitalInjectionPerYear]);
+		$tableDataFormatted[4]['main_items']['cash-and-bank-end-balance']['year_total'] =  HArr::sumAtDates([$netCashBeforeWorkingCapitalPerYear,$totalWorkingCapitalInjectionPerYear]);
 
         $statementData = [
             'cash_end_balance'=>$cashEndBalance,
