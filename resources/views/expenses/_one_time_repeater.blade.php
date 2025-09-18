@@ -6,7 +6,7 @@
 common-parent
  ">
     <div class="col-md-2 pr-2 pl-4">
-        <label class="form-label ">{{ __('Expense Category') }} </label>
+        <label class="form-label `">{{ __('Expense Category') }} </label>
         <select name="category_id" class="form-control expense-category-class">
             @foreach( $project->getExpenseCategories() as $id => $expenseCategoryOptionArr)
             @php
@@ -19,7 +19,7 @@ common-parent
     </div>
     <input type="hidden" name="id" value="{{ isset($expense) ? $expense->id:0 }}">
     <div class="col-md-2 pr-2 pl-2">
-        <label class="form-label ">{{ __('Expense Name') }} </label>
+        <label class="form-label `">{{ __('Expense Name') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
                 <input type="text" class="form-control " name="name" value="{{ isset($expense) ? $expense->getName() : old('name') }}">
@@ -28,7 +28,7 @@ common-parent
     </div>
 
     <div class="col-md-1 pr-2 pl-2">
-        <label class="form-label ">{{ __('Amount') }} </label>
+        <label class="form-label `">{{ __('Amount') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
                 <input type="number" class="form-control only-greater-than-or-equal-zero-allowed " name="amount" value="{{ isset($expense) ? $expense->getAmount() : old('amount') }}" step="0.5">
@@ -37,7 +37,7 @@ common-parent
     </div>
 
     <div class="max-w-15 pr-2 pl-2">
-        <label class="form-label ">{{ __('Start Date') }} </label>
+        <label class="form-label `">{{ __('Start Date') }} </label>
 
         @include('components.calendar-month-year',[
         'name'=>'start_date',
@@ -52,7 +52,7 @@ common-parent
 </div>
 
 {{-- <div class="max-w-15 pr-2 pl-2">
-    <label class="form-label ">{{ __('End Date') }} </label>
+    <label class="form-label `">{{ __('End Date') }} </label>
     @include('components.calendar-month-year',[
     'name'=>'end_date',
     'value'=>$expense ? $expense->getEndDateYearAndMonth() : now()->format('Y-m')
@@ -62,14 +62,14 @@ common-parent
 
 
 <div class="max-w-15 pr-2 pl-2 closest-parent">
-    <label class="form-label ">{{ __('Payment') }} </label>
+    <label class="form-label `">{{ __('Payment') }} </label>
     <x-form.select :selectedValue="isset($expense) ? $expense->getPaymentTerm() : 'cash'" :options="getPaymentTerms()" :add-new="false" class="select2-select repeater-select payment_terms " :all="false" name="payment_terms"></x-form.select>
     <x-modal.custom-collection :title="__('Custom Payment')" :subModel="isset($expense) ? $expense : null "></x-modal.custom-collection>
 
 </div>
 
 <div class="col-md-1 pr-2 pl-2 allocate-parent">
-    <label class="form-label  ">{{ __('Allocate') }} </label>
+    <label class="form-label  `">{{ __('Allocate') }} </label>
     <div class="kt-input-icon ">
         <div class="input-group ">
             <button class="btn btn-primary btn-md allocate-parent-trigger text-nowrap w-full" type="button" data-toggle="modal" data-target="#modal-allocate-{{ $repeaterId }}">{{ __('Allocate') }}</button>
@@ -104,12 +104,12 @@ common-parent
                                         <div class="col-9 text-left">
                                             <label>{{ __('Product') }}</label>
                                             <input readonly class="form-control" type="text" value="{{ $product->getName() }}">
-                                            <input multiple class="form-control" name="product_id" type="hidden" value="{{ $product->id }}">
+                                            <input multiple class="form-control product-id-class" data-product-id="{{ $product->id }}" name="product_id" type="hidden" value="{{ $product->id }}">
 
                                         </div>
                                         <div class="col-3 text-left">
                                             <label>{{ __('Perc.%') }}</label>
-                                            <input multiple class="form-control total_input input-border" name="percentage" value="{{ $percentage }}">
+                                            <input multiple class="form-control   percentage-depreciation total_input input-border" name="percentage" value="{{ $percentage }}">
                                         </div>
 
 

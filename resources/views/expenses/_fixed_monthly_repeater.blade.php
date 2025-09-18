@@ -118,12 +118,12 @@ common-parent
                                         <div class="col-9 text-left">
                                             <label>{{ __('Product') }}</label>
                                             <input readonly class="form-control" type="text" value="{{ $product->getName() }}">
-                                            <input multiple class="form-control" name="product_id" type="hidden" value="{{ $product->id }}">
+                                            <input multiple class="form-control product-id-class"  data-product-id="{{ $product->id }}" name="product_id" type="hidden" value="{{ $product->id }}">
 
                                         </div>
                                         <div class="col-3 text-left">
                                             <label>{{ __('Perc.%') }}</label>
-                                            <input multiple class="form-control total_input input-border" name="percentage" value="{{ $percentage }}">
+                                            <input multiple class="form-control percentage-depreciation total_input input-border" name="percentage" value="{{ $percentage }}">
                                         </div>
 
 
