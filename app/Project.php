@@ -510,7 +510,6 @@ class Project extends Model
                     $totalAvailableValueAtCurrentDateIndex = $fgStatementValues[$productId][$inventoryItemType]['total_available_manufacturing_expenses'][$dateAsIndex];
                     $fgStatementValues[$productId][$inventoryItemType]['addition_manufacturing_expenses'][$dateAsIndex] = $currentManufacturingExpenseVal;
                     $totalAvailableQuantityAtDate  = $totalAvailableQuantity[$dateAsIndex] ??0 ;
-                    
                     $fgStatementValues[$productId][$inventoryItemType]['manufacturing_expenses_per_unit'][$dateAsIndex] =$totalAvailableQuantityAtDate ?  $totalAvailableValueAtCurrentDateIndex /$totalAvailableQuantityAtDate: 0 ;
                     $manufacturingExpensesPerUnit = $fgStatementValues[$productId][$inventoryItemType]['manufacturing_expenses_per_unit'][$dateAsIndex];
                     $salesQuantityAtCurrentDate = $salesQuantity[$dateAsIndex] ?? 0 ;
@@ -532,7 +531,6 @@ class Project extends Model
                 // $currentManufacturingExpenseArr = HArr::sumWithNumber($currentManufacturingExpenseArr,$fgBeginningInventoryBreakdownValue);
                 
             }
-            
             $product->update([
                 'product_manpower_statement'=>$fgStatementValues[$productId]['direct_labor_value']??[],
                 'raw_material_statement'=>$fgStatementValues[$productId]['raw_material_value']??[],
@@ -2240,12 +2238,15 @@ class Project extends Model
         
         
         $totalOtherLongTermsOpening = [];
-        $otherLongTermsOpeningBalanceEndBalances =  DB::table('other_long_term_liabilities_opening_balances')->where('project_id', $projectId)->pluck('statement')->toArray();
-        foreach ($otherLongTermsOpeningBalanceEndBalances as $otherLongTermsOpeningBalanceEndBalance) {
+		$totalAmountOtherLongTerm = 0 ;
+        $otherLongTermsOpeningBalanceEndBalances =  DB::table('other_long_term_liabilities_opening_balances')->where('project_id', $projectId)->get();
+        foreach ($otherLongTermsOpeningBalanceEndBalances->pluck('statement')->toArray() as $otherLongTermsOpeningBalanceEndBalance) {
             $otherLongTermsOpeningBalanceEndBalance= ((array)((array)json_decode($otherLongTermsOpeningBalanceEndBalance))['monthly']??[])['end_balance']??[];
             $totalOtherLongTermsOpening = HArr::sumAtDates([$totalOtherLongTermsOpening,$otherLongTermsOpeningBalanceEndBalance], $sumKeys);
+			$currentAmount = $otherLongTermsOpeningBalanceEndBalances[0]->amount ;
+			$totalAmountOtherLongTerm += $currentAmount ;
         }
-        
+        // dd();
         $currentDataArr = $totalOtherLongTermsOpening ;
         $title = __('Other Long Term Liabilities');
         $currentTabId = $title ;
@@ -2454,7 +2455,8 @@ class Project extends Model
         $supplierPayablesOpeningBalance = $supplierPayablesOpeningBalance ? $supplierPayablesOpeningBalance->amount : 0;
         $changeInSupplierPayables  = HArr::calculateChangeInBefore($supplierPayables, $supplierPayablesOpeningBalance, $yearIndexWithLastMonth);
         $changeInOtherCreditors  = HArr::calculateChangeInBefore($otherCreditors, $totalCreditorsAmount, $yearIndexWithLastMonth,true);
-        $netChangeInWorkingCapital = HArr::sumAtDates([$changeInCustomerReceivables,$changeInFg,$changeInRawMaterial,$changeInOtherDebtors,$changeInSupplierPayables,$changeInOtherCreditors]);
+        $changeInOtherLongTermLiabilities  = HArr::calculateChangeInBefore($totalOtherLongTermsOpening, $totalAmountOtherLongTerm, $yearIndexWithLastMonth,true);
+        $netChangeInWorkingCapital = HArr::sumAtDates([$changeInCustomerReceivables,$changeInFg,$changeInRawMaterial,$changeInOtherDebtors,$changeInSupplierPayables,$changeInOtherCreditors,$changeInOtherLongTermLiabilities]);
         $totalCapital = HArr::sumAtDates([$totalOwnerEquity,$mediumTermLoanPerYear]);
         $equityFundingPercentages = HArr::divideTwoArrAtSameIndex($totalOwnerEquity, $totalCapital);
         $debitFundingPercentages = HArr::divideTwoArrAtSameIndex($mediumTermLoanPerYear, $totalCapital);

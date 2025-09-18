@@ -79,6 +79,9 @@ Route::group(
             }
         });
 
+		             //Ajax
+                Route::get('/get_date', 'HomeController@getdate')->name('get.date');
+				
         Route::group(['middleware' => ['auth']], function () {
 
             //Privacy Policy
@@ -95,8 +98,7 @@ Route::group(
                 //Team Capacity
                 Route::post('/duration_year', 'ProjectController@durationYear')->name('duration.year');
                 Route::post('/business_sector', 'BusinessSectorController@businessSectorChildren')->name('businessSectorChildren');
-                //Ajax
-                Route::get('/get_date', 'HomeController@getdate')->name('get.date');
+   
                 //ContactUs
                 Route::get('ContactUs', 'ContactUsController@getView')->name('ContactUs');
                 Route::post('Send_ContactUs', 'ContactUsController@sendMessage')->name('Send_ContactUs');

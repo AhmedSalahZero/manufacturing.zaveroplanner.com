@@ -110,7 +110,6 @@ class SeasonalityService
 		// foreach ($duration_months_in_years as $year => $months) {
 		// 	if (true) {    // In case of Flat Seasonality
 		// 		if ($seasonality_type == "flat") {
-		// 			dd($months);
 		// 			array_walk($months, function (&$value, $dateAsIndex) use ($flatSeasonalityRate) {
 		// 				$value = $flatSeasonalityRate * $value;
 		// 			});
