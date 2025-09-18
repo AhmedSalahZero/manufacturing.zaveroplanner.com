@@ -3188,9 +3188,8 @@ class Project extends Model
              */
             $vatRate = $tableDataArr['vat_rate']??0;
             $isDeductible = $tableDataArr['is_deductible'] ?? false;
-            
             if ($tableDataArr['payment_terms'] == 'customize') {
-                $tableDataArr['custom_collection_policy'] = sumDueDayWithPayment($tableDataArr['payment_rate'], $tableDataArr['due_days']);
+                $tableDataArr['custom_collection_policy'] = sumDueDayWithPayment($tableDataArr['payment_rate']??[], $tableDataArr['due_days']??[]);
             }
                 
             $customCollectionPolicy = $tableDataArr['custom_collection_policy']??[];
