@@ -1012,3 +1012,6 @@ $(document).on('change','.name-required-when-greater-than-zero-js',function(){
 $(function(){
 	$('.name-required-when-greater-than-zero-js').trigger('change')
 })
+$(function(){
+	$('.delay-button').prop('disabled',false)
+})

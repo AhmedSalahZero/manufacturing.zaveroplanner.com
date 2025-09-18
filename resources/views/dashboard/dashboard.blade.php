@@ -21,10 +21,8 @@
 		
 
      	<div class="mt-3">
-            {{-- <a href="{{ route('main.project.page',['project'=>$project->id]) }}" type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{ __('Go To Main Page') }}</a> --}}
 			<button type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{__('Save')}}</button>
 			<button type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save_and_go_to_main">{{__('Save & Go To Main Page')}}</button>
-		{{-- <button type="submit" class="btn btn-rev float-right" name="submit_button" value="next">{{__('Next')}}</button> --}}
 			
 		</div>
 

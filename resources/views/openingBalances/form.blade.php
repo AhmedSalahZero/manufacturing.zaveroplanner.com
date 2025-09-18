@@ -22,9 +22,7 @@
             </div>
 
 			@include('openingBalances._content',$project->getOpeningBalancesViewVars())
-            <button type="submit" class="btn btn-rev float-right" name="submit_button" value="next">{{ __('Next') }}</button>
-            <button type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{ __('Save & Go To Main Page') }}</button>
-
+            @include('save_buttons')
         </form>
 
     </div>

@@ -16,9 +16,9 @@
         <form method="POST" action="{{ route('manPower.submit', $project) }}">
             @csrf
            @include('manPower._content',$project->getManpowerViewVars())
-            <button type="submit" class="btn btn-rev float-right" name="submit_button" value="next">{{ __('Next') }}</button>
-            <button type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{ __('Save & Go To Main Page') }}</button>
-        </form>
+       @include('save_buttons')
+	   
+	     </form>
     </Div>
 </div>
 @endsection
