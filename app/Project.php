@@ -3229,7 +3229,9 @@ class Project extends Model
             //	$tableDataArr['collection_statements'] = [];
             if ($name) {
                 if ($project->expenseHasAllocation($expenseCategoryId)) {
-                
+					if(!isset($expenseAsPercentageResult['expense_allocations'])){
+						dd($name,$expenseAsPercentageResult);
+					}
                     $expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
                     
                 }

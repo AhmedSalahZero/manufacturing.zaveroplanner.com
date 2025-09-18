@@ -14,13 +14,32 @@ trait HasCollectionOrPaymentStatement {
             $collectionPolicyValue = $customCollectionPolicy ;
         } elseif ($collectionPolicyType == 'system_default' && $paymentTerm=='cash') {
             $collectionPolicyValue = 'monthly';
-        }
+        }elseif($collectionPolicyType == 'system_default'){
+			$collectionPolicyValue = $paymentTerm;
+		}
         $dateValue = convertIndexKeysToString($dateValue, $datesAsIndexAndString);
         $collectionPolicyValue = is_array($collectionPolicyValue) ?  $this->formatDues($collectionPolicyValue) : $collectionPolicyValue;
         $result = (new CollectionPolicyService())->applyCollectionPolicy(true, $collectionPolicyType, $collectionPolicyValue, $dateValue) ;
         
         return convertStringKeysToIndexes($result, $datesAsIndexAndString);
     }
+	//  private function calculateCollectionOrPaymentAmounts(string $paymentTerm, array $totalAfterVat, array $datesAsIndexAndString, array $customCollectionPolicy, $debug=false)
+    // {
+    //     $collectionPolicyType  = $paymentTerm == 'customize' ? 'customize':'system_default';
+    //     $collectionPolicyValue = $collectionPolicyType ;
+    //     $dateValue = $totalAfterVat;
+    //     if ($collectionPolicyType == 'customize') {
+	// 		$collectionPolicyValue = $customCollectionPolicy ;
+    //     } elseif ($collectionPolicyType == 'system_default' && $paymentTerm=='cash') {
+	// 		$collectionPolicyValue = 'monthly';
+    //     }elseif($collectionPolicyType == 'system_default'){
+	// 		$collectionPolicyValue = $paymentTerm;
+	// 	}
+    //     $dateValue = convertIndexKeysToString($dateValue, $datesAsIndexAndString);
+    //     $collectionPolicyValue = is_array($collectionPolicyValue) ?  $this->formatDues($collectionPolicyValue) : $collectionPolicyValue;
+    //     $result = (new CollectionPolicyService())->applyCollectionPolicy(true, $collectionPolicyType, $collectionPolicyValue, $dateValue) ;
+    //     return convertStringKeysToIndexes($result, $datesAsIndexAndString);
+    // }
 	 public function calculateCollectionOrPaymentForMultiCustomizedAmounts(array $dueDayWithRates, array $dateAsIndexAndValue)
     {
 //        $dateAsStringAndValue = convertIndexKeysToString($dateAsIndexAndValue, $datesAsIndexAndString);
