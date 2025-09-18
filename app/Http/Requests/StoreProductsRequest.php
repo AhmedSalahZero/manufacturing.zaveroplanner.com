@@ -48,15 +48,11 @@ class StoreProductsRequest extends FormRequest
 		$yearsAsIndexes =array_keys($years);
 		 foreach ($this->get('rawMaterials') as $index => &$rawMaterialArr) {
 			$rawMaterialArr['product_id'] = $product->id;
-			if(!isset($rawMaterialArr['raw_material_id'])){
-				dd($rawMaterialArr,'raw_material_id');
-			}
             if ($rawMaterialArr['raw_material_id']) {
 				$rawMaterialArr['percentages'] = array_combine($yearsAsIndexes,$rawMaterialArr['percentages']); 
                 $rawMaterials[$index] = $rawMaterialArr;
             }
         }
-		// dd($collectionPolicyValue);
         $this->merge([
             'rawMaterials'=>$rawMaterials,
 			'collection_policy_value'=>$collectionPolicyValue

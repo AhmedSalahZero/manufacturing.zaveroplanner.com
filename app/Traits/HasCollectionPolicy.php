@@ -59,10 +59,7 @@ trait HasCollectionPolicy
 				0 => $dueDayAndRatesAtIndex['cash_payment']??0 , 
 				
 			];
-			// if($this instanceof Product){
-				
-			// 	dd($this,$dueDayAndRatesAtIndex);
-			// }
+	
 			if(!is_null($firstDueDate)){
 				$dueWithRates[$firstDueDate] = $firstDueRate;
 			}if(!is_null($secondDueDate)){
@@ -131,10 +128,7 @@ trait HasCollectionPolicy
             $amountAfterVatForMultiYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $withholdAmountsForMultiYearMonths);
             $withholdPayments = HArr::sumAtDates([$withholdAmountsForFirstYear,$amountAfterVatForMultiYear], array_keys($withholdAmounts));
         }
-		// if($this instanceof Product && $this->id ===14){
-			// dd($this);
-			
-		// }
+		
         $netPaymentsAfterWithhold = HArr::subtractAtDates([$amountAfterVat,$withholdPayments], array_keys($monthlySalesTargetValueBeforeVat));
         $collectionStatement = self::calculateStatement($monthlySalesTargetValueBeforeVat, $vatAmounts, $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
 		return $collectionStatement;

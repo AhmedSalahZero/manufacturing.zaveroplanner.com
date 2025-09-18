@@ -133,6 +133,7 @@ class RedirectionController extends Controller
 
     public function manPowerPost(StoreManpowerRequest $request, Project $project)
     {
+	
         // $result = (new ValidationsController)->manPowerValidation($request,$project);
         $manpowers = [];
         $index=   0 ;
@@ -141,10 +142,7 @@ class RedirectionController extends Controller
             foreach ($allocations['products']??[] as $productId=>$productName) {
                 $manpowerAllocations[$manpowerType][$productId] = $allocations['percentages'][$productId]??0;
             }
-            
         }
-		
-    
         $project->update([
             'manpower_allocations'=>$manpowerAllocations,
             'salaries_annual_increase'=>$request->get('salaries_annual_increase'),
@@ -176,12 +174,8 @@ class RedirectionController extends Controller
                 $index++;
             }
         }
-		// dd($manpowers);
         $request->merge($manpowers);
         $project->storeRepeaterRelations($request, ['manpowers'], ['project_id'=>$project->id]);
-		// $project->recalculateManpowers();
-        // $project->reallocateProductsOnManpowers();
-        // $project->recalculateFgInventoryValueStatement();
 
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
@@ -202,70 +196,7 @@ class RedirectionController extends Controller
         Project $project,
        
     ) {
-        $expenseTypes =getExpensesTypes();
-        $modelName = 'Project';
-     
-        $datesAsStringDateIndex = $project->getDatesAsStringAndIndex();
-     
-        $operationStartDateAsIndex = $datesAsStringDateIndex[$project->getOperationStartDate()];
-    
-       
-        
-        foreach ($expenseTypes as $expenseType) {
-           $project->generateRelationDynamically($expenseType)->delete();
-            $tableId = $expenseType;
-            foreach ((array)$request->get($tableId) as $tableDataArr) {
-	             $expenseCategoryId =$tableDataArr['category_id'];
-		 	   $name = $tableDataArr['name']??null;
-			       $tableDataArr['relation_name']  = $expenseType;
-                $withholdRate = $tableDataArr['withhold_tax_rate']??0;
-                $tableDataArr['withhold_tax_rate'] = $withholdRate;
-                $productIds = $tableDataArr['product_id'];
-                $allocationPercentages = $tableDataArr['percentage'];
-                $tableDataArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
-             
-                if (isset($tableDataArr['start_date']) && count(explode('-', $tableDataArr['start_date'])) == 2) {
-                    $tableDataArr['start_date'] = $tableDataArr['start_date'].'-01';
-                    
-                }if (isset($tableDataArr['end_date']) && count(explode('-', $tableDataArr['end_date'])) == 2) {
-                    $tableDataArr['end_date'] = $tableDataArr['end_date'].'-01';
-                    
-                }
-                $tableDataArr['expense_type'] = 'Expense';
-         
-                    
-                if (isset($tableDataArr['start_date'])) {
-                    $tableDataArr['start_date'] = $datesAsStringDateIndex[$tableDataArr['start_date']];
-                } else {
-                    $tableDataArr['start_date'] = $operationStartDateAsIndex;
-                }
-                if (isset($tableDataArr['end_date'])) {
-                    $tableDataArr['end_date'] = $datesAsStringDateIndex[$tableDataArr['end_date']];
-                } else {
-                    $tableDataArr['end_date'] = $operationStartDateAsIndex;
-                }
-             
-				
-				 $tableDataArr['project_id']  = $project->id ;
-                $tableDataArr['model_id']   = $project->id ;
-                $tableDataArr['model_name']   = $modelName ;
-				
-				  if ($name) {
-					// if($project->expenseHasAllocation($expenseCategoryId)){
-					// //	$expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
-					// }
-					$tableDataArr['collection_statements'] = [];
-                   $project->generateRelationDynamically($tableId, $expenseType)->create($tableDataArr);
-                    
-                }
-				
-                
-            }
-            
-        }
-      
-		
-        
+		$project->storeRepeaterRelations($request, ['expenses'], ['project_id'=>$project->id]);
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);
         }
@@ -286,7 +217,6 @@ class RedirectionController extends Controller
     public function fixedAssetsPost(StoreFixedAssetsRequest $request, Project $project)
     {
         $project->storeRepeaterRelations($request, ['fixedAssets'], ['project_id'=>$project->id]);
-        
         
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);

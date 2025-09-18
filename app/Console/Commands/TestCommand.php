@@ -40,23 +40,5 @@ class TestCommand extends Command
      */
     public function handle()
     {
-		$project = Project::find(140);
-		dd($project->recalculateManpowers());
-		// $arr = [
-		// 	4 => 0 ,
-		// 	5=>100,
-		// 	6=>200,
-		// 	7=>300
-		// ];
-		
-		// $offset = 6 ;
-		// dd();
-	// 	DB::table('business_sectors')->delete();
-    //    foreach(getBusinessSectors() as $sectorName){
-	// 	DB::table('business_sectors')->insert([
-	// 		'name_en'=>$sectorName,
-	// 		'name_ar'=>$sectorName,
-	// 	]);
-	//    }
     }
 }

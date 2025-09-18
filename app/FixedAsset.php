@@ -286,30 +286,13 @@ class FixedAsset extends Model
 			$buildingAssets['initial_total_gross'][$dateAsIndex] =  $buildingAssets['additions'][$dateAsIndex] +  $beginningBalance;
 			$currentInitialTotalGross = $buildingAssets['initial_total_gross'][$dateAsIndex] ??0;
 			$replacementCost[$dateAsIndex] =    in_array($dateAsIndex ,$replacementDates)  ? $this->calculateReplacementCost($currentInitialTotalGross,$propertyReplacementCostRate) : 0;
-			// if($this->id == 51){
-			// 	dd($currentInitialTotalGross,$propertyReplacementCostRate);
-				
-			// }
-			/**
-			 * ! Issue Here
-			 */
 			if( in_array($dateAsIndex ,$replacementDates) && ( $constructionTransferredDateAsIndex <= $operationStartDateAsIndex)){
 				$depreciationEndDateAsIndex = $dateAsIndex+1+$propertyDepreciationDurationInMonths-1;
 			}
-			// $dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ? $dateBeforeOperation : $ffeEndDateAsIndex-1;
 			$replacementValueAtCurrentDate = $replacementCost[$dateAsIndex] ?? 0;
 			$buildingAssets['replacement_cost'][$dateAsIndex] = $replacementCost[$dateAsIndex] ;
 			$buildingAssets['final_total_gross'][$dateAsIndex] = $buildingAssets['initial_total_gross'][$dateAsIndex]  + $replacementValueAtCurrentDate;
 			$depreciation[$dateAsIndex]=$this->calculateMonthlyDepreciation($dateAsIndex,$buildingAssets['additions'][$dateAsIndex],$replacementValueAtCurrentDate,$propertyDepreciationDurationInMonths, $depreciationStartDateAsIndex, $depreciationEndDateAsIndex, $totalMonthlyDepreciation, $accumulatedDepreciation,$studyDates);
-			if($this->id == 51 && $dateAsIndex == 18){
-				// dd($buildingAssets['final_total_gross']);
-			}
-			if($this->id == 51 && $dateAsIndex ==18){
-				// dump($depreciation);
-			}
-			// if($this->id == 51){
-			// dump('q',$totalMonthlyDepreciation);
-		// }
 			$accumulatedDepreciation = calculateAccumulatedDepreciation($totalMonthlyDepreciation,$studyDates);
 			$buildingAssets['total_monthly_depreciation'] =$totalMonthlyDepreciation;
 			$buildingAssets['accumulated_depreciation'] =$accumulatedDepreciation;
@@ -318,10 +301,6 @@ class FixedAsset extends Model
 			$beginningBalance = $buildingAssets['final_total_gross'][$dateAsIndex];
 			$index++;
 		}
-		// if($this->id == 51){
-			// dd('q');
-			// dd('finall',$buildingAssets);
-		// }
 		return $buildingAssets ;
 	}
 	

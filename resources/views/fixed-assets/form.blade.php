@@ -84,7 +84,7 @@
 			
 		
 				'equity_funding_rate':0,
-				'replacement_cost_rate':1,
+				'replacement_cost_rate':0,
 				'depreciation_duration':5,
 				'amount':0,
 				'tenor':60,

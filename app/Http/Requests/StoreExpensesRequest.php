@@ -60,6 +60,7 @@ class StoreExpensesRequest extends FormRequest
 			}
 		}
 	}
+
     $this->merge($expensesFormatted);
 }
 }

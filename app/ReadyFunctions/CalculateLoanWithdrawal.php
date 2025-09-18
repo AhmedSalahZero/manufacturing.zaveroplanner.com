@@ -87,11 +87,6 @@ class CalculateLoanWithdrawal
 			 
 
 		}
-		// $fixedAsset->update([
-			
-		// ]);
-		
-		// dd();
 		return $finalResult ;
 	}
 	

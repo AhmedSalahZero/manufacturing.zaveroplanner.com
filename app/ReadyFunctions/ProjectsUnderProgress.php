@@ -36,12 +36,7 @@ class ProjectsUnderProgress
 		$dateBeforeOperation =  $operationStartDateAsIndex >= $ffeEndDateAsIndex ?   $ffeEndDateAsIndex:$dateBeforeOperation;
 		$finalCapitalizedInterestDateAsIndex = $dateBeforeOperation >= $finalFFEExecutionDateAsIndex ? $dateBeforeOperation : $finalFFEExecutionDateAsIndex;
 		$transferredToFixedAssetDateAsIndex = $finalCapitalizedInterestDateAsIndex;
-		// dd($fixedAsset->);
-		// dd('dddddddd',$transferredToFixedAssetDateAsIndex);
 		$capitalizedInterest = $project->sumTwoArrayUntilIndex($ffeLoanWithdrawalInterestAmounts, $ffeLoanInterestAmount, $finalCapitalizedInterestDateAsIndex);
-		// if(count($capitalizedInterest)){
-		// 	dd($capitalizedInterest);
-		// }
 		foreach ($studyDates as  $dateAsIndex) {
 			$result['beginning_balance'][$dateAsIndex] = $beginningBalance;
 			$additionsAtDate = $additions[$dateAsIndex] ?? 0;
@@ -61,9 +56,6 @@ class ProjectsUnderProgress
 				$result['end_balance'][$dateAsIndex] =$total;
 			}
 		}
-		// dd('q',$result);
-		// ddd
-		// dd('lol',$result);
 		return $result;
 	}
 }

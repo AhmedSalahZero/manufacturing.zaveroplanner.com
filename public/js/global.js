@@ -1000,3 +1000,15 @@ $(document).on('click','.parent-checkbox',function(){
 	$(this).closest('td').find('input[type="checkbox"]').prop('checked',true).trigger('change')
 	
 })
+$(document).on('change','.name-required-when-greater-than-zero-js',function(){
+		const value = $(this).val();
+		const parent = $(this).closest('.closest-parent');
+		if(value > 0){
+			$(parent).find('.name-field-js').prop('required',true);
+		}else{
+			$(parent).find('.name-field-js').prop('required',false);
+		}
+});
+$(function(){
+	$('.name-required-when-greater-than-zero-js').trigger('change')
+})

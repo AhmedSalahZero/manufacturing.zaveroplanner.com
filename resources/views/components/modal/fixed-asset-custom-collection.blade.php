@@ -105,7 +105,7 @@
                         <label class="form-label">{{ __('Reservation %') }} </label>
                         <div class="kt-input-icon">
                             <div class="input-group">
-                                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed hundred-minus-number1" name="reservation_rate" value="{{ isset($subModel) ? $subModel->getReservationRate() : old('reservation_rate') }}">
+                                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed hundred-minus-number1" name="reservation_rate" value="{{ isset($subModel) ? $subModel->getReservationRate() : old('reservation_rate',0) }}">
                             </div>
                         </div>
                     </div>
@@ -114,7 +114,7 @@
                         <label class="form-label">{{ __('Contractual %') }} </label>
                         <div class="kt-input-icon">
                             <div class="input-group">
-                                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed hundred-minus-number2" name="contractual_rate" value="{{ isset($subModel) ? $subModel->getContractualRate() : old('contractual_rate') }}">
+                                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed hundred-minus-number2" name="contractual_rate" value="{{ isset($subModel) ? $subModel->getContractualRate() : old('contractual_rate',0) }}">
                             </div>
                         </div>
                     </div>
@@ -123,7 +123,7 @@
                         <label class="form-label">{{ __('After Months') }} </label>
                         <div class="kt-input-icon">
                             <div class="input-group">
-                                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed" name="after_months" value="{{ isset($subModel) ? $subModel->getAfterMonths() : old('after_months') }}">
+                                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed" name="after_months" value="{{ isset($subModel) ? $subModel->getAfterMonths() : old('after_months',0) }}">
                             </div>
                         </div>
                     </div>

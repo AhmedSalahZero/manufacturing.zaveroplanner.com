@@ -11,7 +11,7 @@ common-parent
         <label class="form-label ">{{ __('Name') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control "  required name="name" value="{{ isset($fixedAsset) ? $fixedAsset->getName() : old('name') }}">
+                <input type="text" class="form-control name-field-js"   name="name" value="{{ isset($fixedAsset) ? $fixedAsset->getName() : old('name') }}">
             </div>
         </div>
     </div>
@@ -20,7 +20,7 @@ common-parent
         <label class="form-label ">{{ __('Count') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control number_field_1 only-greater-than-or-equal-zero-allowed " name="counts" value="{{ isset($fixedAsset) ? $fixedAsset->getCounts() : old('counts') }}" step="1">
+                <input type="text" class="form-control number_field_1 only-greater-than-or-equal-zero-allowed " name="counts" value="{{ isset($fixedAsset) ? $fixedAsset->getCounts() : old('counts',0) }}" step="1">
             </div>
         </div>
     </div>
@@ -29,7 +29,7 @@ common-parent
         <label class="form-label ">{{ __('Amount') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control number_field_2 only-greater-than-or-equal-zero-allowed " name="amount" value="{{ isset($fixedAsset) ? $fixedAsset->getAmount() : old('amount') }}" step="0.5">
+                <input type="text" class="form-control number_field_2 only-greater-than-or-equal-zero-allowed name-required-when-greater-than-zero-js" name="amount" value="{{ isset($fixedAsset) ? $fixedAsset->getAmount() : old('amount',0) }}" step="0.5">
             </div>
         </div>
     </div>
@@ -192,7 +192,7 @@ common-parent
         <label class="form-label "> {!! __('Replacement <br> Cost %') !!} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control only-percentage-allowed " name="replacement_cost_rate" value="{{ isset($fixedAsset) ? $fixedAsset->getReplacementCostRate() : old('replacement_cost') }}" step="any">
+                <input type="text" class="form-control only-percentage-allowed " name="replacement_cost_rate" value="{{ isset($fixedAsset) ? $fixedAsset->getReplacementCostRate() : old('replacement_cost_rate',0) }}" step="any">
             </div>
         </div>
     </div>
@@ -257,7 +257,7 @@ common-parent
         <label class="form-label ">{{ __('Tenor (Months)') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input name="tenor" type="text" class="form-control only-greater-than-zero-allowed " value="{{  $fixedAsset ? $fixedAsset->getTenor() : 0  }}" step="1">
+                <input name="tenor" type="text" class="form-control only-greater-than-zero-allowed " value="{{  $fixedAsset ? $fixedAsset->getTenor() : 60  }}" step="1">
             </div>
         </div>
     </div>
