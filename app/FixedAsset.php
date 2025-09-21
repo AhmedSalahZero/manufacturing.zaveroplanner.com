@@ -32,7 +32,8 @@ class FixedAsset extends Model
 		'ffe_payment'=>'array',
 		'statement'=>'array',
 		'ffe_execution_and_payment'=>'array',
-		'ffe_payable'=>'array'
+		'ffe_payable'=>'array',
+		'monthly_product_allocations'=>'array',
 		
 	];
     public function project()
@@ -411,5 +412,9 @@ class FixedAsset extends Model
 	public function isInstallmentPayment():bool 
 	{
 		return $this->payment_terms === 'installment';
+	}
+	public function isAsRevenuePercentage():bool 
+	{
+		return $this->is_as_revenue_percentages;
 	}
 }

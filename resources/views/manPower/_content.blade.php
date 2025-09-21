@@ -145,6 +145,32 @@
                                 <div class="modal-body">
                                     <table class="table w-full closest-parent">
                                         <tbody>
+										
+										   <tr class="closest-parent">
+                            <td>
+
+                                <div class="d-flex  align-content-center">
+                                    <span class="mr-3">
+                                        <b>{{ __('Allocate based on Revenues Percentages') }}</b>
+                                    </span>
+                                    <div class="kt-radio-inline mt--5">
+
+                                        <label class="kt-radio kt-radio--success text-black font-size-18px">
+                                            @php
+                                      	    $isAsRevenuePercentage = $project ? $project->getManpowerIsAsRevenuePercentage($id) : 1 ;
+                                            @endphp
+                                            <input type="checkbox" class="allocate-checkbox" value="1" name="manpower_is_as_revenue_percentages[{{ $id }}]" @if( $isAsRevenuePercentage) checked @endisset>
+                                            <span></span>
+                                        </label>
+
+                                    </div>
+                                </div>
+
+                            </td>
+
+
+                        </tr>
+						
                                             @php
                                             $allocations = $project->getManpowerAllocationForType($id) ;
                                             @endphp
@@ -152,6 +178,8 @@
                                             @php
                                             $percentage = $allocations[$product->id]??(100/count($products));
                                             @endphp
+											
+											
                                             <tr>
 
                                                 <td>
@@ -166,7 +194,7 @@
                                                         </div>
                                                         <div class="col-3 text-left">
                                                             <label>{{ __('Perc.%') }}</label>
-                                                            <input class="form-control total_input input-border" name="manpower_allocations[{{ $id }}][percentages][{{ $product->id }}]" value="{{ $percentage }}">
+                                                            <input class="form-control percentage-allocation total_input input-border" name="manpower_allocations[{{ $id }}][percentages][{{ $product->id }}]" data-old-value="{{ $percentage }}"  value="{{ $percentage }}">
                                                         </div>
 
 

@@ -28,10 +28,10 @@ common-parent
     </div>
 
     <div class="col-md-1 pr-2 pl-2">
-        <label class="form-label ">{{ __('Expense %') }} </label>
+        <label class="form-label ">{{ __('Cost Per Unit') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control only-percentage-allowed " name="monthly_percentage" value="{{ isset($expense) ? $expense->getMonthlyPercentage() : old('monthly_percentage') }}" >
+                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed " name="monthly_cost_of_unit" value="{{ isset($expense) ? $expense->getMonthlyCostOfUnit() : old('monthly_cost_of_unit') }}" >
             </div>
         </div>
     </div>
@@ -72,6 +72,7 @@ common-parent
         <x-modal.custom-collection :title="__('Custom Payment')" :subModel="isset($expense) ? $expense : null "></x-modal.custom-collection>
 
     </div>
+
 
 
 

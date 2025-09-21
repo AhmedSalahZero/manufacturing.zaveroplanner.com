@@ -2,12 +2,12 @@
 namespace App\Equations;
 class OneTimeExpenseEquation
 {
-	public function calculate(float $amount,int $startDateAsIndex,bool $isDeductible,float $vatRate):array 
+	public function calculate(float $amount,int $amortizationMonths,int $startDateAsIndex,bool $isDeductible,float $vatRate):array 
 	{
 		$payload = [];
 		$oneTimeAmount = ($isDeductible ? $amount : $amount  * (1+($vatRate / 100))) ;
-		$amount = $oneTimeAmount / 12;
-		for($i =  0 ; $i<12 ; $i++){
+		$amount = $oneTimeAmount / $amortizationMonths;
+		for($i =  0 ; $i< $amortizationMonths ; $i++){
 			
 			$payload[$startDateAsIndex+$i] = $amount;
  		}

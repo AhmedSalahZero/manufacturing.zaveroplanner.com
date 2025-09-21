@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\HArr;
+use App\Product;
 use App\Services\IntervalSummationOperations;
 use Carbon\Carbon;
 
@@ -408,6 +409,7 @@ function getExpensesTypes():array
 {
     return [
             'expense_as_percentage',
+            'cost_per_unit',
             'fixed_monthly_repeating_amount',
             'one_time_expense'
     ];

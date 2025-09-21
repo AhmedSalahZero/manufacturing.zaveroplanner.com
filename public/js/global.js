@@ -834,6 +834,15 @@ $(document).on('change', '.hundred-minus-number', function () {
 	$(parent).find('.hundred-minus-number-result'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
 })
 
+$(document).on('change', '.hundred-minus-number-one', function () {
+	let parent = $(this).closest('.closest-parent')
+	const columnIndex = $(this).attr('data-column-index')
+	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
+	let equityFundingPercentage = number_unformat($(parent).find('.hundred-minus-number-one'+appendColumnIndex).val())
+	let debtFunding = 100 - equityFundingPercentage
+	$(parent).find('.hundred-minus-number-result-one'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
+})
+
 $(document).on('change', '.hundred-minus-number1,.hundred-minus-number2', function () {
 	let parent = $(this).closest('.closest-parent')
 	const columnIndex = $(this).attr('data-column-index')
@@ -898,7 +907,7 @@ $(function () {
 })
 function recalculateAllocations(item) {
 	const numberOfProducts = $('#number-of-products').attr('data-value')
-	$('.percentage-depreciation').each(function (index, element) {
+	$('.percentage-allocation').each(function (index, element) {
 		var productId = $(element).closest('.dep-parent').find('.product-id-class').attr('data-product-id')
 		$(element).closest('.dep-parent').find('.product-id-class').val(productId)
 		var percentage = 1 / numberOfProducts * 100
@@ -1014,4 +1023,22 @@ $(function(){
 })
 $(function(){
 	$('.delay-button').prop('disabled',false)
+})
+$(document).on('change','.allocate-checkbox',function(){
+	const modal = $(this).closest('.modal');
+	const isChecked = $(this).is(':checked');
+	if(isChecked){
+		$(modal).find('.percentage-allocation').each(function(index,input){
+			$(input).val(0).prop('readonly',true).trigger('change');
+		})
+	}else{
+		$(modal).find('.percentage-allocation').each(function(index,input){
+			var currentVal = $(input).attr('data-old-value');
+			$(input).val(currentVal).prop('readonly',false).trigger('change');
+		})
+	}
+	
+})
+$(function(){
+	$('.allocate-checkbox').trigger('change',false)
 })

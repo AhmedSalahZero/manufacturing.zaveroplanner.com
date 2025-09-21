@@ -7,6 +7,7 @@ use App\Rules\AllocationMustBeHundredRule;
 use App\Rules\MustBeEqualZeroRule;
 use App\Rules\ShouldNotExceedHundredRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
 class StoreOpeningBalancesRequest extends FormRequest
 {
@@ -36,16 +37,21 @@ class StoreOpeningBalancesRequest extends FormRequest
 	
 	protected function prepareForValidation()
     {
-        // $project = Request()->route('project');
+        $project = Request()->route('project');
         $fixedAssets = Request()->get('fixedAssetOpeningBalances', []);
         foreach ($fixedAssets as $index => &$fixedAssetOpeningArr) {
             $productIds = $fixedAssetOpeningArr['product_id'];
             $allocationPercentages = $fixedAssetOpeningArr['percentage'];
             $fixedAssetOpeningArr['gross_amount'] = number_unformat($fixedAssetOpeningArr['gross_amount']);
             $fixedAssetOpeningArr['accumulated_depreciation'] = number_unformat($fixedAssetOpeningArr['accumulated_depreciation']);
-            $fixedAssetOpeningArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
+            $fixedAssetOpeningArr['product_allocations'] =$productAllocations= array_combine($productIds, $allocationPercentages);
+			$fixedAssetOpeningArr['is_as_revenue_percentages'] =$isAsRevenuePercentage = isset($fixedAssetOpeningArr['is_as_revenue_percentages']) ? Arr::first($fixedAssetOpeningArr['is_as_revenue_percentages']) : 0;	
+			$fixedAssetOpeningArr['monthly_product_allocations'] = $isAsRevenuePercentage ? [] :   $project->calculateMonthlyProductAllocations($productAllocations);
             unset($fixedAssetOpeningArr['product_id']);
             unset($fixedAssetOpeningArr['percentage']);
+			if(is_null($fixedAssetOpeningArr['name'])){
+				unset($fixedAssets[$index]);
+			}
         }
 		
 		

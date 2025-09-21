@@ -28,14 +28,21 @@ common-parent
     </div>
 
     <div class="col-md-1 pr-2 pl-2">
-        <label class="form-label `">{{ __('Amount') }} </label>
+        <label class="form-label">{{ __('Amount') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="number" class="form-control only-greater-than-or-equal-zero-allowed " name="amount" value="{{ isset($expense) ? $expense->getAmount() : old('amount') }}" step="0.5">
+                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed " name="amount" value="{{ isset($expense) ? $expense->getAmount() : old('amount',0) }}" step="0.5">
             </div>
         </div>
     </div>
-
+	<div class="max-w-10 col-md-1 pr-2 pl-2">
+        <label class="form-label ">{{ __('Amortization (mths)') }} </label>
+        <div class="kt-input-icon">
+            <div class="input-group">
+                <input type="text" class="form-control only-greater-than-zero-allowed " name="amortization_months" value="{{ isset($expense) ? $expense->getAmortizationMonths() : old('amortization_months',12) }}" step="0.5">
+            </div>
+        </div>
+    </div>
     <div class="max-w-15 pr-2 pl-2">
         <label class="form-label `">{{ __('Start Date') }} </label>
 
@@ -67,7 +74,6 @@ common-parent
     <x-modal.custom-collection :title="__('Custom Payment')" :subModel="isset($expense) ? $expense : null "></x-modal.custom-collection>
 
 </div>
-
 <div class="col-md-1 pr-2 pl-2 allocate-parent">
     <label class="form-label  `">{{ __('Allocate') }} </label>
     <div class="kt-input-icon ">
@@ -75,9 +81,9 @@ common-parent
             <button class="btn btn-primary btn-md allocate-parent-trigger text-nowrap w-full" type="button" data-toggle="modal" data-target="#modal-allocate-{{ $repeaterId }}">{{ __('Allocate') }}</button>
         </div>
     </div>
+	@include('expenses._allocate_modal',['subModel'=>$expense])
 
-
-    <div class="modal fade allocate-parent-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}" aria-hidden="true">
+    {{-- <div class="modal fade allocate-parent-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header header-border">
@@ -109,7 +115,7 @@ common-parent
                                         </div>
                                         <div class="col-3 text-left">
                                             <label>{{ __('Perc.%') }}</label>
-                                            <input multiple class="form-control   percentage-depreciation total_input input-border" name="percentage" value="{{ $percentage }}">
+                                            <input multiple class="form-control   percentage-allocation total_input input-border" name="percentage" value="{{ $percentage }}">
                                         </div>
 
 
@@ -151,7 +157,7 @@ common-parent
 
             </div>
         </div>
-    </div>
+    </div> --}}
 
 </div>
 

@@ -1,17 +1,17 @@
 <?php 
 namespace App\Equations;
 
-class ExpenseAsPercentageEquation
+class ExpenseAsCostPerUnitEquation
 {
-	public function calculate($products,int $startDateAsIndex  , int $loopEndDateAsIndex , float $monthlyPercentage , float $vatRate = 0 ,bool $isDeductible = true , float $withholdTaxRate = 0 ):array 
+	public function calculate($products,int $startDateAsIndex  , int $loopEndDateAsIndex , float $monthlyCostPerUnit , float $vatRate = 0 ,bool $isDeductible = true , float $withholdTaxRate = 0 ):array 
 	{
 			$resultAsDateIndexAndValue = [];
 			$resultPerProducts = [];
 			foreach($products as $product){
-				$monthlySalesTargetValues = $product->monthly_sales_target_values;
-				foreach($monthlySalesTargetValues as $monthIndex => $val){
+				$monthlySalesTargetQuantities = $product->monthly_sales_target_quantities;
+				foreach($monthlySalesTargetQuantities as $monthIndex => $val){
 					if($monthIndex <= $loopEndDateAsIndex && $monthIndex >= $startDateAsIndex){
-						$valBeforeRate = $monthlyPercentage / 100 * $val ;
+						$valBeforeRate = $monthlyCostPerUnit  * $val ;
 						$resultAsDateIndexAndValue[$monthIndex] = isset($resultAsDateIndexAndValue[$monthIndex]) ? $resultAsDateIndexAndValue[$monthIndex] + $valBeforeRate : $valBeforeRate ; 
 						$resultPerProducts[$product->id][$monthIndex] = $valBeforeRate;
 					}

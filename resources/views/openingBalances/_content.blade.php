@@ -700,13 +700,22 @@
             initEmpty: false
             , defaultValues: {
                 'category_id': 'manufacturing-expenses'
-                , 'payment_terms': 'cash'
-            , }
+                , 'payment_terms': 'cash',
+				'is_as_revenue_percentages':1,
+				'gross_amount':0,
+				'accumulated_depreciation':0,
+				'admin_depreciation_percentage':0,
+				'monthly_counts':60,
+				'monthly_depreciation':0
+            }
             , show: function() {
                 $(this).slideDown();
                 $('.js-select2-with-one-selection').select2({});
                 recalculateAllocations(this);
-
+				$('.hundred-minus-number-one').trigger('change')
+				$('.hundred-minus-number').trigger('change')
+				$('.allocate-checkbox').trigger('change')
+				$('.number_minus_field_1').trigger('change')
             }
             , ready: function(setIndexes) {
 

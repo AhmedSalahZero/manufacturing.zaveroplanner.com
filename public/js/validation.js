@@ -159,7 +159,6 @@ $(document).on('change','.only-smaller-than-or-equal-specific-number-allowed',fu
 	currentValue = currentValue ? currentValue : 0 ;
 	greaterThan = greaterThan + currentValue;
 	greaterThan = greaterThan ? greaterThan : 0 ;
-	console.log(greaterThan)
     if(! isLessThanOrEqual(val,greaterThan) && val  != '')
     {
         let currentLang = $('body').data('lang');
@@ -279,6 +278,7 @@ function number_format(number, decimals, dec_point, thousands_sep) {
     return s.join(dec);
 }
 $(document).on('change','.must-not-exceed-100',function(){
+
 	let lang = $('body').data('lang');
 	title = "Oops..." ;
 	message = "Total Can Not Be Greater Than 100" ;
@@ -290,9 +290,11 @@ $(document).on('change','.must-not-exceed-100',function(){
 
 	let total = 0 ;
 	$(this).closest('.closest-parent').find('.must-not-exceed-100').each(function(index,element){
+
 		total+=parseFloat($(element).val());
 	})
 	if(total > 100){
+	
 		$(this).val(0).trigger('change');
 		Swal.fire({
             icon: "warning",

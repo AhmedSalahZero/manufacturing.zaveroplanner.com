@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Equations\ExpenseAsCostPerUnitEquation;
 use App\Equations\ExpenseAsPercentageEquation;
 use App\Equations\MonthlyFixedRepeatingAmountEquation;
 use App\Equations\OneTimeExpenseEquation;
@@ -44,9 +45,11 @@ class Project extends Model
     }
     protected $casts = [
         'manpower_allocations'=>'array',
+        'monthly_manpower_allocations'=>'array',
         'extended_study_dates'=>'array',
         'vat_statements'=>'array',
-        'corporate_taxes_statement'=>'array'
+        'corporate_taxes_statement'=>'array',
+        'manpower_is_as_revenue_percentages'=>'array',
     ];
     protected $guarded = [];
     public function owner()
@@ -123,6 +126,10 @@ class Project extends Model
     {
         return $this->manpower_allocations[$manpowerTypeId]??[];
     }
+	public function getManpowerIsAsRevenuePercentage(string $manpowerTypeId):int
+	{
+		return $this->manpower_is_as_revenue_percentages[$manpowerTypeId]??0;
+	}
     public function getSalaryIncreaseRate():float
     {
         return $this->salaries_annual_increase?:0;
@@ -212,26 +219,29 @@ class Project extends Model
         // direct_labor
         // manufacturing_overheads
         $totalIndirectManpowers = [];
+		$productMonthlySalesPercentages = $this->getProductMonthlySalesTargetPercentages();
         $operationDates = $this->getOperationDatesAsDateAndDateAsIndex();
         DB::table('product_expense_allocations')->where('project_id', $this->id)->where('is_indirect_manpower', 1)->delete();
-        // product_expense_allocations
         foreach (getManpowerTypes() as $id => $manpowerOptionArr) {
             if ($manpowerOptionArr['has_allocation']) {
+				
+				$monthlyProductAllocations = $this->monthly_manpower_allocations[$id];
+				$isAsRevenuePercentage = $this->manpower_is_as_revenue_percentages[$id]??false;
+				// dd('d',$monthlyProductAllocations);
                 $isIndirectManpower = $manpowerOptionArr['is_indirect_manpower'];
                 $allocationColumnName= $manpowerOptionArr['allocation_column_name'];
                 $salaryExpenses = ManPower::where('type', $id)->where('project_id', $this->id)->pluck('salary_expenses')->toArray();
                 $allocationForManpowerType = $this->getManpowerAllocationForType($id);
                 
                 $totalManpowerSalaries = HArr::sumAtDates($salaryExpenses, $operationDates);
+				$currentValue = Product::multiplyWithAllocation($productMonthlySalesPercentages,$monthlyProductAllocations, $this->products, $totalManpowerSalaries ,$isAsRevenuePercentage);
                 foreach ($allocationForManpowerType as $productId => $allocationPercentage) {
-                    $product = Product::find($productId);
-                
-                    $currentValue = HArr::MultiplyWithNumber($totalManpowerSalaries, $allocationPercentage/100) ;
+					$product = Product::find($productId);
                     if ($isIndirectManpower) {
-                        $totalIndirectManpowers[$id][$productId]= $currentValue ;
+                        $totalIndirectManpowers[$id][$productId]= $currentValue[$productId]??[] ;
                     }
                     $product->update([
-                        $allocationColumnName => $currentValue
+                        $allocationColumnName => $currentValue[$productId]??[]
                     ]);
                     
                 }
@@ -316,6 +326,7 @@ class Project extends Model
     {
         $loanTableName = $isSensitivity ? 'sensitivity_loan_schedule_payments' : 'loan_schedule_payments';
         $studyEndDateAsIndex = $this->getStudyEndDateAsIndex();
+		 $productMonthlySalesPercentages = $this->getProductMonthlySalesTargetPercentages();
         $calculateFixedLoanAtEndService = new CalculateFixedLoanAtEndService();
         $projectUnderProgressService = new ProjectsUnderProgress();
         $datesAsStringAndIndex = $this->getDateWithDateIndex();
@@ -409,22 +420,28 @@ class Project extends Model
                 'ffe_payable'=>$ffePayable,
                 
             ]);
-            $fixedAssetsAllocations =[];
-            $allocationsPercentages = $fixedAsset->getProductAllocations();
-            foreach ($allocationsPercentages as $productId => $allocationPercentage) {
-                foreach ($manufacturingDepreciations as $dateAsIndex => $depreciationValue) {
-                    $fixedAssetsAllocations[$productId][$dateAsIndex]  = $depreciationValue * $allocationPercentage /100 ;
-                }
-                
-                DB::table('product_expense_allocations')->insert([
+         //   $fixedAssetsAllocations =[];
+         //   $allocationsPercentages = $fixedAsset->getProductAllocations();
+      //      foreach ($allocationsPercentages as $productId => $allocationPercentage) {
+                // foreach ($manufacturingDepreciations as $dateAsIndex => $depreciationValue) {
+                //     $fixedAssetsAllocations[$productId][$dateAsIndex]  = $depreciationValue * $allocationPercentage /100 ;
+                // }
+				$monthlyProductAllocations = $fixedAsset->monthly_product_allocations;
+				
+				$isAsRevenuePercentage = $fixedAsset->is_as_revenue_percentages;
+                $fixedAssetsAllocations = Product::multiplyWithAllocation($productMonthlySalesPercentages,$monthlyProductAllocations, $this->products,$manufacturingDepreciations ,$isAsRevenuePercentage);
+				foreach($fixedAssetsAllocations as $productId => $payload){
+					 DB::table('product_expense_allocations')->insert([
                     'project_id'=>$this->id ,
                     'product_id'=>$productId,
                     'expense_name'=>$fixedAsset->getName(),
                     'is_expense'=>0,
                     'is_depreciation'=>1 ,
-                    'payload'=>json_encode($fixedAssetsAllocations[$productId]??[])
+                    'payload'=>json_encode($payload)
                 ]);
-            }
+				}
+               
+  //          }
         }
      
         
@@ -607,7 +624,7 @@ class Project extends Model
         $yearWithItsMonths=$this->getYearIndexWithItsMonths();
         unset($yearWithItsMonths[array_key_last($yearWithItsMonths)]);
         $sumKeys = array_keys($studyMonthsForViews);
-                
+              $productMonthlySalesPercentages = $this->getProductMonthlySalesTargetPercentages();  
         $fixedAssetOpeningBalances  = $this->fixedAssetOpeningBalances;
         $datesAsStringAndIndex = $this->getDateWithDateIndex();
         $operationStartDateFormatted = $this->getOperationStartDateFormatted();
@@ -640,12 +657,19 @@ class Project extends Model
             $adminAllocationPercentages[$openingId]=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $adminDepreciationPercentage/100);
             $manufacturingAllocationPercentages[$openingId]=HArr::MultiplyWithNumber($dateIndexWithMonthlyDepreciation, $manufacturingDepreciationPercentage/100);
          
-            foreach ($allocationPercentage as $productId => $percentage) {
-                foreach ($manufacturingAllocationPercentages[$openingId]??[] as $dateIndex => $value) {
-                    $productExpenses[$openingId][$productId][$dateIndex] = $value  * ($percentage/100);
-                }
-            }
+            // foreach ($allocationPercentage as $productId => $percentage) {
+                // foreach ($manufacturingAllocationPercentages[$openingId]??[] as $dateIndex => $value) {
+                //     $productExpenses[$openingId][$productId][$dateIndex] = $value  * ($percentage/100);
+                // }
             // }
+            // }
+			
+					$monthlyProductAllocations = $fixedAssetOpeningBalance->monthly_product_allocations;
+				
+				$isAsRevenuePercentage = $fixedAssetOpeningBalance->is_as_revenue_percentages;
+				
+                $productExpenses[$openingId] = Product::multiplyWithAllocation($productMonthlySalesPercentages,$monthlyProductAllocations, $this->products,$manufacturingAllocationPercentages[$openingId] ,$isAsRevenuePercentage);
+				
             
         }
         $finalResult =[];
@@ -735,7 +759,8 @@ class Project extends Model
         $years  = $this->getYears();
         $expenses = $this->expenses;
         $products = $this->products;
-        return ['project'=>$this,'years'=>$years,'expenses'=>$expenses,'step_data'=>$step_data,'products'=>$products];
+		$productOptions = $this->products->formattedForSelect(true,'getId','getName');
+        return ['project'=>$this,'productOptions'=>$productOptions,'years'=>$years,'expenses'=>$expenses,'step_data'=>$step_data,'products'=>$products];
     }
     public function getFixedAssetsViewVars():array
     {
@@ -937,6 +962,7 @@ class Project extends Model
         $expenses = DB::table('expenses')->whereIn('category_id', array_merge(['general-expenses','sales','marketing'], $additionalExpensesArr))->where('project_id', $project->id)->get();
         $columnName = [
             'expense_as_percentage'=>'expense_as_percentages',
+            'cost_per_unit'=>'expense_as_percentages',
             'fixed_monthly_repeating_amount'=>'monthly_repeating_amounts',
             'one_time_expense'=>'payload.monthly_one_time'
         ];
@@ -3106,8 +3132,10 @@ class Project extends Model
     {
         $monthlyFixedRepeatingAmountEquation = new MonthlyFixedRepeatingAmountEquation;
         $expenseAsPercentageEquation = new ExpenseAsPercentageEquation;
+        $expenseAsCostPerUnitEquation = new ExpenseAsCostPerUnitEquation;
         $oneTimeExpenseEquation= new OneTimeExpenseEquation;
-        
+        $productMonthlySalesPercentages = $this->getProductMonthlySalesTargetPercentages();
+		
         $expenses = Expense::where('project_id', $this->id)->get();
         //     $modelName = 'Project';
         $project = $this->refresh();
@@ -3126,7 +3154,7 @@ class Project extends Model
             /**
                * * to repeat 2 years inside json
                */
-            $productAllocations = $tableDataArr['product_allocations'] ;
+            $monthlyProductAllocations = $tableDataArr['monthly_product_allocations'] ;
             $expenseCategoryId =$tableDataArr['category_id'];
                 
             $name = $tableDataArr['name'];
@@ -3163,7 +3191,9 @@ class Project extends Model
                 $tableDataArr['monthly_repeating_amounts']  = $monthlyFixedRepeatingResults['total_before_vat'];
                 $tableDataArr['total_vat']  = $monthlyFixedRepeatingResults['total_vat'];
                 $tableDataArr['total_after_vat']  = $monthlyFixedRepeatingResults['total_after_vat'];
-                $expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productAllocations, $project->products, $tableDataArr['total_after_vat']);
+				$isAsRevenuePercentage = $tableDataArr['is_as_revenue_percentages'];
+
+                $expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productMonthlySalesPercentages,$monthlyProductAllocations, $project->products, $tableDataArr['total_after_vat'],$isAsRevenuePercentage);
               
                 $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy, true) ;
                 $withholdPayments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $withholdAmounts, $datesAsIndexAndString, $customCollectionPolicy) ;
@@ -3179,7 +3209,29 @@ class Project extends Model
              * * Expense As Percentage
              */
             if ($tableId =='expense_as_percentage' && $name) {
-                $expenseAsPercentageResult = $expenseAsPercentageEquation->calculate($project->products, $productAllocations, $tableDataArr['start_date'], $loopEndDate, $tableDataArr['monthly_percentage'], $vatRate, $isDeductible, $tableDataArr['withhold_tax_rate']) ;
+				$vatRate = $vatRate ?: 0 ;
+				$withholdRate = $tableDataArr['withhold_tax_rate'] ??0 ;
+				$selectedProducts = $project->products->whereIn('id',$tableDataArr['products']);
+                $expenseAsPercentageResult = $expenseAsPercentageEquation->calculate($selectedProducts, $tableDataArr['start_date'], $loopEndDate, $tableDataArr['monthly_percentage'], $vatRate, $isDeductible, $withholdRate) ;
+                $expenseAmounts = $expenseAsPercentageResult['expense_amounts'];
+                $tableDataArr['expense_as_percentages']  =$expenseAmounts  ;
+                $tableDataArr['total_vat']  =[]  ;
+                $tableDataArr['total_after_vat']  =$expenseAmounts  ;
+                $withholdAmounts  = [];
+                $tableDataArr['payment_amounts'] = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy) ;
+                $payments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $tableDataArr['total_after_vat'], $datesAsIndexAndString, $customCollectionPolicy) ;
+                $withholdPayments = $this->calculateCollectionOrPaymentAmounts($tableDataArr['payment_terms'], $withholdAmounts, $datesAsIndexAndString, $customCollectionPolicy) ;
+                $netPaymentsAfterWithhold = HArr::subtractAtDates([$payments,$withholdPayments], array_keys($payments));
+                $tableDataArr['withhold_amounts'] = $withholdAmounts ;
+                $tableDataArr['withhold_payments']=$withholdPayments;
+                $tableDataArr['payment_amounts'] = $payments;
+                $tableDataArr['net_payments_after_withhold']=$netPaymentsAfterWithhold;
+                $tableDataArr['collection_statements']   =Expense::calculateStatement($tableDataArr['expense_as_percentages'], $tableDataArr['total_vat'], $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
+            } if ($tableId =='cost_per_unit' && $name) {
+				$vatRate = $vatRate ?: 0 ;
+				$withholdRate = $tableDataArr['withhold_tax_rate'] ??0 ;
+				$selectedProducts = $project->products->whereIn('id',$tableDataArr['products']);
+                $expenseAsPercentageResult = $expenseAsCostPerUnitEquation->calculate($selectedProducts, $tableDataArr['start_date'], $loopEndDate, $tableDataArr['monthly_cost_of_unit'], $vatRate, $isDeductible, $withholdRate) ;
                 $expenseAmounts = $expenseAsPercentageResult['expense_amounts'];
                 $tableDataArr['expense_as_percentages']  =$expenseAmounts  ;
                 $tableDataArr['total_vat']  =[]  ;
@@ -3201,9 +3253,10 @@ class Project extends Model
             */
             if ($tableId == 'one_time_expense') {
                 $startDateAsIndex = $tableDataArr['start_date'] ;
+                $amortizationMonths = $tableDataArr['amortization_months'] ;
                 $amountBeforeVat = $tableDataArr['amount']??0 ;
                 $withholdAmount = $tableDataArr['withhold_tax_rate'] / 100 * $amountBeforeVat ;
-                $oneTimeExpenses = $oneTimeExpenseEquation->calculate($amountBeforeVat, $startDateAsIndex, $isDeductible, $vatRate);
+                $oneTimeExpenses = $oneTimeExpenseEquation->calculate($amountBeforeVat,$amortizationMonths, $startDateAsIndex, $isDeductible, $vatRate);
                 $tableDataArr['payload']  = $oneTimeExpenses ;
                 $amountBeforeVatPayload = [$startDateAsIndex=>$amountBeforeVat] ;
                 $vatRate = $tableDataArr['vat_rate'] ??0 ;
@@ -3213,7 +3266,9 @@ class Project extends Model
                 $tableDataArr['total_vat']  =$vats  ;
                 $amountAfterVat = [$startDateAsIndex => $amountBeforeVat + $amountBeforeVat * $vatRate ];
                 $tableDataArr['total_after_vat']  =$amountAfterVat  ;
-                $expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productAllocations, $project->products, $oneTimeExpenses['monthly_one_time']??[]);
+				$isAsRevenuePercentage = $tableDataArr['is_as_revenue_percentages'];
+						
+                $expenseAsPercentageResult['expense_allocations'] = Product::multiplyWithAllocation($productMonthlySalesPercentages,$monthlyProductAllocations, $project->products, $oneTimeExpenses['monthly_one_time']??[],$isAsRevenuePercentage);
                     
                 $withholdAmount = $tableDataArr['withhold_tax_rate']/100 ;
                 $withholdAmounts  = [$startDateAsIndex =>  $amountBeforeVat * $withholdAmount ] ;
@@ -3225,15 +3280,13 @@ class Project extends Model
                 $tableDataArr['payment_amounts'] = $payments;
                 $tableDataArr['net_payments_after_withhold']=$netPaymentsAfterWithhold;
                 $tableDataArr['collection_statements']   =Expense::calculateStatement($amountBeforeVatPayload, $tableDataArr['total_vat'], $netPaymentsAfterWithhold, $withholdPayments, $dateIndexWithDate);
-                // $tableDataArr['prepaid_expense_statement'] = Expense::calculatePrepaidExpenseStatement();
+ 
             }
                
-            //	$tableDataArr['collection_statements'] = [];
+         
             if ($name) {
                 if ($project->expenseHasAllocation($expenseCategoryId)) {
-					if(!isset($expenseAsPercentageResult['expense_allocations'])){
-						dd($name,$expenseAsPercentageResult);
-					}
+					
                     $expenseAllocations[$expenseType][$expenseCategoryId][$name] = $expenseAsPercentageResult['expense_allocations'];
                     
                 }
@@ -3257,7 +3310,6 @@ class Project extends Model
                 
                 
         // after loop
-                
         $expenseAllocationFormatted = [];
         foreach ($expenseAllocations as $expenseType => $arr1) {
             foreach ($arr1 as $expenseCategoryId => $expenseCategoryNameAndValues) {
@@ -3307,7 +3359,7 @@ class Project extends Model
 			'export_collection_statement'=> $exportCollectionStatement,
 			'collection_statement'=>$collectionStatement
 		]);
-    //    $project->recalculateFgInventoryValueStatement();
+
 		
 }
 /**
@@ -3351,5 +3403,57 @@ class Project extends Model
 		
 		
 	}
+
+	
+		public function calculateMonthlyProductAllocations(array $productAllocations){
+			if(!count($productAllocations)){
+				return [];
+			}
+			$studyDatesAsIndexes = $this->getCalculatedExtendedStudyDates();
+			// dd($productAllocations);
+			$result = [];
+			$accumulated = [];
+			// $studyStartDateAsIndex = $this->
+			foreach($productAllocations as $productId => $expensePercentage){
+				$product = Product::find($productId);
+				$sellingStartDateAsIndex = $product->selling_start_date;
+				foreach($studyDatesAsIndexes as $currentDateAsIndex){
+					$result[$productId][$currentDateAsIndex] = 0 ;
+					if($currentDateAsIndex >= $sellingStartDateAsIndex){
+						$result[$productId][$currentDateAsIndex] = $expensePercentage ;
+						$accumulated[$currentDateAsIndex] = isset($accumulated[$currentDateAsIndex]) ? $accumulated[$currentDateAsIndex] + $expensePercentage : $expensePercentage;
+						
+					}
+				}
+			}
+			$finalResult = [];
+			foreach($result as $productId => $dateIndexWithPercentage){
+				foreach($dateIndexWithPercentage as $dateAsIndex => $percentage){
+					$currentTotalPercentage  = $accumulated[$dateAsIndex] ;
+					$finalResult[$productId][$dateAsIndex] = $currentTotalPercentage ? $percentage / $currentTotalPercentage : 0 ; 
+				}
+			}
+			return $finalResult;
+		}
+		public function getProductMonthlySalesTargetPercentages():array 
+		{
+			$totals = [];
+			$this->products->each(function(Product $product) use (&$totals){
+				$currentMonthlySalesTargetValues = $product->monthly_sales_target_values ;
+				foreach($currentMonthlySalesTargetValues as $dateAsIndex => $monthlySalesTargetValue ){
+					$totals[$dateAsIndex] = isset($totals[$dateAsIndex]) ? $totals[$dateAsIndex] + $monthlySalesTargetValue : $monthlySalesTargetValue;
+				}
+			});
+			$finalResult = [];
+			$this->products->each(function(Product $product) use ($totals,&$finalResult){
+				$currentMonthlySalesTargetValues = $product->monthly_sales_target_values ;
+				foreach($currentMonthlySalesTargetValues as $dateAsIndex => $monthlySalesTargetValue ){
+					$currentTotal = $totals[$dateAsIndex];
+					$finalResult[$product->id][$dateAsIndex] = $currentTotal ? $monthlySalesTargetValue / $currentTotal : 0 ;
+				}
+			});
+			return $finalResult;
+		
+		}
 
 }

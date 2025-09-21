@@ -15,7 +15,8 @@ class FixedAssetOpeningBalance extends Model
 		'admin_depreciations'=>'array',
 		'manufacturing_depreciations'=>'array',
 		'monthly_accumulated_depreciations'=>'array',
-		'statement'=>'array'
+		'statement'=>'array',
+		'monthly_product_allocations'=>'array',
 	];
 	
 	public static function getOpeningBalanceColumnName():string
@@ -86,5 +87,9 @@ class FixedAssetOpeningBalance extends Model
 	public function getProductAllocations():array 
 	{
 		return $this->product_allocations;
+	}
+	public function isAsRevenuePercentage():bool 
+	{
+		return $this->is_as_revenue_percentages;
 	}
 }

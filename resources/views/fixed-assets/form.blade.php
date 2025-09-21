@@ -80,8 +80,8 @@
 				'installment_count':1,
 				'payment_installment_interval':'monthly',
 			
-		
-				'equity_funding_rate':0,
+				'is_as_revenue_percentages':1,
+				'equity_funding_rate':100,
 				'replacement_cost_rate':0,
 				'depreciation_duration':5,
 				'amount':0,
@@ -95,7 +95,8 @@
 				$('.js-select2-with-one-selection').select2({});
 				$('.hundred-minus-number').trigger('change')
 				recalculateAllocations(this);
-				
+				$('.hundred-minus-number-one').trigger('change')
+				$('.allocate-checkbox').trigger('change')
             }
             , ready: function(setIndexes) {
 					

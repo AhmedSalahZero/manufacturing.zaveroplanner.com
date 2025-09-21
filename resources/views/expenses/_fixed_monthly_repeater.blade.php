@@ -31,7 +31,7 @@ common-parent
         <label class="form-label ">{{ __('Amount') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="number" class="form-control only-greater-than-or-equal-zero-allowed " name="amount" value="{{ isset($expense) ? $expense->getAmount() : old('amount') }}" step="0.5">
+                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed " name="amount" value="{{ isset($expense) ? $expense->getAmount() : old('amount') }}">
             </div>
         </div>
     </div>
@@ -40,7 +40,7 @@ common-parent
         <label class="form-label ">{{ __('Increase %') }} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="number" class="form-control only-percentage-allowed" name="increase_rate" value="{{ isset($expense) ? $expense->getIncreaseRate() : old('increase_rate') }}" step="any">
+                <input type="text" class="form-control only-percentage-allowed" name="increase_rate" value="{{ isset($expense) ? $expense->getIncreaseRate() : old('increase_rate') }}" >
             </div>
         </div>
     </div>
@@ -91,82 +91,7 @@ common-parent
     </div>
 
 
-    <div class="modal fade allocate-parent-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header header-border">
-                    <h5 class="modal-title font-size-1rem">{{ __('Allocate') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-
-                    <table class="table w-full closest-parent">
-                        <tbody>
-
-                            @foreach($products as $product)
-                            @php
-                            $percentage = $expense ? $expense->getProductAllocationPercentageForTypeAndProduct($product->id) : null;
-                            $percentage = is_null($percentage) ? 1/count($products)*100 : $percentage;
-                            @endphp
-                            <tr>
-
-                                <td>
-                                    <div class="form-group d-flex   text-center">
-
-                                        <div class="col-9 text-left">
-                                            <label>{{ __('Product') }}</label>
-                                            <input readonly class="form-control" type="text" value="{{ $product->getName() }}">
-                                            <input multiple class="form-control product-id-class"  data-product-id="{{ $product->id }}" name="product_id" type="hidden" value="{{ $product->id }}">
-
-                                        </div>
-                                        <div class="col-3 text-left">
-                                            <label>{{ __('Perc.%') }}</label>
-                                            <input multiple class="form-control percentage-depreciation total_input input-border" name="percentage" value="{{ $percentage }}">
-                                        </div>
-
-
-                                    </div>
-                                </td>
-
-                            </tr>
-                            @endforeach
-
-                            <tr>
-
-                                <td>
-                                    <div class="form-group d-flex   text-center">
-
-                                        <div class="col-9 text-left">
-                                            <label>{{ __('Total') }}</label>
-                                            <input readonly class="form-control" type="text" value="{{ __('Total') }}">
-                                        </div>
-                                        <div class="col-3	 text-left">
-                                            <label>{{ __('Total %') }}</label>
-                                            <input readonly class="form-control must-not-exceed-100 total_row_result input-border" value="{{ 0 }}">
-                                        </div>
-
-
-                                    </div>
-                                </td>
-
-                            </tr>
-
-
-                        </tbody>
-                    </table>
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn save-modal btn-primary" data-dismiss="modal">{{ __('Save') }}</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
+	@include('expenses._allocate_modal',['subModel'=>$expense])
 </div>
 
 

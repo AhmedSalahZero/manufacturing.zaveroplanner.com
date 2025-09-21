@@ -95,6 +95,10 @@ class Product extends Model
     {
         return $this->belongsTo(Project::class);
     }
+	public function getId():int 
+	{
+		return $this->id;
+	}
 	public function getName():string 
 	{
 		return $this->name ; 
@@ -428,14 +432,14 @@ class Product extends Model
 	{
 		return $this->collection_statement ?:[];
 	}
-	public static function multiplyWithAllocation(array $productAllocations , $products , array $resultAsDateIndexAndValue )
+	public static function multiplyWithAllocation(array $productMonthlySalesPercentages, array $monthlyProductAllocations , $products , array $resultAsDateIndexAndValue , bool $isAsRevenuePercentage )
 	{
 		$expenseAllocations = [];
 			foreach($products as $product){
-				foreach($resultAsDateIndexAndValue as $dateAsIndex => $value){
-					$currentAllocationPercentage = $productAllocations[$product->id] ?? 0 ;
-					$currentAllocationPercentage = $currentAllocationPercentage / 100 ;
-					$expenseAllocations[$product->id][$dateAsIndex] = $value *   $currentAllocationPercentage;
+				foreach($resultAsDateIndexAndValue as $dateAsIndex => $expenseValue){
+					$currentMonthlySalesPercentage = $isAsRevenuePercentage ? $productMonthlySalesPercentages[$product->id][$dateAsIndex] : 1; 
+					$currentAllocationPercentage = $isAsRevenuePercentage ?  1 :  $monthlyProductAllocations[$product->id][$dateAsIndex] ?? 0 ;
+					$expenseAllocations[$product->id][$dateAsIndex] = $currentMonthlySalesPercentage * $expenseValue *   $currentAllocationPercentage;
 				}
 			}
 			return $expenseAllocations;

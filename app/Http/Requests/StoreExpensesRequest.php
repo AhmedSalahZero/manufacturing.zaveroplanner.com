@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
 class StoreExpensesRequest extends FormRequest
 {
@@ -29,6 +30,7 @@ class StoreExpensesRequest extends FormRequest
     }
 	protected function prepareForValidation()
 {
+
 	$currentIndex= 0 ;
 	$expensesFormatted =[];
 	$project = $this->route('project');
@@ -48,13 +50,17 @@ class StoreExpensesRequest extends FormRequest
 					// $project->getDate
 						$expensesFormatted['expenses'][$currentIndex]['end_date'] =$dateIndexWithDates[$currentExpenseArr['end_date']] ;	
                 }
-				$expensesFormatted['expenses'][$currentIndex]['type'] = $expenseTypeId;					
+				$expensesFormatted['expenses'][$currentIndex]['type'] = $expenseTypeId;			
+				$expensesFormatted['expenses'][$currentIndex]['is_as_revenue_percentages'] = $isAsRevenuePercentage =  isset($currentExpenseArr['is_as_revenue_percentages']) ? Arr::first($currentExpenseArr['is_as_revenue_percentages']) : 0;			
 				
 				
-				  $productIds = $currentExpenseArr['product_id'];
-                $allocationPercentages = $currentExpenseArr['percentage'];
+				$productIds = $currentExpenseArr['product_id']??[];
+                $allocationPercentages = $currentExpenseArr['percentage']??[];
+				
                 $productAllocations = array_combine($productIds, $allocationPercentages);
-				$expensesFormatted['expenses'][$currentIndex]['product_allocations'] = $productAllocations;			
+				
+				$expensesFormatted['expenses'][$currentIndex]['product_allocations'] = $productAllocations;		
+				$expensesFormatted['expenses'][$currentIndex]['monthly_product_allocations'] = $isAsRevenuePercentage ? [] :   $project->calculateMonthlyProductAllocations($productAllocations);
 				
 				if($currentExpenseArr['payment_terms'] == 'customize'){
 					$newDueDays = [];

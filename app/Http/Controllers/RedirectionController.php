@@ -2,12 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Assets;
-use App\Equations\ExpenseAsPercentageEquation;
-use App\Equations\MonthlyFixedRepeatingAmountEquation;
-use App\Equations\OneTimeExpenseEquation;
-use App\Expense;
-use App\Helpers\HArr;
+
 use App\Http\Requests\StoreExpensesRequest;
 use App\Http\Requests\StoreFixedAssetsRequest;
 use App\Http\Requests\StoreManpowerRequest;
@@ -34,6 +29,7 @@ class RedirectionController extends Controller
 
     public function productsPost(StoreProductsRequest $request, Project $project, Product $product)
     {
+
 
 		$request->merge([
 			'fg_inventory_quantity'=>number_unformat($request->get('fg_inventory_quantity')),
@@ -138,13 +134,19 @@ class RedirectionController extends Controller
         $manpowers = [];
         $index=   0 ;
         $manpowerAllocations = [];
+		$monthlyProductAllocations = [];
         foreach ($request->get('manpower_allocations') as $manpowerType => $allocations) {
             foreach ($allocations['products']??[] as $productId=>$productName) {
                 $manpowerAllocations[$manpowerType][$productId] = $allocations['percentages'][$productId]??0;
             }
+			$monthlyProductAllocations[$manpowerType] = $project->calculateMonthlyProductAllocations($manpowerAllocations[$manpowerType]);
         }
+		
+		// $isAsRevenuePercentage ? [] :   $project->calculateMonthlyProductAllocations($productAllocations)
         $project->update([
             'manpower_allocations'=>$manpowerAllocations,
+			'monthly_manpower_allocations'=>$monthlyProductAllocations,
+			'manpower_is_as_revenue_percentages'=>$request->get('manpower_is_as_revenue_percentages',[]),
             'salaries_annual_increase'=>$request->get('salaries_annual_increase'),
             'salaries_tax_rate'=>$request->get('salaries_tax_rate'),
             'social_insurance_rate'=>$request->get('social_insurance_rate')
@@ -196,6 +198,7 @@ class RedirectionController extends Controller
         Project $project,
        
     ) {
+
 		$project->storeRepeaterRelations($request, ['expenses'], ['project_id'=>$project->id]);
         if ($request->get('submit_button') != 'next') {
             return redirect()->route('main.project.page', ['project'=>$project->id]);

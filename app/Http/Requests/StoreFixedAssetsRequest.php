@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
 class StoreFixedAssetsRequest extends FormRequest
 {
@@ -37,12 +38,16 @@ class StoreFixedAssetsRequest extends FormRequest
 				unset($fixedAssets[$index]);
 				continue;
 			}
-            $productIds = $fixedAssetArr['product_id'];
-            $allocationPercentages = $fixedAssetArr['percentage'];
+            $productIds = $fixedAssetArr['product_id']??[];
+            $allocationPercentages = $fixedAssetArr['percentage']??[];
+            $fixedAssetArr['product_allocations'] = $productAllocations =  array_combine($productIds, $allocationPercentages);
+			$fixedAssetArr['is_as_revenue_percentages'] =$isAsRevenuePercentage = isset($fixedAssetArr['is_as_revenue_percentages']) ? Arr::first($fixedAssetArr['is_as_revenue_percentages']) : 0;	
+			$fixedAssetArr['monthly_product_allocations'] = $isAsRevenuePercentage ? [] :   $project->calculateMonthlyProductAllocations($productAllocations);
+			
             $fixedAssetArr['amount'] = number_unformat($fixedAssetArr['amount']);
             $fixedAssetArr['start_date'] = $project->getIndexDateFromString($fixedAssetArr['start_date'].'-01');
             $fixedAssetArr['end_date'] = $project->getIndexDateFromString($fixedAssetArr['end_date'].'-01');
-            $fixedAssetArr['product_allocations'] = array_combine($productIds, $allocationPercentages);
+			
             unset($fixedAssetArr['product_id']);
             unset($fixedAssetArr['percentage']);
 			$fixedAssetArr['due_days'] = array_unique($fixedAssetArr['due_days']??[]);

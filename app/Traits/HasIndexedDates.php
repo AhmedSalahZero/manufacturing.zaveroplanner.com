@@ -771,6 +771,10 @@ trait HasIndexedDates
 			return  extendArr($arr,$config[$isMonthlyColumn]['position'],$config[$isMonthlyColumn]['no_repeats']);
 			
 	}
+	public function getCalculatedExtendedStudyDates():array 
+	{
+		return range(0,$this->duration * 12 +11);
+	}
 	
 	
 	

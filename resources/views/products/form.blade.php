@@ -13,7 +13,9 @@
         {{ __("ZAVERO Manufacturing") }} > {{$project->name}} > {{ $product->getName() }}
     </h1>
     <div class="ProjectList">
+		
         <form action="{{route('products.submit',[$project,$product->id])}}" method="POST">
+
             {{ csrf_field() }}
 
 			@include('products._content')

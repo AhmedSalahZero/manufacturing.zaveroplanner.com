@@ -26,6 +26,8 @@ class Expense extends Model
 		'withhold_amounts'=>'array',
 		'product_allocations'=>'array',
 		'prepaid_expense_statement'=>'array',
+		'products'=>'array',
+		'monthly_product_allocations'=>'array',
     ];
     
     public function project()
@@ -204,5 +206,17 @@ class Expense extends Model
 	}
 	public function getProductAllocationPercentageForTypeAndProduct(int $productId):?float{
 		return $this->product_allocations[$productId]??null;
+	}
+	public function getProductArr():array 
+	{
+		return $this->products?:[];
+	}
+	public function isAsRevenuePercentage():bool 
+	{
+		return $this->is_as_revenue_percentages;
+	}
+	public function getAmortizationMonths():int 
+	{
+		return $this->amortization_months?:12;
 	}
 }

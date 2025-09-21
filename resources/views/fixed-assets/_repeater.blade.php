@@ -84,7 +84,7 @@ common-parent
         <label class="form-label "> {!! __('Administration <br> Depreciation %') !!} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed " name="admin_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getAdminDepreciationPercentage() : old('admin_depreciation_percentage',0) }}" step="0.5">
+                <input type="text" class="form-control only-greater-than-or-equal-zero-allowed hundred-minus-number-one" name="admin_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getAdminDepreciationPercentage() : old('admin_depreciation_percentage',0) }}" step="0.5">
             </div>
         </div>
     </div>
@@ -93,7 +93,7 @@ common-parent
         <label class="form-label ">{!! __('Manufacturing <br> Depreciation %') !!} </label>
         <div class="kt-input-icon">
             <div class="input-group">
-                <input type="text" class="form-control  only-greater-than-or-equal-zero-allowed " name="manufacturing_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getManufacturingDepreciationPercentage() : old('manufacturing_depreciation_percentage',0) }}" step="0.5">
+                <input type="text" readonly class="form-control  only-greater-than-or-equal-zero-allowed hundred-minus-number-result-one" name="manufacturing_depreciation_percentage" value="{{ isset($fixedAsset) ? $fixedAsset->getManufacturingDepreciationPercentage() : old('manufacturing_depreciation_percentage',0) }}" step="0.5">
             </div>
         </div>
     </div>
@@ -107,8 +107,8 @@ common-parent
             </div>
         </div>
 
-
-        <div class="modal fade allocate-parent-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}" aria-hidden="true">
+		@include('expenses._allocate_modal',['subModel'=>$fixedAsset])
+        {{-- <div class="modal fade allocate-parent-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header header-border">
@@ -135,13 +135,11 @@ common-parent
                                             <div class="col-9 text-left">
                                                 <label>{{ __('Product') }}</label>
                                                 <input readonly class="form-control" type="text" value="{{ $product->getName() }}">
-                                                {{-- <input type="text" style="width:0;height:0;padding:0;margin:0;font-size:0 !important;line-height:0;border:0px solid red;" multiple name="product_id" readonly value="$product->id"> --}}
                                                 <input multiple class="form-control product-id-class" data-product-id="{{ $product->id }}" name="product_id" type="hidden" value="{{ $product->id }}">
-
                                             </div>
                                             <div class="col-3 text-left">
                                                 <label>{{ __('Perc.%') }}</label>
-                                                <input multiple class="form-control percentage-depreciation total_input input-border" name="percentage" value="{{ $percentage }}">
+                                                <input multiple class="form-control percentage-allocation total_input input-border" name="percentage" value="{{ $percentage }}">
                                             </div>
 
 
@@ -183,7 +181,7 @@ common-parent
 
                 </div>
             </div>
-        </div>
+        </div> --}}
 
     </div>
 
