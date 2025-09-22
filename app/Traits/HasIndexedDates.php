@@ -692,10 +692,21 @@ trait HasIndexedDates
     }
 	   public function getYearOrMonthIndexes():array 
     {
-        // if ($this->isMonthlyStudy()) {
-        //     return $this->getMonthlyIndexes();
-        // }
         return $this->getYearlyIndexes();
+    }
+	   public function getYearOrMonthIndexesFromStudy():array 
+    {
+		 $studyMonthsForViews = $this->getStudyDates();
+        $studyMonthsForViews = array_slice($studyMonthsForViews, 0, $this->getViewStudyEndDateAsIndex()+1);
+        $yearWithItsMonths=$this->getYearIndexWithItsMonths();
+        unset($yearWithItsMonths[array_key_last($yearWithItsMonths)]);
+		$yearIndexWithValue = $this->replaceMonthIndexWithYearIndex($studyMonthsForViews);
+		$result = [];
+		foreach($yearIndexWithValue as $yearAsIndex => $dateAsString){
+			$yearFormatted = explode('-',$dateAsString)[0];
+			$result[$yearAsIndex]  =  'Yr-'.$yearFormatted ;
+		}
+		return $result;
     }
 	public function getMonthlyIndexes()
 	{
@@ -718,6 +729,7 @@ trait HasIndexedDates
         return $results;
 		
 	}
+		
 	public function getActiveMonthlyDates($yearIndexWithItsActiveMonths,$dateIndexWithDate)
 	{
 		$results = [];
@@ -774,6 +786,26 @@ trait HasIndexedDates
 	public function getCalculatedExtendedStudyDates():array 
 	{
 		return range(0,$this->duration * 12 +11);
+	}
+	public function replaceMonthIndexWithYearIndex(array $items)
+	{
+		$newResult = [];
+		foreach($items as $dateIndex => $value){
+			$yearIndex = $this->getYearIndexFromDateIndex($dateIndex) ;
+			$newResult[$yearIndex] = $value; 
+		}
+		return $newResult;
+	}
+	public function replaceMonthIndexWithYearIndexInTwoArr(array $items)
+	{
+		$newResult = [];
+		foreach($items as $key => $newItems){
+			foreach($newItems as $dateIndex => $value){
+			$yearIndex = $this->getYearIndexFromDateIndex($dateIndex) ;
+			$newResult[$key][$yearIndex] = $value; 
+		}
+		}
+		return $newResult;
 	}
 	
 	

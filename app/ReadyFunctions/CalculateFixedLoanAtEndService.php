@@ -65,7 +65,6 @@ class CalculateFixedLoanAtEndService
 		}
 		$loanFactors = [];
 		$installmentFactors = [];
-		// dd($currentStartDateAsIndex,$startDate);
 		$datesAsIndexString=HDate::generateDatesBetweenStartDateAndDuration($currentStartDateAsIndex,$startDate,$tenor,$installmentPaymentIntervalName);
 		$installmentPaymentIntervalValue = $this->getInstallmentPaymentIntervalValue($installmentPaymentIntervalName);
 		$intervalValue = $installmentPaymentIntervalValue;
@@ -143,7 +142,6 @@ class CalculateFixedLoanAtEndService
 		$installmentAmounts = $this->calculateInstallmentAmount($installmentPaymentIntervalValue,$loanFactors,$installmentFactors, $stepRate, $installmentStartDateAsIndex, $endDateAsIndex, $tenor, $installmentPaymentIntervalValue, $appliedStepValue,$pricingPerMonths);
 
 		$loanScheduleResult = $this->calculateLoanScheduleResult($installmentPaymentIntervalValue,$datesIndexAndDaysCount,$loanType, $loanAmount, $interestFactors, $installmentAmounts,$currentStartDateAsIndex);
-		
 		if($indexOfLoop == -1){
 		
 			return [
@@ -370,6 +368,8 @@ class CalculateFixedLoanAtEndService
 					$ffeLoanStartDateAsIndex=$project->convertDateStringToDateIndex($ffeLoanStartDate);
 					$ffeLoanCalculations = $fixedLoanAtEndService->__calculate([],-1,$ffeLoanType, $ffeLoanStartDate, $ffeLoanAmount, $ffeBaseRate, $ffeMarginRate, $ffeTenor, $ffeInstallmentIntervalName, $ffeStepUpRate, $ffeStepUpIntervalName, $ffeStepDownRate, $ffeStepDownIntervalName, $ffeGracePeriod,$ffeLoanStartDateAsIndex);
 					$ffeLoanCalculations = $ffeLoanCalculations['final_result']??[];
+					$currentEndBalances = $ffeLoanCalculations['endBalance']??[] ;
+					$ffeLoanCalculations['endBalance'] =HArr::fillMissedKeysFromPreviousKeys($currentEndBalances,$project->getCalculatedExtendedStudyDates());
 					$ffeLoanCalculations['month_as_index'] = $ffeLoanStartDateAsIndex;
 					$ffeLoanCalculations['loan_type'] = $ffeLoanType;
 					$ffeLoanInterestAmounts = $ffeLoanCalculations['interestAmount'] ?? [];

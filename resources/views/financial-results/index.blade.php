@@ -6,13 +6,24 @@ input.form-control[type="text"][readonly] {
     color: black !important;
     font-weight: 400 !important;
 }
+.fixed-column-table {
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  border-collapse: collapse;
+}
+.fixed-column {
+  position: sticky;
+  left: -15px;
+  background: #f8f8f8; /* Optional: distinguish the fixed column */
+  z-index: 1; /* Ensure it stays above other cells */
+}
+
 </style>
 <div class="col-12">
 
     <h1 class="bread-crumbs">
         {{ __('ZAVERO Manufacturing') }} > {{ $project->name }} > {{ $title }}
     </h1>
-
 
     @include('financial-results._content')
 	

@@ -994,7 +994,7 @@ public static function calculateWorkingCapital($cashAndBankAmount,$totalCashInAs
 			$lastIndex+=1;
 			$freeCashFlowForEquity[$lastIndex] = $value * (1+$perptual) ;
 		}
-		if(count($freeCashFlowForEquity) >=180){
+		if(count($freeCashFlowForEquity) >=240){
 			return $freeCashFlowForEquity;
 		}
 		return self::extendFreeCashflowTenYears($freeCashFlowForEquity,$perptual);

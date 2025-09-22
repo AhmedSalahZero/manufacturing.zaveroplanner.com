@@ -95,7 +95,8 @@ trait HasCollectionPolicy
         $monthlySalesTargetValueAfterVat = HArr::sumAtDates([$monthlySalesTargetValueBeforeVat,$vatAmounts], array_keys($monthlySalesTargetValueBeforeVat));
 	
         $salesActiveYearsIndexWithItsMonths=  $this->getSalesActiveYearsIndexWithItsMonths();
-        $hasMultiYear = array_key_exists(1, $salesActiveYearsIndexWithItsMonths) ;
+        $hasMultiYear = count($salesActiveYearsIndexWithItsMonths) > 1 ;
+	
 		$firstYearIndex = array_key_first($salesActiveYearsIndexWithItsMonths);
         $monthlySalesTargetValueAfterVatForFirstYearMonths = array_intersect_key($monthlySalesTargetValueAfterVat, array_flip(array_keys($salesActiveYearsIndexWithItsMonths[$firstYearIndex])));
         $dueDayWithRates = $this->getDueDayWithRates(0,$localOrExport);
@@ -104,11 +105,14 @@ trait HasCollectionPolicy
 			
 		// }
         $amountAfterVat = [];
+		
         $amountAfterVatForFirstYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $monthlySalesTargetValueAfterVatForFirstYearMonths);
         $amountAfterVat = $amountAfterVatForFirstYear;
+		
         if ($hasMultiYear) {
             $secondYearStartMonthIndex = array_key_last(($salesActiveYearsIndexWithItsMonths[$firstYearIndex])) + 1 ;
-            $monthlySalesTargetValueAfterVatForMultiYearMonths = array_slice($monthlySalesTargetValueAfterVat, $secondYearStartMonthIndex, null, true);
+            $monthlySalesTargetValueAfterVatForMultiYearMonths = HArr::slice_from_index($monthlySalesTargetValueAfterVat, $secondYearStartMonthIndex);
+			
             $dueDayWithRates = $this->getDueDayWithRates(1,$localOrExport);
             $amountAfterVatForMultiYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $monthlySalesTargetValueAfterVatForMultiYearMonths);
             $amountAfterVat = HArr::sumAtDates([$amountAfterVatForFirstYear,$amountAfterVatForMultiYear], array_keys($monthlySalesTargetValueAfterVat));
@@ -121,9 +125,10 @@ trait HasCollectionPolicy
 	
         $withholdAmountsForFirstYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $withholdAmountsForFirstYearMonths);
         $withholdPayments = $withholdAmountsForFirstYear;
+		
         if ($hasMultiYear) {
             $secondYearStartMonthIndex = array_key_last(($salesActiveYearsIndexWithItsMonths[$firstYearIndex])) + 1 ;
-            $withholdAmountsForMultiYearMonths = array_slice($withholdAmounts, $secondYearStartMonthIndex, null, true);
+            $withholdAmountsForMultiYearMonths = HArr::slice_from_index($withholdAmounts, $secondYearStartMonthIndex);
             $dueDayWithRates = $this->getDueDayWithRates(1,$localOrExport);
             $amountAfterVatForMultiYear = $this->calculateCollectionOrPaymentForMultiCustomizedAmounts($dueDayWithRates, $withholdAmountsForMultiYearMonths);
             $withholdPayments = HArr::sumAtDates([$withholdAmountsForFirstYear,$amountAfterVatForMultiYear], array_keys($withholdAmounts));

@@ -924,9 +924,10 @@ class Project extends Model
             $currentTotalCogs = $totalCogs[$id]??[];
             $tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['data'] = $currentTotalCogs ;
             $tableDataFormatted[$costOfServiceOrderIndex]['sub_items'][$id]['year_total'] = $currentTotalPerYear = HArr::sumPerYearIndex($currentTotalCogs, $yearWithItsMonths);
-            $totalCogsPerYear[$id] = array_values($currentTotalPerYear);
-            $totalCogsPercentageOfRevenues[$id]  = array_values(HArr::calculatePercentageOf($salesRevenueYearTotal, $currentTotalPerYear)) ;
+            $totalCogsPerYear[$id] = $currentTotalPerYear;
+            $totalCogsPercentageOfRevenues[$id]  = HArr::calculatePercentageOf($salesRevenueYearTotal, $currentTotalPerYear) ;
         }
+		
         $totalCostOfGoodsSold = HArr::sumAtDates(array_values($totalCogs), $sumKeys) ;
         $tableDataFormatted[$costOfServiceOrderIndex]['main_items']['cost-of-goods-sold']['data'] =  $totalCostOfGoodsSold ;
         $tableDataFormatted[$costOfServiceOrderIndex]['main_items']['cost-of-goods-sold']['year_total'] =$costOfGodSoldTotalPerYear = HArr::sumPerYearIndex($totalCostOfGoodsSold, $yearWithItsMonths);
@@ -1001,8 +1002,8 @@ class Project extends Model
         foreach ($resultPerCategory as $categoryId => $values) {
             
             $currentItems=HArr::sumPerYearIndex($values, $yearWithItsMonths);
-            $resultTotalPerCategoryPerYear[$categoryId]=array_values($currentItems);
-            $resultTotalPercentagesPerCategoryPerYear[$categoryId]=array_values(HArr::calculatePercentageOf($salesRevenueYearTotal, $currentItems));
+            $resultTotalPerCategoryPerYear[$categoryId]=$currentItems;
+            $resultTotalPercentagesPerCategoryPerYear[$categoryId]=HArr::calculatePercentageOf($salesRevenueYearTotal, $currentItems);
         }
         
        
@@ -1211,27 +1212,28 @@ class Project extends Model
         $retainedEarningOpening = $retainedEarningOpening ? $retainedEarningOpening->retained_earnings : 0;
         // $retainedEarning = HArr::calculateRetainEarning($retainedEarningOpening,$ebt);
         $retainedEarning = HArr::calculateRetainEarning($retainedEarningOpening, $netProfit);
+
         $data = [
-            'total_sales_revenues'=>array_values($salesRevenueYearTotal) ,
-            'annually_sales_revenues_growth_rates'=>array_values($annuallySalesRevenueGrowthRates) ,
-            'gross_profit'=>array_values($grossProfitTotalPerYear),
-            'annually_gross_profit_revenue_percentages'=>array_values($grossProfitRevenuePercentages),
-            'ebitda'=>array_values($ebitdaTotalPerYear),
-            'annually_ebitda_revenue_percentages'=>array_values($editdaRevenuePercentage),
-            'ebit'=>array_values($ebitTotalPerYear),
-            'annually_ebit_revenue_percentages'=>array_values($editRevenuePercentage),
+            'total_sales_revenues'=>$project->replaceMonthIndexWithYearIndex($salesRevenueYearTotal) ,
+            'annually_sales_revenues_growth_rates'=>$project->replaceMonthIndexWithYearIndex($annuallySalesRevenueGrowthRates) ,
+            'gross_profit'=>$project->replaceMonthIndexWithYearIndex($grossProfitTotalPerYear),
+            'annually_gross_profit_revenue_percentages'=>$project->replaceMonthIndexWithYearIndex($grossProfitRevenuePercentages),
+            'ebitda'=>$project->replaceMonthIndexWithYearIndex($ebitdaTotalPerYear) ,
+            'annually_ebitda_revenue_percentages'=>$project->replaceMonthIndexWithYearIndex($editdaRevenuePercentage),
+            'ebit'=>$project->replaceMonthIndexWithYearIndex($ebitTotalPerYear),
+            'annually_ebit_revenue_percentages'=>$project->replaceMonthIndexWithYearIndex($editRevenuePercentage) ,
             'monthly_ebt'=>$ebt,
-            'ebt'=>array_values($ebtTotalPerYear),
-            'annually_ebt_revenue_percentages'=>array_values($ebtRevenuePercentagePerYear),
+            'ebt'=>$project->replaceMonthIndexWithYearIndex($ebtTotalPerYear),
+            'annually_ebt_revenue_percentages'=>$project->replaceMonthIndexWithYearIndex($ebtRevenuePercentagePerYear),
             'net_profit'=>$netProfit,
-            'annually_net_profit'=>$netProfitTotalPerYear,
-            'annually_net_profit_revenue_percentages'=>array_values($netProfitRevenuePercentage),
-            'total_cogs'=>$totalCogsPerYear,
-            'total_percentages_cogs'=>$totalCogsPercentageOfRevenues,
+            'annually_net_profit'=>$project->replaceMonthIndexWithYearIndex($netProfitTotalPerYear),
+            'annually_net_profit_revenue_percentages'=>$project->replaceMonthIndexWithYearIndex($netProfitRevenuePercentage),
+            'total_cogs'=>$project->replaceMonthIndexWithYearIndexInTwoArr($totalCogsPerYear),
+            'total_percentages_cogs'=>$project->replaceMonthIndexWithYearIndexInTwoArr($totalCogsPercentageOfRevenues),
             'accumulated_retained_earnings'=>$retainedEarning,
-            'total_depreciation'=>array_values($totalDepreciationTotalPerYear),
-            'sganda'=>$resultTotalPerCategoryPerYear,
-            'sganda_revenues_percentages'=>$resultTotalPercentagesPerCategoryPerYear
+            'total_depreciation'=>$project->replaceMonthIndexWithYearIndex($totalDepreciationTotalPerYear),
+            'sganda'=>$project->replaceMonthIndexWithYearIndexInTwoArr($resultTotalPerCategoryPerYear),
+            'sganda_revenues_percentages'=>$project->replaceMonthIndexWithYearIndexInTwoArr($resultTotalPercentagesPerCategoryPerYear) 
         ];
         $this->incomeStatement ? $this->incomeStatement->update($data)  : $this->incomeStatement()->create($data);
         return [
@@ -2231,7 +2233,6 @@ class Project extends Model
             $totalLoanBalances = HArr::sumAtDates([$loanEndBalance,$totalLoanBalances], $sumKeys);
         }
         
-
         $mediumTermLoans  = HArr::sumAtDates([$totalLoanBalances,$totalLoansOpening], $sumKeys) ;
         foreach ($this->fixedAssets as $fixedAsset) {
             $loanWithdrawalEndBalance = $fixedAsset->ffe_loan_withdrawal_end_balance?:[];
@@ -2272,7 +2273,6 @@ class Project extends Model
 			$currentAmount = $otherLongTermsOpeningBalanceEndBalances[0]->amount ;
 			$totalAmountOtherLongTerm += $currentAmount ;
         }
-        // dd();
         $currentDataArr = $totalOtherLongTermsOpening ;
         $title = __('Other Long Term Liabilities');
         $currentTabId = $title ;
@@ -2623,7 +2623,7 @@ class Project extends Model
         $formattedResult['ebit_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_ebit_revenue_percentages : [];
         $formattedResult['ebt'] =  $incomeStatement ? $incomeStatement->ebt : [];
         $formattedResult['ebt_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_ebt_revenue_percentages : [];
-        $formattedResult['net_profit'] =  $incomeStatement ? $incomeStatement->net_profit : [];
+        $formattedResult['net_profit'] =  $incomeStatement ? $incomeStatement->annually_net_profit : [];
         $formattedResult['net_profit_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_net_profit_revenue_percentages : [];
         $formattedExpenses['raw-material-cost'] = $incomeStatement ? $incomeStatement->total_cogs['raw_material']??[] : [];
         $formattedExpenses['labor-cost'] = $incomeStatement ? $incomeStatement->total_cogs['direct_labor']??[] : [];
@@ -2689,14 +2689,15 @@ class Project extends Model
         $taxRate = $project->tax_rate / 100 ;
         $formattedDcfMethod['taxes'] = $taxes =  HArr::MultiplyWithNumberIfPositive($formattedDcfMethod['ebit'], $taxRate);
         $formattedDcfMethod['depreciation'] = $depreciation =  $incomeStatement ? $incomeStatement->total_depreciation : [];
-        $formattedDcfMethod['net-change-in-working-capital'] = $netChangeInWorkingCapital = $balanceSheet ? array_values($balanceSheet->net_change_in_working_capital) : [];
-		$fixedAssetPayments = array_values($cashflow->fixed_asset_payments) ; 
+        $formattedDcfMethod['net-change-in-working-capital'] = $netChangeInWorkingCapital = $balanceSheet ? $project->replaceMonthIndexWithYearIndex($balanceSheet->net_change_in_working_capital) : [];
+		$fixedAssetPayments = $project->replaceMonthIndexWithYearIndex($cashflow->fixed_asset_payments) ; 
         $formattedDcfMethod['capex'] = $capex =  $cashflow ? $fixedAssetPayments  : [];
         $sum = HArr::sumAtDates([$ebit,$depreciation,$netChangeInWorkingCapital], $years);
         $minus = HArr::sumAtDates([$taxes,$capex], $years);
         $freeCashflow = HArr::subtractAtDates([$sum,$minus], $years);
         $formattedDcfMethod['free-cashflow'] = $freeCashflow ;
         $lastValueFreeCashflow = $freeCashflow[array_key_last($freeCashflow)] ??0;
+	
         $perptual = $this->perpetual_growth_rate/100;
         $lastValueFreeCashflow = $lastValueFreeCashflow * (1+$perptual);
         $returnRate = $this->return_rate/100;
@@ -2741,7 +2742,7 @@ class Project extends Model
             $newWacc[$yearAsIndex] = pow(1+$wacc, $index);
             $index++;
         }
-        $formattedDcfMethod['discount-factor'] = array_values($newWacc) ;
+        $formattedDcfMethod['discount-factor'] = $project->replaceMonthIndexWithYearIndex($newWacc) ;
         $formattedDcfMethod['npv'] = [0=>array_sum(HArr::divideTwoArrAtSameIndex($freeCashflowWithTerminal, array_values($newWacc)))] ;
         $formattedDcfMethod['irr'] = [Finance::irr($freeCashflowWithTerminal)*100] ;
         $paybackPeriodService = new CalculatePaybackPeriodService();
@@ -2771,11 +2772,14 @@ class Project extends Model
         $sensitivityFormattedResult = [];
         $sensitivityFormattedExpenses=[];
         // if($withSensitivity){
-        // 	$sensitivityDashboardData = $this->generateDashboardData($project,true );
-        // 	$sensitivityFormattedResult = $sensitivityDashboardData['formattedResult'];
+			// 	$sensitivityDashboardData = $this->generateDashboardData($project,true );
+			// 	$sensitivityFormattedResult = $sensitivityDashboardData['formattedResult'];
         // 	$sensitivityFormattedExpenses = $sensitivityDashboardData['formattedExpenses'];
         // }
         $yearOrMonthsIndexes = $project->getYearOrMonthIndexes();
+		
+		$yearOrMonthsIndexesFromStudy = $project->getYearOrMonthIndexesFromStudy();
+		
     
         $isYearsStudy = true;
         
@@ -2784,16 +2788,20 @@ class Project extends Model
         $cashAndBanks = $balanceSheet ? (array)$balanceSheet->cash_and_banks : [];
         $customerReceivables = $balanceSheet ? (array)$balanceSheet->customer_receivables : [];
         $currentRatio = HArr::divideTwoArrAtSameIndex($currentAssets, $currentLiabilities);
+		$currentRatio = $project->replaceMonthIndexWithYearIndex($currentRatio);
         $quickAssets = HArr::sumAtDates([$cashAndBanks,$customerReceivables]);
         $quickRatio =HArr::divideTwoArrAtSameIndex($quickAssets, $currentLiabilities);
+		$quickRatio = $project->replaceMonthIndexWithYearIndex($quickRatio);
         $cashRatio =HArr::divideTwoArrAtSameIndex($cashAndBanks, $currentLiabilities);
+		$cashRatio = $project->replaceMonthIndexWithYearIndex($cashRatio);
         $workingCapital =HArr::subtractAtDates([$currentAssets,$currentLiabilities]);
+		$workingCapital = $project->replaceMonthIndexWithYearIndex($workingCapital);
         $liquidityRatio = [
             'current-ratio'=>[
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Current Ratio (CR = Current Assets ÷ Current Liabilities )'),
-                'data'=>array_values($currentRatio),
+                'data'=>$currentRatio,
                 'is_divided'=>false ,
                 'mark'=>' :1'
             ],
@@ -2801,7 +2809,7 @@ class Project extends Model
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Quick Ratio = (Cash & Equivalent + AR + NR) ÷ Current Liabilities	'),
-                'data'=>array_values($quickRatio),
+                'data'=>$quickRatio,
                 'is_divided'=>false ,
                 'mark'=>' :1'
             ],
@@ -2809,7 +2817,7 @@ class Project extends Model
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Cash Ratio = (Cash & Equivalent) ÷ Current Liabilities	'),
-                'data'=>array_values($cashRatio),
+                'data'=>$cashRatio,
                 'is_divided'=>false ,
                 'mark'=>' :1'
             ],
@@ -2817,7 +2825,7 @@ class Project extends Model
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Working Capital = Current Assets - Current Liabilities'),
-                'data'=>array_values($workingCapital),
+                'data'=>$workingCapital,
                 'is_divided'=>true ,
                 'mark'=>' '. $project->getMainFunctionalCurrencyFormatted()
             ],
@@ -2837,7 +2845,7 @@ class Project extends Model
         array_walk($daysYearsWithItsActiveMonths, function (&$value, $key) {
             $value = count($value) * 30 ;
         });
-        $avgWithOpening = array_values(HArr::avgWithOpening($customerReceivables));
+    //    $avgWithOpening = array_values(HArr::avgWithOpening($customerReceivables));
         
         $annuallySalesRevenue = $incomeStatement ? $incomeStatement->total_sales_revenues : [];
 
@@ -2846,7 +2854,9 @@ class Project extends Model
          */
         $customerReceivables = $this->getTotalCustomerReceivables($sumKeys);
         $customerReceivables = HArr::sumPerYearIndex($customerReceivables, $yearWithItsIndexes);
-        $avgCustomerReceivables = HArr::divideTwoArrAtSameIndex(array_values($customerReceivables), $yearsWithItsActiveMonths);
+		
+		$customerReceivables = $project->replaceMonthIndexWithYearIndex($customerReceivables);
+        $avgCustomerReceivables = HArr::divideTwoArrAtSameIndex($customerReceivables, $yearsWithItsActiveMonths);
         $avgCustomerReceivables = HArr::divideTwoArrAtSameIndex($avgCustomerReceivables, $annuallySalesRevenue);
         $dso = HArr::multipleTwoArrAtSameIndex($avgCustomerReceivables, $daysYearsWithItsActiveMonths);
                 
@@ -2861,11 +2871,11 @@ class Project extends Model
         $annuallyTotalCogs = HArr::subtractAtDates([$annuallySalesRevenue,$grossProfit]);
         $inventory = HArr::sumAtDates([$totalFGs,$totalRawMaterials], $sumKeys);
         $inventory = HArr::sumPerYearIndex($inventory, $yearWithItsIndexes);
-        $avgInventory = HArr::divideTwoArrAtSameIndex(array_values($inventory), $yearsWithItsActiveMonths);
+		$inventory = $project->replaceMonthIndexWithYearIndex($inventory);
+        $avgInventory = HArr::divideTwoArrAtSameIndex($inventory, $yearsWithItsActiveMonths);
         $avgInventory = HArr::divideTwoArrAtSameIndex($avgInventory, $annuallyTotalCogs);
         $dio = HArr::multipleTwoArrAtSameIndex($avgInventory, $daysYearsWithItsActiveMonths);
-                
-                
+     
         /**
          * * DPO
          */
@@ -2874,7 +2884,8 @@ class Project extends Model
         $annuallyTotalCogs = HArr::subtractAtDates([$annuallySalesRevenue,$grossProfit]);
         // $supplierPayable = HArr::sumAtDates([$totalFGs,$totalRawMaterials],$sumKeys);
         $supplierPayable = HArr::sumPerYearIndex($supplierPayable, $yearWithItsIndexes);
-        $avgSupplier = HArr::divideTwoArrAtSameIndex(array_values($supplierPayable), $yearsWithItsActiveMonths);
+		$supplierPayable = $project->replaceMonthIndexWithYearIndex($supplierPayable);
+        $avgSupplier = HArr::divideTwoArrAtSameIndex($supplierPayable, $yearsWithItsActiveMonths);
         $avgSupplier = HArr::divideTwoArrAtSameIndex($avgSupplier, $annuallyTotalCogs);
         $dpo = HArr::multipleTwoArrAtSameIndex($avgSupplier, $daysYearsWithItsActiveMonths);
                 
@@ -2889,7 +2900,7 @@ class Project extends Model
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Days Sales Outstanding (DSO) = Av. Receivables ÷ Net Sales × 360'),
-                'data'=>array_values($dso),
+                'data'=>$dso,
                 'is_divided'=>false ,
                 'mark'=>' days'
             ],
@@ -2897,7 +2908,7 @@ class Project extends Model
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Days Inventory Outstanding (DIO) = Av. Inventory ÷ COGS × 360'),
-                'data'=>array_values($dio),
+                'data'=>$dio,
                 'is_divided'=>false ,
                 'mark'=>' days'
             ],
@@ -2905,7 +2916,7 @@ class Project extends Model
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Days Payable Outstanding (DPO) = Av. Payables ÷ COGS × 360'),
-                'data'=>array_values($dpo),
+                'data'=>$dpo,
                 'is_divided'=>false ,
                 'mark'=>' days'
             ],
@@ -2913,7 +2924,7 @@ class Project extends Model
                 'number-format'=>2 ,
                 'is_number'=>true ,
                 'title'=>__('Cash Conversion Cycle (CCC) = DSO + DIO - DPO'),
-                'data'=>array_values($ccc),
+                'data'=>$ccc,
                 'is_divided'=>false ,
                 'mark'=>' days'
             ],
@@ -2921,8 +2932,8 @@ class Project extends Model
             
             
         ];
-        
         return [
+			'studyDates'=>$yearOrMonthsIndexesFromStudy,
             'liquidityRatio'=>$liquidityRatio,
             'activityRatio'=>$activityRatio,
         'yearsWithItsMonths' => $project->getOperationDurationPerYearFromIndexes(),
@@ -3354,6 +3365,7 @@ class Project extends Model
 		$localCollectionStatement = $product->calculateMultiYearsCollectionPolicy($localMonthlySalesTargetValueBeforeVat,'local',true);
 		$exportCollectionStatement = $product->calculateMultiYearsCollectionPolicy($exportMonthlySalesTargetValueBeforeVat,'export');
 		$collectionStatement = HArr::sumTwoIntervalArrays($localCollectionStatement,$exportCollectionStatement);
+	
         $product->update([
 			'local_collection_statement'=> $localCollectionStatement ,
 			'export_collection_statement'=> $exportCollectionStatement,

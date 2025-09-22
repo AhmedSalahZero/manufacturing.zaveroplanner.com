@@ -5,7 +5,7 @@ $tableClasses =  'col-md-12';
 <x-tables.repeater-table :scrollable="false" :table-class="$tableClasses" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="'food'" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
     <x-slot name="ths">
         <x-tables.repeater-table-th class="  header-border-down max-column-th-class" :title="__('Item')"></x-tables.repeater-table-th>
-        @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+        @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
         <x-tables.repeater-table-th class=" interval-class header-border-down " :title="$yearOrMonthFormatted"></x-tables.repeater-table-th>
         @endforeach
     </x-slot>
@@ -35,7 +35,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0)  / getDivisionNumber();
             @endphp
@@ -76,7 +76,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0)/ getDivisionNumber() ;
             @endphp
@@ -118,7 +118,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
@@ -161,7 +161,8 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+	
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0)/ getDivisionNumber() ;
             @endphp
@@ -204,7 +205,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0)/ getDivisionNumber() ;
             @endphp
@@ -246,7 +247,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
@@ -288,7 +289,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
@@ -329,7 +330,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0)/ getDivisionNumber() ;
             @endphp
@@ -371,7 +372,7 @@ $tableClasses =  'col-md-12';
             @php
             $columnIndex = 0 ;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0) ;
             @endphp
@@ -414,7 +415,7 @@ $tableClasses =  'col-md-12';
             $columnIndex = 0 ;
 			$isFirstLoop=true;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
@@ -464,7 +465,7 @@ $tableClasses =  'col-md-12';
             $columnIndex = 0 ;
 			$isFirstLoop=true;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0);
             @endphp
@@ -514,7 +515,7 @@ $tableClasses =  'col-md-12';
             $columnIndex = 0 ;
 			$isFirstLoop=true;
             @endphp
-            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($studyDates as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
             $currentVal = ($formattedDcfMethod[$key][$yearOrMonthAsIndex]??0);
             @endphp
@@ -522,8 +523,9 @@ $tableClasses =  'col-md-12';
 			@if($isFirstLoop)
                 <div class="d-flex align-items-center justify-content-center">
 				@php
-					$month = array_key_first($currentVal) ;
-					$duration =$currentVal[$month]??null ;
+			
+					$month = array_key_first($formattedDcfMethod[$key][0]??[]) ;
+					$duration =$formattedDcfMethod[$key][0][$month]??'' ;
 					$currentVal = $month ? $month .' [ '.$duration.' ]' : '';
 				@endphp
                     <x-repeat-right-dot-inputs :isNumber="false" :disabled="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="$currentVal" :classes="''" :is-percentage="false" :mark="' '" :name="''" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>

@@ -9,7 +9,6 @@
 
 <div class="formItem pl-4 pr-4">
 
-
     <div class="row">
         @include('dashboard._income-statement')
         @if($withSensitivity)
