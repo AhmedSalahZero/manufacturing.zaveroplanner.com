@@ -266,7 +266,7 @@ common-parent
         $currentVal = $fixedAsset ? $fixedAsset->getInstallmentInterval():'monthly';
         @endphp
         <select name="installment_interval" class="form-control ">
-            @foreach( ['monthly'=>__('Monthly'),'quartly'=>__('Quarterly'),'semi annually'=>__('Semi-annually'),'annually'=>__('Annually')] as $id => $title)
+            @foreach( ['monthly'=>__('Monthly'),'quartly'=>__('Quarterly'),'semi annually'=>__('Semi-annually')] as $id => $title)
             <option {{ $id == $currentVal ? 'selected'  : ''}} value="{{ $id }}">{{ $title }}</option>
             @endforeach
         </select>

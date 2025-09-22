@@ -437,7 +437,7 @@ class Product extends Model
 		$expenseAllocations = [];
 			foreach($products as $product){
 				foreach($resultAsDateIndexAndValue as $dateAsIndex => $expenseValue){
-					$currentMonthlySalesPercentage = $isAsRevenuePercentage ? $productMonthlySalesPercentages[$product->id][$dateAsIndex] : 1; 
+					$currentMonthlySalesPercentage = $isAsRevenuePercentage && isset($productMonthlySalesPercentages[$product->id][$dateAsIndex]) ? $productMonthlySalesPercentages[$product->id][$dateAsIndex] : 1; 
 					$currentAllocationPercentage = $isAsRevenuePercentage ?  1 :  $monthlyProductAllocations[$product->id][$dateAsIndex] ?? 0 ;
 					$expenseAllocations[$product->id][$dateAsIndex] = $currentMonthlySalesPercentage * $expenseValue *   $currentAllocationPercentage;
 				}

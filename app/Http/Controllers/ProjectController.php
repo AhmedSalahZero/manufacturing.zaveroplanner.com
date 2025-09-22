@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\BusinessSector;
 use App\Http\Requests\storeProjectDetailRequest;
 use App\Http\Requests\StoreProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
 use App\Project;
-use App\Traits\Redirects;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -95,6 +92,8 @@ class ProjectController extends Controller
 			
 			$products = [];
 			foreach($request->get('products') as $index=>&$productArr){
+				$productArr['vat_rate'] = $productArr['vat_rate']?:0;
+				$productArr['withhold_tax_rate'] = $productArr['withhold_tax_rate']?:0;
 				$productArr['selling_start_date'] = $productArr['selling_start_date'].'-01';
 				$productArr['selling_start_date'] = $project->getIndexDateFromString($productArr['selling_start_date']);
 				$products[$index] = $productArr;

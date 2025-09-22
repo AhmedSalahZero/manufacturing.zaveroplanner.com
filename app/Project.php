@@ -124,11 +124,11 @@ class Project extends Model
     }
     public function getManpowerAllocationForType(string $manpowerTypeId)
     {
-        return $this->manpower_allocations[$manpowerTypeId]??[];
+		return array_key_exists($manpowerTypeId,$this->manpower_allocations) ? $this->manpower_allocations[$manpowerTypeId] : [] ;
     }
 	public function getManpowerIsAsRevenuePercentage(string $manpowerTypeId):int
 	{
-		return $this->manpower_is_as_revenue_percentages[$manpowerTypeId]??0;
+		return array_key_exists($manpowerTypeId,$this->manpower_is_as_revenue_percentages) ? $this->manpower_is_as_revenue_percentages[$manpowerTypeId] :0 ;
 	}
     public function getSalaryIncreaseRate():float
     {
@@ -3410,10 +3410,8 @@ class Project extends Model
 				return [];
 			}
 			$studyDatesAsIndexes = $this->getCalculatedExtendedStudyDates();
-			// dd($productAllocations);
 			$result = [];
 			$accumulated = [];
-			// $studyStartDateAsIndex = $this->
 			foreach($productAllocations as $productId => $expensePercentage){
 				$product = Product::find($productId);
 				$sellingStartDateAsIndex = $product->selling_start_date;
@@ -3422,14 +3420,13 @@ class Project extends Model
 					if($currentDateAsIndex >= $sellingStartDateAsIndex){
 						$result[$productId][$currentDateAsIndex] = $expensePercentage ;
 						$accumulated[$currentDateAsIndex] = isset($accumulated[$currentDateAsIndex]) ? $accumulated[$currentDateAsIndex] + $expensePercentage : $expensePercentage;
-						
 					}
 				}
 			}
 			$finalResult = [];
 			foreach($result as $productId => $dateIndexWithPercentage){
 				foreach($dateIndexWithPercentage as $dateAsIndex => $percentage){
-					$currentTotalPercentage  = $accumulated[$dateAsIndex] ;
+					$currentTotalPercentage  = $accumulated[$dateAsIndex]??0 ;
 					$finalResult[$productId][$dateAsIndex] = $currentTotalPercentage ? $percentage / $currentTotalPercentage : 0 ; 
 				}
 			}

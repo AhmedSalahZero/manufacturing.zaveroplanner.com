@@ -12,12 +12,9 @@ use App\Http\Requests\StoreRawMaterialPaymentsRequest;
 use App\Product;
 use App\Project;
 use App\RawMaterial;
-use App\ReadyFunctions\CollectionPolicyService;
 use App\Sensitivity;
 use App\Traits\Redirects;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 
 class RedirectionController extends Controller
 {
@@ -142,7 +139,6 @@ class RedirectionController extends Controller
 			$monthlyProductAllocations[$manpowerType] = $project->calculateMonthlyProductAllocations($manpowerAllocations[$manpowerType]);
         }
 		
-		// $isAsRevenuePercentage ? [] :   $project->calculateMonthlyProductAllocations($productAllocations)
         $project->update([
             'manpower_allocations'=>$manpowerAllocations,
 			'monthly_manpower_allocations'=>$monthlyProductAllocations,

@@ -40,6 +40,7 @@ return array(
     'App\\Http\\Controllers\\BusinessSectorController' => $baseDir . '/app/Http/Controllers/BusinessSectorController.php',
     'App\\Http\\Controllers\\ContactUsController' => $baseDir . '/app/Http/Controllers/ContactUsController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+    'App\\Http\\Controllers\\CopyProjectController' => $baseDir . '/app/Http/Controllers/CopyProjectController.php',
     'App\\Http\\Controllers\\DashboardController' => $baseDir . '/app/Http/Controllers/DashboardController.php',
     'App\\Http\\Controllers\\ExpenseController' => $baseDir . '/app/Http/Controllers/ExpenseController.php',
     'App\\Http\\Controllers\\ExpensesDashboardController' => $baseDir . '/app/Http/Controllers/ExpensesDashboardController.php',

@@ -109,12 +109,12 @@ class HDate
 		if($isAtEnd){
 			for($i =0 ; $i <= ($duration/$intervalValue); $i++  ){
 				$result[$currentStartDateAsIndex]=$dateService->addMonths($startDateDay,$startDate,$i*$intervalValue);
-				$currentStartDateAsIndex++;
+				$currentStartDateAsIndex+=$intervalValue;
 			}
 		}else{
 			for($i =0 ; $i <= ($duration/$intervalValue); $i++  ){
 				$result[$currentStartDateAsIndex]=$dateService->addMonths($startDateDay,$startDate,$i*$intervalValue);
-				$currentStartDateAsIndex++;
+				$currentStartDateAsIndex+=$intervalValue;
 			}
 		}
 		return $result;
@@ -125,9 +125,10 @@ class HDate
 	public static function getDateAfterIndex(array $datesAsIndexString , array $datesAsStringIndex  , string $date , int $numberOfShifts)
 	{
 		$index =$datesAsStringIndex[$date];
-		return $datesAsIndexString[$index + $numberOfShifts ]??null;
+		$nextIndex = getNthKeyAfter($datesAsIndexString, $index, $numberOfShifts) ;
+		return $datesAsIndexString[$nextIndex]??null;
 	}
-	public static function calculateDaysCountAtEnd(array $items,int $currentDaysCount = null):array{
+	public static function calculateDaysCountAtEnd(array $items,int $intervalValue,int $currentDaysCount = null):array{
 		$currentDayCount = 0 ; 
 		$dayCounts = [];
 		$secondDate = null ;
@@ -144,7 +145,7 @@ class HDate
 					continue;   
 				}
 				$secondDate = $dateAsString  ;
-				$firstDate = $items[$currentDateIndex-1];
+				$firstDate = $items[$currentDateIndex-$intervalValue];
 				$secondDateTime  = strtotime($secondDate.' 00:00:00');
 				$firstDateTime  = strtotime($firstDate.' 00:00:00');
 				$result = $secondDateTime-$firstDateTime;

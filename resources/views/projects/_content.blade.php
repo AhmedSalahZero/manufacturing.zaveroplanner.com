@@ -162,7 +162,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label> {{__('Required Investment Return %')}} </label>
-                            <input type="number" step="any" min="0" class="form-control   " name="return_rate" value="{{isset($project->return_rate) ? $project->return_rate  :old('return_rate') }}" placeholder="{{__('Required Investment Return %')}}" id="return_rate">
+                            <input type="text" step="any"  class="form-control   " name="return_rate" value="{{isset($project->return_rate) ? $project->return_rate  :old('return_rate',0) }}" placeholder="{{__('Required Investment Return %')}}" id="return_rate">
                         </div>
                     </div>
                     <div class="col-md-3">

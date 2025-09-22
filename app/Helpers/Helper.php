@@ -4,6 +4,7 @@ use App\Helpers\HArr;
 use App\Product;
 use App\Services\IntervalSummationOperations;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 const MAX_YEARS_COUNT = 7;
 const FFE_COST = 'ffe_cost' ;
@@ -598,4 +599,36 @@ function getNextKey(array $array, $key) {
     
     // Return the next key
     return $keys[$currentKeyIndex + 1];
+}
+function getTableNamesThatHasColumn(string $columnName)
+{
+  $database = DB::getDatabaseName();
+	return DB::table('information_schema.columns')
+        ->select('table_name')
+        ->where('column_name', $columnName)
+        ->where('table_schema', $database)
+        ->distinct()->pluck('TABLE_NAME')->toArray();
+	
+}
+function getNthKeyAfter($array, $specificKey, $n) {
+    // Get all keys from the array
+    $keys = array_keys($array);
+    
+    // Find the position of the specific key
+    $keyPosition = array_search($specificKey, $keys);
+    
+    // Check if the specific key exists
+    if ($keyPosition === false) {
+        return null; // Key not found
+    }
+    
+    // Calculate the position of the nth key after
+    $targetPosition = $keyPosition + $n;
+    
+    // Check if the target position exists
+    if (isset($keys[$targetPosition])) {
+        return $keys[$targetPosition];
+    }
+    
+    return null; // No nth key exists
 }

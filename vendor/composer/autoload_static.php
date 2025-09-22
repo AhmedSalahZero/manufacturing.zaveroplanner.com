@@ -656,6 +656,7 @@ class ComposerStaticInite97a568dc59bb3b2403c43c21046be64
         'App\\Http\\Controllers\\BusinessSectorController' => __DIR__ . '/../..' . '/app/Http/Controllers/BusinessSectorController.php',
         'App\\Http\\Controllers\\ContactUsController' => __DIR__ . '/../..' . '/app/Http/Controllers/ContactUsController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\CopyProjectController' => __DIR__ . '/../..' . '/app/Http/Controllers/CopyProjectController.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
         'App\\Http\\Controllers\\ExpenseController' => __DIR__ . '/../..' . '/app/Http/Controllers/ExpenseController.php',
         'App\\Http\\Controllers\\ExpensesDashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/ExpensesDashboardController.php',

@@ -94,7 +94,8 @@ Route::group(
                 Route::get('/sharingPage/{project}', 'SharingController@index')->name('sharing.page');
                 Route::post('/sharingLink/{project}', 'SharingController@newLink')->name('sharingLink.store');
                 Route::get('/sharingLinkStatus/{project}/{sharing}', 'SharingController@changeStatus')->name('sharingLink.status');
-
+				
+                Route::post('/copy-project/{project}', 'CopyProjectController@index')->name('copy.project');
                 //Team Capacity
                 Route::post('/duration_year', 'ProjectController@durationYear')->name('duration.year');
                 Route::post('/business_sector', 'BusinessSectorController@businessSectorChildren')->name('businessSectorChildren');
