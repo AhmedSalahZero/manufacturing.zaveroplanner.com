@@ -169,6 +169,21 @@
 
 </div>
 
+<div class="div-title">
+    {{ __('Investment Structure' ) }}
+</div>
+
+
+<div class="formItem">
+
+    <div class="row pl-4 pr-4">
+        @include('dashboard._required_investment',['formattedDcfMethod'=>$requiredInvestments])
+    </div>
+
+
+</div>
+
+
 @if($project->duration >1 )
 <div class="div-title">
     {{ __('Discount Cashflow Valuation (DCF) Figs\'000' ) }}

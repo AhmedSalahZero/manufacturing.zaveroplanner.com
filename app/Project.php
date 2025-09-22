@@ -2797,6 +2797,55 @@ class Project extends Model
 		$cashRatio = $project->replaceMonthIndexWithYearIndex($cashRatio);
         $workingCapital =HArr::subtractAtDates([$currentAssets,$currentLiabilities]);
 		$workingCapital = $project->replaceMonthIndexWithYearIndex($workingCapital);
+		// foreach($this)
+		$totalFixedAssets = 0 ;
+		foreach($this->fixedAssets as $fixedAsset){
+			$totalFixedAssets+= ($fixedAsset->counts * $fixedAsset->amount);
+		}
+		$workingCapitalInjection = $cashflow ? array_sum($cashflow->working_capital_injection) : 0;
+		$equityInjection = $cashflow ? array_sum($cashflow->equity_injection) + $workingCapitalInjection : 0;
+		$totalLoans = $cashflow ? array_sum($cashflow->loan_withdrawal) : 0;
+		$requiredInvestments = [
+			[
+				'fixed-asset-investment'=> [
+				'number-format'=>0,
+				'is_number'=>true ,
+				'title'=>__('Fixed Asset Investment'),
+				'data'=>$totalFixedAssets   , 
+				'is_divided'=>true ,
+				'mark'=>' ' . $project->getMainFunctionalCurrencyFormatted()
+			],
+			'working-capital-injection'=> [
+				'number-format'=>0,
+				'is_number'=>true ,
+				'title'=>__('Working Capital Investment'),
+				'data'=>$workingCapitalInjection   , 
+				'is_divided'=>true ,
+				'mark'=>' ' . $project->getMainFunctionalCurrencyFormatted()
+			],
+		],
+		[
+			'equity-injection'=> [
+				'number-format'=>0,
+				'is_number'=>true ,
+				'title'=>__('Required Equity'),
+				'data'=>$equityInjection   , 
+				'is_divided'=>true ,
+				'mark'=>' ' . $project->getMainFunctionalCurrencyFormatted()
+			],
+			'total-loans'=> [
+				'number-format'=>0,
+				'is_number'=>true ,
+				'title'=>__('Total Loans'),
+				'data'=>$totalLoans   , 
+				'is_divided'=>true ,
+				'mark'=>' ' . $project->getMainFunctionalCurrencyFormatted()
+			]
+		]
+		
+			
+		];
+		// dd($requiredInvestments);
         $liquidityRatio = [
             'current-ratio'=>[
                 'number-format'=>2 ,
@@ -2934,6 +2983,7 @@ class Project extends Model
             
         ];
         return [
+			'requiredInvestments'=>$requiredInvestments,
 			'studyDates'=>$yearOrMonthsIndexesFromStudy,
             'liquidityRatio'=>$liquidityRatio,
             'activityRatio'=>$activityRatio,
