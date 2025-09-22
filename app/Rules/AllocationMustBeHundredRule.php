@@ -26,7 +26,6 @@ class AllocationMustBeHundredRule implements ImplicitRule
      */
     public function passes($attribute, $value)
     {
-
         foreach(getManpowerTypes() as $id => $manpowerOptionArr){
 			if($manpowerOptionArr['has_allocation']){
 				$title = $manpowerOptionArr['title'];
@@ -38,6 +37,7 @@ class AllocationMustBeHundredRule implements ImplicitRule
 						continue;
 					}
 					$totalAllocationPercentage = array_sum(Request()->input('manpower_allocations.'.$id.'.percentages',[]));
+					
 					if($totalAllocationPercentage != 100){
 						$this->error_title = $title;
 						return false ;						

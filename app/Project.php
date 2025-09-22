@@ -124,11 +124,11 @@ class Project extends Model
     }
     public function getManpowerAllocationForType(string $manpowerTypeId)
     {
-		return array_key_exists($manpowerTypeId,$this->manpower_allocations) ? $this->manpower_allocations[$manpowerTypeId] : [] ;
+		return array_key_exists($manpowerTypeId,$this->manpower_allocations?:[]) ? $this->manpower_allocations[$manpowerTypeId] : [] ;
     }
 	public function getManpowerIsAsRevenuePercentage(string $manpowerTypeId):int
 	{
-		return array_key_exists($manpowerTypeId,$this->manpower_is_as_revenue_percentages) ? $this->manpower_is_as_revenue_percentages[$manpowerTypeId] :0 ;
+		return array_key_exists($manpowerTypeId,$this->manpower_is_as_revenue_percentages?:[]) ? $this->manpower_is_as_revenue_percentages[$manpowerTypeId] :0 ;
 	}
     public function getSalaryIncreaseRate():float
     {
@@ -2166,8 +2166,9 @@ class Project extends Model
     
         $totalExpenses = [];
         $expenses =  DB::table('expenses')->where('project_id', $projectId)->pluck('collection_statements')->toArray();
+		
         foreach ($expenses as $expenseArr) {
-            $expenseArr= ((array)(((array)((array)json_decode($expenseArr))['monthly']??[]))['end_balance']??[]);
+            $expenseArr= @((array)(((array)((array)json_decode($expenseArr))['monthly']??[]))['end_balance']??[]);
             $totalExpenses = HArr::sumAtDates([$expenseArr,$totalExpenses], $sumKeys);
         }
         
@@ -3464,5 +3465,8 @@ class Project extends Model
 			return $finalResult;
 		
 		}
-
+		public function isOneYearDuration():bool
+		{
+			return $this->duration == 1 ;
+		}
 }

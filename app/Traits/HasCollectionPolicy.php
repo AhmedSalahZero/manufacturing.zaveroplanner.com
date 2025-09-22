@@ -40,7 +40,7 @@ trait HasCollectionPolicy
 		
 		$dueDayAndRatesAtIndex = [];
 		if(!is_null($localOrExport)){
-			$dueDayAndRatesAtIndex = $this->collection_policy_value[$localOrExport][$index] ;
+			$dueDayAndRatesAtIndex = $this->collection_policy_value[$localOrExport][$index]??0 ;
 			
 		}else{
 			$dueDayAndRatesAtIndex = $this->collection_policy_value[$index]??[] ;

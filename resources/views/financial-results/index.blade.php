@@ -20,7 +20,7 @@ input.form-control[type="text"][readonly] {
 
 </style>
 <div class="col-12">
-
+	<div id="study-duration" data-duration="{{ $project->duration }}"></div>
     <h1 class="bread-crumbs">
         {{ __('ZAVERO Manufacturing') }} > {{ $project->name }} > {{ $title }}
     </h1>

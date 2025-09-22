@@ -29,13 +29,15 @@ class storeProjectDetailRequest extends FormRequest
 		if($isNewCompany){
 			$operationStartDateValidation ='after_or_equal:start_date';
 		}
+		$duration = $this->project->duration ;
+		$perpetualIsRequired = $duration >  1  ? 'required' : 'sometimes';
         return [
             'operation_start_date'=>['required',$operationStartDateValidation,'before:end_date'],
 			'products.*.selling_start_date'=>['required','after_or_equal:operation_start_date','before:end_date'],
 			'products.*.name'=>['required'],
 			'rawMaterials.*.name'=>['required'],
-			'return_rate'=>['required','gt:0'], 
-			'perpetual_growth_rate'=>['required','gt:0'], 
+			'return_rate'=>[$perpetualIsRequired,'gt:0'], 
+			'perpetual_growth_rate'=>[$perpetualIsRequired,'gt:0'], 
         ];
     }
 	public function messages()

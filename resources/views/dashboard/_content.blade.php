@@ -169,7 +169,7 @@
 
 </div>
 
-
+@if($project->duration >1 )
 <div class="div-title">
     {{ __('Discount Cashflow Valuation (DCF) Figs\'000' ) }}
 </div>
@@ -184,7 +184,7 @@
 
 
 </div>
-
+@endif
 
 
 

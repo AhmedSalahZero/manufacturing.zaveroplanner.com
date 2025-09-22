@@ -25,8 +25,10 @@ class LocalAndExportCollectionPolicyRule implements Rule
      */
     public function passes($attribute, $value)
     {
+		$project = Request()->route('project') ;
+		$duration = $project->duration  > 1 ?  1 : 0 ;
 		foreach(['local','export'] as $localOrExport){
-			for($i = 0 ; $i<= 1 ; $i++){
+			for($i = 0 ; $i<= $duration ; $i++){
 			$firstLocalCollectionPolicy = Request('collection_policy_value')[$localOrExport][$i]??[];
 			$cashRate = $firstLocalCollectionPolicy['cash_payment'] ?? 0 ; 
 			$rates = array_sum($firstLocalCollectionPolicy['rate']??[]);

@@ -25,7 +25,9 @@ class CollectionPolicyRule implements Rule
      */
     public function passes($attribute, $value)
     {
-		for($i = 0 ; $i<= 1 ; $i++){
+		$project = Request()->route('project') ;
+		$duration = $project->duration  > 1 ?  1 : 0 ;
+		for($i = 0 ; $i<= $duration ; $i++){
 			$firstLocalCollectionPolicy = $value[$i]??[];
 			$cashRate = $firstLocalCollectionPolicy['cash_payment'] ?? 0 ; 
 			$rates = array_sum($firstLocalCollectionPolicy['rate']??[]);

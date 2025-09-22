@@ -143,9 +143,9 @@ class RedirectionController extends Controller
             'manpower_allocations'=>$manpowerAllocations,
 			'monthly_manpower_allocations'=>$monthlyProductAllocations,
 			'manpower_is_as_revenue_percentages'=>$request->get('manpower_is_as_revenue_percentages',[]),
-            'salaries_annual_increase'=>$request->get('salaries_annual_increase'),
-            'salaries_tax_rate'=>$request->get('salaries_tax_rate'),
-            'social_insurance_rate'=>$request->get('social_insurance_rate')
+            'salaries_annual_increase'=>$request->get('salaries_annual_increase',0),
+            'salaries_tax_rate'=>$request->get('salaries_tax_rate',0),
+            'social_insurance_rate'=>$request->get('social_insurance_rate',0)
         ]);
        
         // $existingCount =

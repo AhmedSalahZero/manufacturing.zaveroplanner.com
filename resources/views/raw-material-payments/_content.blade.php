@@ -32,13 +32,13 @@
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Due <br> Days-1')"></x-tables.repeater-table-th>
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Payment <br> Rate-2 %')"></x-tables.repeater-table-th>
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Due <br> Days-2')"></x-tables.repeater-table-th>
-
+								@if(!$project->isOneYearDuration())
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Cash %')"></x-tables.repeater-table-th>
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Payment <br> Rate-1 %')"></x-tables.repeater-table-th>
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Due <br> Days-1')"></x-tables.repeater-table-th>
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Payment <br> Rate-2 %')"></x-tables.repeater-table-th>
                                 <x-tables.repeater-table-th class="  header-border-down max-w-5 font-weight-normal" :title="__('Due <br> Days-2')"></x-tables.repeater-table-th>
-
+								@endif 
 
                             </x-slot>
                             <x-slot name="trs">
@@ -62,7 +62,6 @@
 											class="form-control" type="text" name="rawMaterials[{{ $rawMaterialId }}][beginning_inventory_value]" value="{{ $rawMaterial->beginning_inventory_value }}">
                                         </div>
                                     </td>
-
                                     @foreach($project->getFirstYearUntilLast(0) as $index=>$title)
                                     @php
 
@@ -80,9 +79,8 @@
 
 
 
-
                                     </td>
-
+									
                                     @for($numberOfCollections = 0 ; $numberOfCollections<= 1 ; $numberOfCollections++) <td>
 
                                         @php

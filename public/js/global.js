@@ -829,28 +829,28 @@ $(document).on('change', '.hundred-minus-number', function () {
 	let parent = $(this).closest('.closest-parent')
 	const columnIndex = $(this).attr('data-column-index')
 	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
-	let equityFundingPercentage = number_unformat($(parent).find('.hundred-minus-number'+appendColumnIndex).val())
+	let equityFundingPercentage = number_unformat($(parent).find('.hundred-minus-number' + appendColumnIndex).val())
 	let debtFunding = 100 - equityFundingPercentage
-	$(parent).find('.hundred-minus-number-result'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
+	$(parent).find('.hundred-minus-number-result' + appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
 })
 
 $(document).on('change', '.hundred-minus-number-one', function () {
 	let parent = $(this).closest('.closest-parent')
 	const columnIndex = $(this).attr('data-column-index')
 	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
-	let equityFundingPercentage = number_unformat($(parent).find('.hundred-minus-number-one'+appendColumnIndex).val())
+	let equityFundingPercentage = number_unformat($(parent).find('.hundred-minus-number-one' + appendColumnIndex).val())
 	let debtFunding = 100 - equityFundingPercentage
-	$(parent).find('.hundred-minus-number-result-one'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
+	$(parent).find('.hundred-minus-number-result-one' + appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
 })
 
 $(document).on('change', '.hundred-minus-number1,.hundred-minus-number2', function () {
 	let parent = $(this).closest('.closest-parent')
 	const columnIndex = $(this).attr('data-column-index')
 	const appendColumnIndex = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
-	let number1 = number_unformat($(parent).find('.hundred-minus-number1'+appendColumnIndex).val())
-	let number2 = number_unformat($(parent).find('.hundred-minus-number2'+appendColumnIndex).val())
-	let debtFunding = 100 - number1-number2
-	$(parent).find('.hundred-minus-two-number-result'+appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
+	let number1 = number_unformat($(parent).find('.hundred-minus-number1' + appendColumnIndex).val())
+	let number2 = number_unformat($(parent).find('.hundred-minus-number2' + appendColumnIndex).val())
+	let debtFunding = 100 - number1 - number2
+	$(parent).find('.hundred-minus-two-number-result' + appendColumnIndex).val(number_format(debtFunding, 1)).trigger('change')
 })
 
 
@@ -926,7 +926,7 @@ if (btn) {
 	})
 }
 
-const card2= document.getElementById("myCard2")
+const card2 = document.getElementById("myCard2")
 const btn2 = document.getElementById("toggleBtn2")
 if (btn2) {
 	btn2.addEventListener("click", () => {
@@ -980,65 +980,68 @@ $(document).on('change', '.current-growth-rate-result-value-formatted2', functio
 	}
 })
 
-$(document).on('change','.sum_product_value_1,.sum_product_quantity_1,.sum_product_value_2,.sum_product_quantity_2',function(){
-	
-	
+$(document).on('change', '.sum_product_value_1,.sum_product_quantity_1,.sum_product_value_2,.sum_product_quantity_2', function () {
+
+
 	const parent = $(this).closest('.closest-parent')
 	const columnIndex = $(this).attr('data-column-index')
 	const appendQuery = columnIndex == undefined ? '' : '[data-column-index="' + columnIndex + '"]'
 	const number1 = number_unformat($(parent).find('.sum_product_value_1' + appendQuery).val())
 	const number2 = number_unformat($(parent).find('.sum_product_quantity_1' + appendQuery).val())
-		const number3 = number_unformat($(parent).find('.sum_product_value_2' + appendQuery).val())
+	const number3 = number_unformat($(parent).find('.sum_product_value_2' + appendQuery).val())
 	const number4 = number_unformat($(parent).find('.sum_product_quantity_2' + appendQuery).val())
-	
-	let result = ( number1 * number2) + (number3*number4);
+
+	let result = (number1 * number2) + (number3 * number4)
 	const resultQuery = $(parent).find('.two_sum_product_result' + appendQuery)
 	const numberFormat = resultQuery.attr('data-number-format')
 	if (numberFormat != undefined) {
 		result = number_format(result, numberFormat)
 	}
 	resultQuery.val(result).trigger('change')
-	
+
 })
-$(function(){
-	$('.collapse-before-me').trigger('click')
+$(function () {
+	const studyDuration = $('#study-duration').attr('data-duration');
+	if(studyDuration >1 ){
+		$('.collapse-before-me').trigger('click')
+	}
 	$('.expense-category-class').trigger('change')
 })
-$(document).on('click','.parent-checkbox',function(){
-	 $(this).closest('.closest-parent').find('input[type="checkbox"]').prop('checked',false).trigger('change');
-	$(this).closest('td').find('input[type="checkbox"]').prop('checked',true).trigger('change')
-	
+$(document).on('click', '.parent-checkbox', function () {
+	$(this).closest('.closest-parent').find('input[type="checkbox"]').prop('checked', false).trigger('change')
+	$(this).closest('td').find('input[type="checkbox"]').prop('checked', true).trigger('change')
+
 })
-$(document).on('change','.name-required-when-greater-than-zero-js',function(){
-		const value = $(this).val();
-		const parent = $(this).closest('.closest-parent');
-		if(value > 0){
-			$(parent).find('.name-field-js').prop('required',true);
-		}else{
-			$(parent).find('.name-field-js').prop('required',false);
-		}
-});
-$(function(){
+$(document).on('change', '.name-required-when-greater-than-zero-js', function () {
+	const value = $(this).val()
+	const parent = $(this).closest('.closest-parent')
+	if (value > 0) {
+		$(parent).find('.name-field-js').prop('required', true)
+	} else {
+		$(parent).find('.name-field-js').prop('required', false)
+	}
+})
+$(function () {
 	$('.name-required-when-greater-than-zero-js').trigger('change')
 })
-$(function(){
-	$('.delay-button').prop('disabled',false)
+$(function () {
+	$('.delay-button').prop('disabled', false)
 })
-$(document).on('change','.allocate-checkbox',function(){
-	const modal = $(this).closest('.modal');
-	const isChecked = $(this).is(':checked');
-	if(isChecked){
-		$(modal).find('.percentage-allocation').each(function(index,input){
-			$(input).val(0).prop('readonly',true).trigger('change');
+$(document).on('change', '.allocate-checkbox', function () {
+	const modal = $(this).closest('.modal')
+	const isChecked = $(this).is(':checked')
+	if (isChecked) {
+		$(modal).find('.percentage-allocation').each(function (index, input) {
+			$(input).val(0).prop('readonly', true).trigger('change')
 		})
-	}else{
-		$(modal).find('.percentage-allocation').each(function(index,input){
-			var currentVal = $(input).attr('data-old-value');
-			$(input).val(currentVal).prop('readonly',false).trigger('change');
+	} else {
+		$(modal).find('.percentage-allocation').each(function (index, input) {
+			var currentVal = $(input).attr('data-old-value')
+			$(input).val(currentVal).prop('readonly', false).trigger('change')
 		})
 	}
-	
+
 })
-$(function(){
-	$('.allocate-checkbox').trigger('change',false)
+$(function () {
+	$('.allocate-checkbox').trigger('change', false)
 })
