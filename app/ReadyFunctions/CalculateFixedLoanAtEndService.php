@@ -143,7 +143,6 @@ class CalculateFixedLoanAtEndService
 		$installmentAmounts = $this->calculateInstallmentAmount($installmentPaymentIntervalValue,$loanFactors,$installmentFactors, $stepRate, $installmentStartDateAsIndex, $endDateAsIndex, $tenor, $installmentPaymentIntervalValue, $appliedStepValue,$pricingPerMonths);
 
 		$loanScheduleResult = $this->calculateLoanScheduleResult($installmentPaymentIntervalValue,$datesIndexAndDaysCount,$loanType, $loanAmount, $interestFactors, $installmentAmounts,$currentStartDateAsIndex);
-		dd('w',$loanScheduleResult);
 		
 		if($indexOfLoop == -1){
 		
