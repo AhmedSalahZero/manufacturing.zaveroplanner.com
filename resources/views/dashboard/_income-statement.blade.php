@@ -1,5 +1,5 @@
 @php
-	$tableClass = $isYearsStudy ? 'col-md-6'  : 'col-md-12';
+$tableClass = $isYearsStudy ? 'col-md-6' : 'col-md-12';
 @endphp
 <x-tables.repeater-table :scrollable="false" :table-class="$tableClass" :removeActionBtn="true" :removeRepeater="true" :initialJs="false" :repeater-with-select2="true" :canAddNewItem="false" :parentClass="'js-remove-hidden'" :hide-add-btn="true" :tableName="''" :repeaterId="''" :relationName="''" :isRepeater="$isRepeater=!(isset($removeRepeater) && $removeRepeater)">
     <x-slot name="ths">
@@ -9,7 +9,7 @@
         @endforeach
     </x-slot>
     <x-slot name="trs">
-	
+
 
 
         <tr data-repeat-formatting-decimals="1" data-repeater-style>
@@ -46,7 +46,7 @@
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
-		$currentVal = ($formattedResult['gross_profit'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
+            $currentVal = ($formattedResult['gross_profit'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -70,7 +70,7 @@
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
-		$currentVal = ($formattedResult['ebitda'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
+            $currentVal = ($formattedResult['ebitda'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -100,9 +100,9 @@
             @php
             $columnIndex = 0 ;
             @endphp
-           @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
-		$currentVal = ($formattedResult['ebit'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
+            $currentVal = ($formattedResult['ebit'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -129,9 +129,9 @@
             @php
             $columnIndex = 0 ;
             @endphp
-           @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
-		$currentVal = ($formattedResult['ebt'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
+            $currentVal = ($formattedResult['ebt'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -161,7 +161,7 @@
             @endphp
             @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
             @php
-		$currentVal = ($formattedResult['net_profit'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
+            $currentVal = ($formattedResult['net_profit'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
             @endphp
             <td>
                 <div class="d-flex align-items-center justify-content-center">
@@ -176,6 +176,36 @@
 
 
         </tr>
+
+
+
+        {{-- <tr data-repeat-formatting-decimals="1" data-repeater-style>
+
+            <td>
+                <input value="{{ __('Sales Breakeven') }}" disabled class="form-control text-left " type="text">
+            </td>
+
+
+            @php
+            $columnIndex = 0 ;
+            @endphp
+            @foreach($yearOrMonthsIndexes as $yearOrMonthAsIndex=>$yearOrMonthFormatted)
+            @php
+            $currentVal = ($formattedResult['sales_break_even'][$yearOrMonthAsIndex]??0) / getDivisionNumber();
+            @endphp
+            <td>
+                <div class="d-flex align-items-center justify-content-center">
+                    <x-repeat-right-dot-inputs :disabled="true" :removeThreeDotsClass="true" :removeThreeDots="true" :number-format-decimals="0" :currentVal="$currentVal" :classes="'only-greater-than-or-equal-zero-allowed total-loans-hidden js-recalculate-equity-funding-value'" :is-percentage="false" :mark="' '" :name="'IjaraMortgageRevenueProjectionByCategory['.'ijara_mortgage_transactions_projections'.']['.$yearOrMonthAsIndex.']'" :columnIndex="$columnIndex"></x-repeat-right-dot-inputs>
+                </div>
+            </td>
+            @php
+            $columnIndex++ ;
+            @endphp
+
+            @endforeach
+
+
+        </tr> --}}
 
 
 

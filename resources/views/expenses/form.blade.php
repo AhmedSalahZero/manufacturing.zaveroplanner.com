@@ -17,9 +17,9 @@
 
         <form action="{{ route('expenses.submit', $project) }}" method="POST">
             {{ csrf_field() }}
-            <div class="col-12 alert alert-info text-center">
+            {{-- <div class="col-12 alert alert-info text-center">
                 <span class="red">{{ __('If you have information please fill or click next') }}</span>
-            </div>
+            </div> --}}
             @include('expenses._content',$project->getExpensesViewVars())
 
             @include('save_buttons')

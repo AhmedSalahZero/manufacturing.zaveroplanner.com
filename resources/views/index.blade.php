@@ -15,17 +15,33 @@
     </h1>
     <form action="{{ route('projects.store') }}" method="POST">
         {{ csrf_field() }}
-        <div class="form-group">
-            <label for="exampleInputEmail1">{{ __('Add New Study') }}</label>
-            <input type="text" name="name" required value="{{ old('name') }}" class="form-control" id="exampleInputname1" aria-describedby="nameHelp">
+		<div class="row">
+		<div class="col-12">
+		            <label class="new-study-label" for="exampleInputEmail1">{{ __('Add New Study') }}</label>
+		</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8">
+      	      <input placeholder="{{ __('Insert New Study Name') }}" type="text" name="name" required value="{{ old('name') }}" class="form-control  p-10 d-inline-block w-60" id="exampleInputname1" aria-describedby="nameHelp">
+			</div>
+			<div class="col-md-4 ml-n-1">
+			<button type="submit"  class="btn d-inline-flex btn-secondary btn-outline-hover-brand btn-icon  add-study-btn " title="{{ __('Add') }}" href="#">
+			{{ __('Add') }}
+			</button>
             <input name="user_id" type="hidden" value="{{ auth()->user()->id }}">
-        </div>
-        <button type="submit" class="btn btn-rev float-right">{{ __('Add') }}</button>
+			
+			</div>
+		</div>
+        {{-- <div class="form-group">
+			
+        </div> --}}
+		
+        {{-- <button type="submit" class="btn btn-rev float-right">{{ __('Add') }}</button> --}}
     </form>
     <div class="clearfix"></div>
     <Div class="ProjectList">
         <!-- Modal -->
-        <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        {{-- <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header d-none">
@@ -46,7 +62,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         @foreach ($projects as $project)
         <div class="row" @if (app()->getLocale() == 'ar') style="direction:rtl" @endif>
             <div class="col-8">
@@ -57,7 +73,7 @@
                 @endif
 
                 <a href="{{ $projectLink }}">
-                    <div class="projectItem">
+                    <div class="projectItem study-label ">
                         {{ $project->name }}
                         <Span>- {{ __('Click To Start') }} </Span>
                     </div>
@@ -65,13 +81,18 @@
             </div>
             <div>
 
-                <button type="submit" class="btn btn-rev float-left delete-btn" data-toggle="modal" data-target="#exampleModal{{ $project->id }}"><i class="fas fa-trash-alt"></i></button>
-                <button type="button" class="btn btn-rev float-left  delete-btn share_button" data-toggle="modal" data-target="#sharing{{ $project->id }}"><i class="fas fa-share-alt"></i></button>
-                <button type="button" class="btn btn-rev float-left  delete-btn share_button" data-toggle="modal" data-target="#copy{{ $project->id }}"><i class="fas fa-copy"></i></button>
+
+                                    <a data-toggle="modal" data-target="#sharing{{ $project->id }}" type="button" class="btn btn-secondary btn-outline-hover-brand btn-icon share-btn-class" title="{{ __('Share') }}" href="#"><i class="fa fa-share-alt exclude-icon default-icon-color"></i></a>
+                                    <a data-toggle="modal" data-target="#copy{{ $project->id }}" type="button" class="btn btn-secondary btn-outline-hover-brand btn-icon copy-btn-class" title="{{ __('Copy') }}" href="#"><i class="fa fa-copy exclude-icon default-icon-color"></i></a>
+                                    <a data-toggle="modal" data-target="#deleteModel{{ $project->id }}" type="button" class="btn btn-secondary btn-outline-hover-brand btn-icon delete-btn-class" title="{{ __('Delete') }}" href="#"><i class="fa fa-trash-alt exclude-icon default-icon-color"></i></a>
+
+                {{-- <button type="submit" class="btn btn-rev float-left delete-btn" data-toggle="modal" data-target="#exampleModal{{ $project->id }}"><i class="fas fa-trash-alt"></i></button> --}}
+                {{-- <button type="button" class="btn btn-rev float-left  delete-btn share_button" data-toggle="modal" data-target="#sharing{{ $project->id }}"><i class="fas fa-share-alt"></i></button> --}}
+                {{-- <button type="button" class="btn btn-rev float-left  delete-btn share_button" data-toggle="modal" data-target="#copy{{ $project->id }}"><i class="fas fa-copy"></i></button> --}}
             </div>
         </div>
         <!-- Modal -->
-        <div class="modal fade " id="exampleModal{{ $project->id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $project->id }}" aria-hidden="true">
+        <div class="modal fade " id="deleteModel{{ $project->id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $project->id }}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header d-none">
@@ -113,7 +134,7 @@
                     </div>
                     <div class="modal-footer d-flex">
                         <button type="button" class="btn btn-sm btn-secondary p-2" data-dismiss="modal">{{__('Close')}}</button>
-                        <button type="submit" class="btn btn-sm btn-info p-2" ><span class="tooltiptext"><i class="far fa-copy" > {{__('Copy')}}</i> </span>
+                        <button type="submit" class="btn btn-sm btn-info p-2 " ><span class="tooltiptext submit-copy-btn"><i class="far fa-copy" > {{__('Copy')}}</i> </span>
                         </button>
                     </div>
 					     </form>
@@ -148,7 +169,7 @@
                     <div class="modal-footer d-flex">
                         <a href="{{ route('sharing.page', $project) }}" class="btn btn-light mr-auto p-2">{{__('Sharing Links')}}</a>
                         <button type="button" class="btn btn-secondary p-2" data-dismiss="modal">{{__('Close')}}</button>
-                        <button type="submit" class="btn btn-info p-2" onclick="myFunction({{ $project->id }})" onmouseout="outFunc({{ $project->id }})"><span class="tooltiptext"><i class="far fa-copy" id="myTooltip{{ $project->id }}"> {{__('Copy')}}</i> </span>
+                        <button type="submit" class="btn btn-info p-2" onclick="myFunction({{ $project->id }})" onmouseout="outFunc({{ $project->id }})"><span class="tooltiptext"><i class="far fa-copy submit-copy-btn " id="myTooltip{{ $project->id }}"> {{__('Copy')}}</i> </span>
                         </button>
                     </div>
                 </div>

@@ -710,3 +710,111 @@ td > .kt-radio.kt-radio--single {
 .mt--5{
 	margin-top:-5px
 }
+.study-label , .study-label:hover
+{
+    border: 1px solid #4d9afa !important;
+    color: black;
+	background-color: #f7f8fa;
+    font-weight: 600 !important;
+    border-radius: 4px;
+	margin-top:0;
+	margin-bottom:10px;
+}
+.study-label:hover{
+	
+	background-color: #4d9afa ;
+	color:white;
+}
+.btn.btn-icon {
+    height: 3rem;
+    width: 3rem;
+	background: white;
+    outline: none !important;
+    vertical-align: middle;
+}
+.btn.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+	    cursor: pointer;
+		    border: 1px solid blue !important;
+}
+.share-btn-class 
+{
+	color:blue !important;
+}
+.share-btn-class:hover {
+	background-color:#4d9afa;
+}
+.share-btn-class:hover i 
+{
+	color:white !important;
+}
+
+
+
+
+.delete-btn-class 
+{
+	color:red !important;
+}
+.delete-btn-class:hover {
+	background-color:#4d9afa;
+}
+.delete-btn-class:hover i 
+{
+	color:white !important;
+}
+
+.btn i {
+    vertical-align: middle;
+    line-height: 0;
+	
+}
+.new-study-label{
+    color: green;
+    font-weight: bold;
+    font-size: 16px !important;
+}
+.p-10{
+	height:3rem !important;
+}
+
+.copy-btn-class 
+{
+	color:green ;
+}
+
+.copy-btn-class:hover {
+	background-color:#4d9afa;
+}
+.copy-btn-class:hover i 
+{
+	color:white !important;
+}
+
+.add-study-btn{
+	width: 25% !important;
+    color: blue ;
+	font-size:16px !important;
+}
+.add-study-btn:hover,.add-study-btn:hover i{
+	color:blue ;
+	
+}
+.ml-n-1{
+	margin-left: -1rem;
+}
+.submit-copy-btn 
+{
+	display: flex;
+    height: 21px;
+    justify-content: center;
+    align-items: center;
+	
+}
+.bread-crumbs{
+	font-size:20px !important;
+	font-weight:bold !important;
+}

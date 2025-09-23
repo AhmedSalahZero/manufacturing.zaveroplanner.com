@@ -17,9 +17,6 @@
 	@csrf
 	<div class="ProjectList">
         @include('dashboard._content',$project->getDashboardViewVars())
-
-		
-
      	<div class="mt-3">
 			<button type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save">{{__('Save')}}</button>
 			<button type="submit" class="btn btn-rev float-right main-page-button" name="submit_button" value="save_and_go_to_main">{{__('Save & Go To Main Page')}}</button>

@@ -38,9 +38,9 @@
                 @auth
                     <a title="{{__('Home')}}" class="logout float-left" href="{{ route('home') }}"><i class="fas fa-home"></i></a>
 
-                    <a title="{{ __('Systems List') }}" class="logout  float-left" href="{{ env('ZAVERO') . app()->getLocale() }}">
+                    {{-- <a title="{{ __('Systems List') }}" class="logout  float-left" href="{{ env('ZAVERO') . app()->getLocale() }}">
                         <i class="fas fa-list"></i>
-                    </a>
+                    </a> --}}
                     <a class="logout" href="{{LaravelLocalization::localizeUrl('logout') }}"
                         onclick="event.preventDefault();
                                 document.getElementById('logout-form').submit();">

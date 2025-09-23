@@ -2606,12 +2606,17 @@ class Project extends Model
         return array_values($barChart);
                     
     }
+	// public function calculateAnnuallySalesBreakEvens()
+	// {
+	// 	$expensePerPercentages = $this->expenses->where('relation_name','expense_as_percentage');
+	// 	dd($expensePerPercentages);
+	// }
     public function getDashboardViewVars():array
     {
         $project = $this ;
-        
         $withSensitivity = false ;
         $incomeStatement = $project->incomeStatement;
+    //    $annuallySalesBreakEvens = $this->calculateAnnuallySalesBreakEvens() ;
         $balanceSheet = $project->balanceSheet;
         $cashflow = $project->cashInOutStatement;
         $formattedResult['sales_revenue'] = $incomeStatement ? $incomeStatement->total_sales_revenues : [];
@@ -2626,6 +2631,8 @@ class Project extends Model
         $formattedResult['ebt_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_ebt_revenue_percentages : [];
         $formattedResult['net_profit'] =  $incomeStatement ? $incomeStatement->annually_net_profit : [];
         $formattedResult['net_profit_percentage_of_sales'] = $incomeStatement ? $incomeStatement->annually_net_profit_revenue_percentages : [];
+	
+  //     $formattedResult['sales_break_even'] =  $incomeStatement ? $annuallySalesBreakEvens : [];
         $formattedExpenses['raw-material-cost'] = $incomeStatement ? $incomeStatement->total_cogs['raw_material']??[] : [];
         $formattedExpenses['labor-cost'] = $incomeStatement ? $incomeStatement->total_cogs['direct_labor']??[] : [];
         $formattedExpenses['manufacturing-overheads'] = $incomeStatement ? $incomeStatement->total_cogs['manufacturing-overheads']??[] : [];
