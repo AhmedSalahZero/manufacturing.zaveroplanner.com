@@ -15,6 +15,7 @@ class MonthlyFixedRepeatingAmountEquation
 		][$increaseInterval];
 	
 		$counter = 0 ;
+		
 		$amountBeforeVat = $amount ; 
 		$amountAfterVat = $isDeductible ? $amountBeforeVat : $amountBeforeVat  * (1+($vatRate / 100));
 		for($currentStartDateAsIndex ; $currentStartDateAsIndex <= $endDateAsIndex ; $currentStartDateAsIndex++ ){
