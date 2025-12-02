@@ -48,6 +48,9 @@ class FfeExecutionAndPayment
 	{
 		return  $ffeCost * (1+ ($softContingencyRate / 100));
 	}
+	/**
+	 * * هنا بنحدد هندفع قديه من معانا \
+	 * 	 */
 	public function calculateFfeEquityPayment(array $ffePayments, float $ffeCost, float $softContingencyRate, float $softEquityFundingRate)
 	{
 		$totalFfeCost = $this->calculateTotalFfeCost($ffeCost,$softContingencyRate);
@@ -81,6 +84,8 @@ class FfeExecutionAndPayment
 		$totalFfeCost = $this->calculateTotalFfeCost($ffeCost,$softContingencyRate);
 		
 		$equityFundingAmount = $this->calculateEquityFundingAmount($totalFfeCost, $equityFundingRate);
+		
+		
 		$ffeLoanWithdrawal = [];
 		$isFirstNestedIf = true;
 		foreach ($ffePayments as $index=>$landPayment) {
@@ -96,11 +101,11 @@ class FfeExecutionAndPayment
 				$isFirstNestedIf = false;
 			}
 		}
+		
 		if (array_sum($ffeLoanWithdrawal) > -1 && array_sum($ffeLoanWithdrawal) < 1) {
 			return [];
 		}
-	//	$ffeLoanWithdrawal  = [0=>1000,2=>3000];
-		// $ffeLoanWithdrawal  = [];
+	
 		$firstKey = array_key_first($ffeLoanWithdrawal);
 		$lastKey = array_key_last($ffeLoanWithdrawal);
 		if($firstKey !== null){

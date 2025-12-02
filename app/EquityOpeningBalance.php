@@ -16,8 +16,8 @@ class EquityOpeningBalance extends Model
 			static::saving(function(self $model){
 					$studyMonthsForViews = array_flip($model->project->getOperationDatesAsDateAndDateAsIndexToStudyEndDate());
      			   	$sumKeys = array_keys($studyMonthsForViews);
-					$model->paid_up_capital_extended = HArr::repeatThrough($model->paid_up_capital_amount,$sumKeys);
-					$model->legal_reserve_extended = HArr::repeatThrough($model->legal_reserve,$sumKeys);
+					$model->paid_up_capital_extended = HArr::repeatThrough($model->paid_up_capital_amount?:0,$sumKeys);
+					$model->legal_reserve_extended = HArr::repeatThrough($model->legal_reserve?:0,$sumKeys);
 			});
 	}
 	

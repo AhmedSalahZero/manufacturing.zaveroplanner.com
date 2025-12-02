@@ -49,9 +49,11 @@ class FixedAsset extends Model
 	{
 		return $this->counts;
 	}
-	public function getTotalItemsCost()
+	public function getTotalItemsCost():float 
 	{
-		return $this->getCounts() * $this->getAmount();
+				return $this->getCounts() * $this->getAmount();
+
+		
 	}
 	public function getTotalCost()
 	{
@@ -233,9 +235,7 @@ class FixedAsset extends Model
 	public function calculateFFEAssetsForFFE(int  $transferredDateForFFEAsIndex,float  $transferredAmount,array $studyDates,int $studyEndDateAsIndex,Project $project):array 
 	{
 		
-			$assets = [];
 			$totalItemsCost = $this->getTotalItemsCost();
-		// $this->ffeItems->each(function(FFEItem $this) use ($totalItemsCost,$transferredDateForFFEAsIndex,$transferredAmount,&$assets,$studyDates,$studyEndDateAsIndex){
 			$depreciationDurationInMonthsForFFE = $this->getDepreciationDurationInMonths();
 			$ffeReplacementCostRateForFFE = $this->getReplacementCostRate()  ;
 			$ffeReplacementIntervalInMonthsForFFE = $this->getReplacementIntervalInMonths();
@@ -247,10 +247,6 @@ class FixedAsset extends Model
 				]
 			];
 			return  $this->calculateFFEAssets($depreciationDurationInMonthsForFFE,$ffeReplacementCostRateForFFE,$ffeReplacementIntervalInMonthsForFFE,$projectUnderProgressForFFE,$studyDates,$studyEndDateAsIndex,$project);
-			// $assets[$this->getName()] = $this->calculateFFEAssets($depreciationDurationInMonthsForFFE,$ffeReplacementCostRateForFFE,$ffeReplacementIntervalInMonthsForFFE,$projectUnderProgressForFFE,$studyDates,$studyEndDateAsIndex,$project);
-		// });
-		return $assets ;
-	  
 	}
 	
 	public function calculateFFEAssets(int $propertyDepreciationDurationInMonths,float $propertyReplacementCostRate,int $propertyReplacementIntervalInMonths,array $projectUnderProgressForConstruction,array $studyDates,int $studyEndDateAsIndex  ,Project $project):array 
@@ -307,7 +303,7 @@ class FixedAsset extends Model
 	
 	
 
-	protected function calculateReplacementCost(float $totalGross, float $propertyReplacementCostRate,  )
+	protected function calculateReplacementCost(float $totalGross, float $propertyReplacementCostRate )
 	{
 		return $totalGross * $propertyReplacementCostRate ;
 	}

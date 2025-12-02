@@ -301,17 +301,7 @@ class CalculateFixedLoanAtEndService
 		$ffeExecutionAndPaymentService  = new FfeExecutionAndPayment();
 		$contractPaymentService  = new ContractPaymentService();
 		$loanWithdrawalService = new CalculateLoanWithdrawal();
-	
-
-		
-		
-
-
-
 		$contractPayments = [];
-	
-		
-	
 
 		$ffeEquityPayment= [];
 		$ffeLoanInstallment = [];
@@ -337,10 +327,22 @@ class CalculateFixedLoanAtEndService
 			$ratesWithIsFromExecution  = $ffe->getRatesWithIsFromExecution();
 			$ffeEquityFundingRate = $ffe->getEquityFunding();
 			$executionAndPayment =$ffeExecutionAndPaymentService->__calculate($totalFFECost, $ffeStartDateAsIndex, $duration,$dateIndexWithDate);
+			
 			$ffePayment = $ffe->isInstallmentPayment() ? (new InstallmentWithGraceMethod)->__calculate($ffe->getStartDateAsIndex(),$ffe->getTotalCost(),$ffe->getReservationRate(),$ffe->getRemainingBalanceRate(),$ffe->getInstallmentGracePeriod(),$ffe->getInstallmentCount(),$ffe->getPaymentInstallmentInterval(),$ffe->getContractualRate(),$ffe->getAfterMonths())  : $contractPaymentService->__calculate( $executionAndPayment, $ffeCollectionPolicyValue,$ratesWithIsFromTotal,$ratesWithIsFromExecution,$dateIndexWithDate, $dateWithDateIndex);
+			/**
+			 * * دا الدفع كامل
+			 */
 			$contractPayments['FFE Payment'] = $ffePayment;
+			/**
+			 * * فيه جزء منه هدفعه من معايا
+			 */
 			$ffeEquityPayment['FFE Equity Injection'] = $ffeExecutionAndPaymentService->calculateFFEEquityPayment($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
+			/**
+			 * * والباقي هاخد بيه قرض
+			 */
+			
 			$ffeLoanWithdrawal['FFE Loan Withdrawal'] = $ffeExecutionAndPaymentService->calculateFFELoanWithdrawal($contractPayments['FFE Payment'], $totalFFECost, 0, $ffeEquityFundingRate);
+		
 			
 			$equityFunding = $ffe->getEquityFundingRate();
 			
@@ -356,12 +358,12 @@ class CalculateFixedLoanAtEndService
 				$ffeStepDownIntervalName='annually';
 				$ffeGracePeriod=$ffe->getGracePeriod();
 				$ffeLoanPricing = $ffe->getPricing();
-			//	$loanWithdrawalService = new CalculateLoanWithdrawal();
 				
 				$ffeLoanWithdrawalInterest=$loanWithdrawalService->__calculate($project->replaceIndexWithItsStringDate($ffeLoanWithdrawal['FFE Loan Withdrawal'],$dateIndexWithDate), $ffeBaseRate, $ffeMarginRate, $dateWithDateIndex);
 				$ffeLoanWithdrawalInterestAmounts =$ffeLoanWithdrawalInterest['withdrawal_interest_amounts']??[];
 				$ffeLoanWithdrawalEndBalance = $ffeLoanWithdrawalInterest['withdrawalEndBalance']??[];
 				$ffeLoanWithdrawalAmounts = $ffeLoanWithdrawalInterest['loanWithdrawal']??[];
+				
 				$ffeLoanStartDate =array_key_last($ffeLoanWithdrawalInterest);
 				$ffeLoanAmount = $ffeLoanWithdrawalInterest[$ffeLoanStartDate];
 				if ($ffeLoanStartDate) {
@@ -378,6 +380,7 @@ class CalculateFixedLoanAtEndService
 					$ffeLoanInstallment['FFE Loan Installment'] = $ffeLoanCalculations['schedulePayment']??[];
 				}
 			}
+			
 		return [
 			'contractPayments'=>$contractPayments,
 			'ffeEquityPayment'=>$ffeEquityPayment,
@@ -390,20 +393,11 @@ class CalculateFixedLoanAtEndService
 			'ffeLoanAmount'=>$ffeLoanAmount,
 			'ffeLoanEndBalanceAtStudyEndDate'=>$ffeLoanEndBalanceAtStudyEndDate,
 			'ffeLoanPricing'=>$ffeLoanPricing ,
-			
-			
 			'ffeLoanEndBalance'=>$ffeLoanEndBalance,
-			
 			'ffeLoanWithdrawalEndBalance'=>$ffeLoanWithdrawalEndBalance,
 			'ffeLoanWithdrawalAmounts'=>$ffeLoanWithdrawalAmounts ,
-		
-			
-			
-			
 			'ffeLoanCalculations'=>$ffeLoanCalculations??[],
 			'ffePayment'=>$contractPayments['FFE Payment']
-			
-
 		];
 
 

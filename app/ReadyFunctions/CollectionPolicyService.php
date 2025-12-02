@@ -57,63 +57,101 @@ class CollectionPolicyService
 		return $collections;
 	}
 	
+	protected function getNumberOfMonthsForInterval(string $intervalName)
+	{
+		if($intervalName == 'monthly' || $intervalName == 'cash'){
+			return 1 ;
+		}
+		if($intervalName  == 'quarterly' || $intervalName =='quartly'){
+			return 3 ;
+		}
+		if($intervalName == 'semi-annually'){
+			return 6;
+		}
+		if($intervalName == 'annually'){
+			return 12 ;
+		}
+		throw new \Exception('Custom Error .. Invalid Interval Name'.$intervalName);
+	}
 	protected function sumForInterval(array $dateValues, string $intervalName)
 	{
 		$result = [];
-		$periodInterval = $this->getPeriodsForStartMonths($intervalName);
-		
-
-		foreach ($dateValues as $currentDate => $value) {
-			$dateObject = Carbon::make($currentDate);
-			$year = $dateObject->format('Y');
-			$month = $dateObject->format('m');
-			$day = $dateObject->format('d');
-			$sumMonth = sprintf("%02d", $this->getSumMonth($month, $periodInterval));
-			$resultDate = $year  . '-' . $sumMonth . '-' . $day;
-			$result[$resultDate] = isset($result[$resultDate]) ? $result[$resultDate] + $value  : $value;
+		$max = $this->getNumberOfMonthsForInterval($intervalName);
+		$i = 1 ;
+		$currentSum = 0 ;
+		foreach($dateValues as $dateAsString => $value){
+			if($i == 1){
+				$currentDateIndex = $dateAsString ;
+			}
+			$currentSum += $value ; 
+			$result[$currentDateIndex] = $currentSum;
+			if($i % $max === 0){
+				$i = 0 ;
+				$currentSum = 0 ;
+			}
+			$i++;
 		}
 		return $result;
+	
 	}
+	
+	// protected function sumForInterval(array $dateValues, string $intervalName)
+	// {
+	// 	$result = [];
+	// 	$periodInterval = $this->getPeriodsForStartMonths($intervalName);
+		
 
-	protected function getPeriodsForStartMonths($interval)
-	{
+	// 	foreach ($dateValues as $currentDate => $value) {
+	// 		$dateObject = Carbon::make($currentDate);
+	// 		$year = $dateObject->format('Y');
+	// 		$month = $dateObject->format('m');
+	// 		$day = $dateObject->format('d');
+	// 		$sumMonth = sprintf("%02d", $this->getSumMonth($month, $periodInterval));
+	// 		$resultDate = $year  . '-' . $sumMonth . '-' . $day;
+	// 		$result[$resultDate] = isset($result[$resultDate]) ? $result[$resultDate] + $value  : $value;
+	// 	}
+	// 	return $result;
+	// }
 
-		if ($interval == 'monthly') {
-			return  [
-				1 => [1],
-				2 => [2],
-				3 => [3],
-				4 => [4],
-				5 => [5],
-				6 => [6],
-				7 => [7],
-				8 => [8],
-				9 => [9],
-				10 => [10],
-				11 => [11],
-				12 => [12],
-			];
-		}
+	// protected function getPeriodsForStartMonths($interval)
+	// {
 
-		if ($interval == 'quarterly') {
+	// 	if ($interval == 'monthly') {
+	// 		return  [
+	// 			1 => [1],
+	// 			2 => [2],
+	// 			3 => [3],
+	// 			4 => [4],
+	// 			5 => [5],
+	// 			6 => [6],
+	// 			7 => [7],
+	// 			8 => [8],
+	// 			9 => [9],
+	// 			10 => [10],
+	// 			11 => [11],
+	// 			12 => [12],
+	// 		];
+	// 	}
 
-			return [
-				1 => [1, 2, 3], 4 => [4, 5, 6], 7 => [7, 8, 9], 10 => [10, 11, 12]
-			];
-		}
-		if ($interval == 'semi-annually') {
-			return [
-				1 => [1, 2, 3, 4, 5, 6], 7 => [7, 8, 9, 10, 11, 12]
-			];
-		}
+	// 	if ($interval == 'quarterly') {
 
-		if ($interval == 'annually') {
-			return [
-				1 => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-			];
-		}
-		return [];
-	}
+	// 		return [
+	// 			1 => [1, 2, 3], 4 => [4, 5, 6], 7 => [7, 8, 9], 10 => [10, 11, 12]
+	// 		];
+	// 	}
+	// 	if ($interval == 'semi-annually') {
+	// 		return [
+	// 			1 => [1, 2, 3, 4, 5, 6], 7 => [7, 8, 9, 10, 11, 12]
+	// 		];
+	// 	}
+
+	// 	if ($interval == 'annually') {
+	// 		return [
+	// 			1 => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+	// 		];
+	// 	}
+	// 	return [];
+	// }
 
 	protected function formatRatesWithDueDays(array $ratesAndDueDays): array
 	{
@@ -133,13 +171,13 @@ class CollectionPolicyService
 	}
 
 
-	protected function getSumMonth($month, $mapMonths)
-	{
+	// protected function getSumMonth($month, $mapMonths)
+	// {
 
-		foreach ($mapMonths as $sumMonth => $sumMonths) {
-			if (in_array($month, $sumMonths)) {
-				return $sumMonth;
-			}
-		}
-	}
+	// 	foreach ($mapMonths as $sumMonth => $sumMonths) {
+	// 		if (in_array($month, $sumMonths)) {
+	// 			return $sumMonth;
+	// 		}
+	// 	}
+	// }
 }

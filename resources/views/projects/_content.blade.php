@@ -84,8 +84,8 @@
                                 <span class="red">*</span></label>
                             </label>
                             @include('components.calendar-month-year',[
-                            'name'=>'start_date',
-                            'value'=>$project->getStudyStartDateYearAndMonth()
+								'name'=>'start_date',
+								'value'=>$project->getStudyStartDateYearAndMonth()
                             ])
                         </div>
                     </div>

@@ -4,7 +4,10 @@ namespace App\ReadyFunctions ;
 use App\Helpers\HArr;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
-
+/**
+ * * الفائدة على مراحل السحب من القرض
+ * * 
+ */
 class CalculateLoanWithdrawal 
 {
 	public function __calculate(array $loanWithdrawal,float $baseRate , float $marginRate,array $dateWithDateIndex)
@@ -20,8 +23,8 @@ class CalculateLoanWithdrawal
 		$withdrawalEndBalanceDate =HArr::getLastNonZeroKey($loanWithdrawal) ;  
 
 		return [
-			'withdrawal_interest_amounts'=>$withdrawalWithInterest['interestAmount']??[],
-			'withdrawalEndBalance'=>$withdrawalWithInterest['withdrawalEndBalance']??[],
+			'withdrawal_interest_amounts'=>$withdrawalWithInterest['interestAmount']??[], // مقدار الفؤائد علي السحوبات
+			'withdrawalEndBalance'=>$withdrawalWithInterest['withdrawalEndBalance']??[], 
 			'loanWithdrawal'=>$withdrawalWithInterest['loanWithdrawal']??[],
 			$withdrawalEndBalanceDate =>$withdrawalEndBalance, // [$withdrawalEndBalanceDate =>$withdrawalEndBalance] must be the last key in array to be sent to loan function 
 		];

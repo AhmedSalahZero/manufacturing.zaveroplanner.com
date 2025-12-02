@@ -7,21 +7,12 @@ use App\Project;
 
 class ProjectsUnderProgress
 {
-	public function calculateForFFE(FixedAsset $fixedAsset,int $ffeStartDateAsIndex,int $ffeEndDateAsIndex,array $ffeExecutionAndPayment,array $ffeLoanInterestAmount,array $ffeLoanWithdrawalInterestAmounts,Project $project,int $operationStartDateAsIndex,array $datesAsStringAndIndex,array $datesIndexWithYearIndex,array $yearIndexWithYear,array $dateIndexWithDate,array $dateWithMonthNumber):array
+	public function calculateForFFE(int $ffeStartDateAsIndex,int $ffeEndDateAsIndex,array $ffeExecutionAndPayment,array $ffeLoanInterestAmount,array $ffeLoanWithdrawalInterestAmounts,Project $project,int $operationStartDateAsIndex,array $datesAsStringAndIndex,array $datesIndexWithYearIndex,array $yearIndexWithYear,array $dateIndexWithDate,array $dateWithMonthNumber):array
 	{
 		$fixedStartDateISEqualToFixedEndDate = $ffeEndDateAsIndex == $ffeStartDateAsIndex ;
 		$transferDateFactor = $fixedStartDateISEqualToFixedEndDate ? 0 : 1 ;
-		// if(){
-		// 	return [
-		// 		'transferred_date_and_vales'=>[
-		// 			$ffeEndDateAsIndex=>0
-		// 		]
-		// 		];
-		// }
-		
 		$studyDurationPerYear = $project->getStudyDurationPerYear($datesAsStringAndIndex,$datesIndexWithYearIndex,$yearIndexWithYear,$dateIndexWithDate,$dateWithMonthNumber,true, true, false);
 		$studyDates = $project->getOnlyDatesOfActiveStudy($studyDurationPerYear,$dateIndexWithDate);
-		
 		$result = [];
 		$beginningBalance = 0;
 		$additions = sumTwoArray($ffeExecutionAndPayment, []);

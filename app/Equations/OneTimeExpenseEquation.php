@@ -8,7 +8,6 @@ class OneTimeExpenseEquation
 		$oneTimeAmount = ($isDeductible ? $amount : $amount  * (1+($vatRate / 100))) ;
 		$amount = $oneTimeAmount / $amortizationMonths;
 		for($i =  0 ; $i< $amortizationMonths ; $i++){
-			
 			$payload[$startDateAsIndex+$i] = $amount;
  		}
 

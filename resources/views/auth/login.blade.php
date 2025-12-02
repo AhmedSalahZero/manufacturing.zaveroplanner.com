@@ -41,7 +41,7 @@
 
 <div class="clearfix"></div>
 <div class="otherLinks">
-    <a class="btn btn-rev button-view" href="{{ route('register') }}">{{ __('Create New Account') }} </a>
+    {{-- <a class="btn btn-rev button-view" href="{{ route('register') }}">{{ __('Create New Account') }} </a> --}}
     <a class="btn btn-rev button-view" href="{{ route('password.request') }}">{{ __('Forgot Password?') }}</a>
 </div>
 @endsection

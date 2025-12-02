@@ -65,12 +65,10 @@ common-parent
 
     </div>
 
-
     <div class="pr-2 pl-2 closest-parent">
         <label class="form-label ">{{ __('Payment') }} </label>
         <x-form.select :selectedValue="isset($expense) ? $expense->getPaymentTerm() : 'cash'" :options="getPaymentTerms()" :add-new="false" class="select2-select repeater-select payment_terms " :all="false" name="payment_terms"></x-form.select>
         <x-modal.custom-collection :title="__('Custom Payment')" :subModel="isset($expense) ? $expense : null "></x-modal.custom-collection>
-
     </div>
 
 

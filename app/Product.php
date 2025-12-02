@@ -12,7 +12,6 @@ use App\Traits\HasSeasonality;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {

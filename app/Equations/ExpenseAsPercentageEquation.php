@@ -9,9 +9,9 @@ class ExpenseAsPercentageEquation
 			$resultPerProducts = [];
 			foreach($products as $product){
 				$monthlySalesTargetValues = $product->monthly_sales_target_values;
-				foreach($monthlySalesTargetValues as $monthIndex => $val){
+				foreach($monthlySalesTargetValues as $monthIndex => $monthlySalesTargetValue){
 					if($monthIndex <= $loopEndDateAsIndex && $monthIndex >= $startDateAsIndex){
-						$valBeforeRate = $monthlyPercentage / 100 * $val ;
+						$valBeforeRate = $monthlyPercentage / 100 * $monthlySalesTargetValue ;
 						$resultAsDateIndexAndValue[$monthIndex] = isset($resultAsDateIndexAndValue[$monthIndex]) ? $resultAsDateIndexAndValue[$monthIndex] + $valBeforeRate : $valBeforeRate ; 
 						$resultPerProducts[$product->id][$monthIndex] = $valBeforeRate;
 					}

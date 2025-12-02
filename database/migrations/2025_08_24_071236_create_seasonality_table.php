@@ -16,7 +16,9 @@ class CreateSeasonalityTable extends Migration
     {
         Schema::create('seasonality', function (Blueprint $table) {
             $table->id();
-			$table->unsignedBigInteger('model_id');
+			$table->unsignedBigInteger('company_id'); 
+			$table->unsignedBigInteger('study_id'); // in this system it would be study id
+			// $table->unsignedBigInteger('model_id'); // in this system it would be study id
 			$table->string('model_name');
 			$table->enum('type',['flat','quarterly','monthly'])->default('flat');
 			$table->json('percentages')->comment('زي ما هي في الفورم بالظبط علشان لما نيجي نجيب الاولد داتا في الفيو');

@@ -113,6 +113,7 @@ Route::group(
                     # Expenses
                     Route::get('/expenses', 'RedirectionController@expensesGet')->name('expenses.form');
                     Route::post('/expenses', 'RedirectionController@expensesPost')->name('expenses.submit');
+					
 					 # Fixed Assets
 					 Route::get('/fixed-assets', 'RedirectionController@fixedAssetsGet')->name('fixed.assets.form');
 					 Route::post('/fixed-assets', 'RedirectionController@fixedAssetsPost')->name('assets.submit');

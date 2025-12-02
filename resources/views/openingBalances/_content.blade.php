@@ -459,7 +459,48 @@
                         </div>
 
                         <!-- Modal for Settlements -->
-                        <div class="modal fade" id="modal-interests-{{ $repeaterId }}-{{ $currentRowIndex }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}-{{ $currentRowIndex }}" aria-hidden="true">
+                        <div class="modal fade" id="modal-installments-{{ $repeaterId }}-{{ $currentRowIndex }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}-{{ $currentRowIndex }}" aria-hidden="true">
+                            <div class="modal-dialog modal-full" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header header-border">
+                                        <h5 class="modal-title font-size-1rem text-blue" id="modalLabel-{{ $repeaterId }}">{{ __('Installments') }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table>
+                                            <tbody>
+                                                @php
+                                                $yearIndexWithItsMonthsAsIndexAndString = $project->getYearIndexWithItsMonthsAsIndexAndString();
+                                                @endphp
+                                                @foreach($yearIndexWithItsMonthsAsIndexAndString as $yearIndex => $itsMonths)
+                                                <tr>
+                                                    @foreach($itsMonths as $dateAsIndex => $dateAsString )
+                                                    @php $dateFormatted=\Carbon\Carbon::make($dateAsString)->format('M`Y');
+                                                    @endphp
+                                                    <td>
+                                                        <div class="form-group text-center">
+                                                            <label>{{ $dateFormatted }}</label>
+                                                            <div class="ml-2">
+                                                                <input class="form-control input-border" data-main-category="{{ $repeaterId }}" data-sub-category="installments" data-last-index="{{ $dateAsIndex }}" name="[installments]" multiple value="{{ $model ? $model->getInstallmentAtDateIndex($dateAsIndex):0 }}">
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    @endforeach
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn save-modal btn-primary" data-dismiss="modal">{{ __('Save') }}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						
+						<div class="modal fade" id="modal-interests-{{ $repeaterId }}-{{ $currentRowIndex }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}-{{ $currentRowIndex }}" aria-hidden="true">
                             <div class="modal-dialog modal-full" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header header-border">
@@ -501,46 +542,7 @@
                             </div>
                         </div>
 
-                        <div class="modal fade" id="modal-installments-{{ $repeaterId }}-{{ $currentRowIndex }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $repeaterId }}-{{ $currentRowIndex }}" aria-hidden="true">
-                            <div class="modal-dialog modal-full" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header header-border">
-                                        <h5 class="modal-title font-size-1rem text-blue" id="modalLabel-{{ $repeaterId }}">{{ __('Installments') }}</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table>
-                                            <tbody>
-                                                @php
-                                                $yearIndexWithItsMonthsAsIndexAndString = $project->getYearIndexWithItsMonthsAsIndexAndString();
-                                                @endphp
-                                                @foreach($yearIndexWithItsMonthsAsIndexAndString as $yearIndex => $itsMonths)
-                                                <tr>
-                                                    @foreach($itsMonths as $dateAsIndex => $dateAsString )
-                                                    @php $dateFormatted=\Carbon\Carbon::make($dateAsString)->format('M`Y');
-                                                    @endphp
-                                                    <td>
-                                                        <div class="form-group text-center">
-                                                            <label>{{ $dateFormatted }}</label>
-                                                            <div class="ml-2">
-                                                                <input class="form-control input-border" data-main-category="{{ $repeaterId }}" data-sub-category="installments" data-last-index="{{ $dateAsIndex }}" name="[installments]" multiple value="{{ $model ? $model->getInstallmentAtDateIndex($dateAsIndex):0 }}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    @endforeach
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn save-modal btn-primary" data-dismiss="modal">{{ __('Save') }}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        
 
                     </div>
                     @endforeach
@@ -748,20 +750,25 @@
                 , 'existing_count': '0'
             }
             , show: function() {
+
                 $(this).slideDown();
                 // Update modal IDs to ensure uniqueness
                 const $item = $(this);
                 const index = $item.index();
-                const modalId = `modal-${index}-${Date.now()}`;
-                $item.find('.modal').attr('id', modalId);
-                $item.find('[data-toggle="modal"]').attr('data-target', `#${modalId}`);
+				const modals = $item.find('.modal') ;
+				let modalIds = [];
+				modals.each(function(currentOrder,modal){
+             	   var modalId = `modal-${currentOrder}-${index}-${Date.now()}`;
+              	  $(modal).attr('id', modalId);
+					$(modal).closest('.common-parent').find('[data-toggle="modal"]').attr('data-target', `#${modalId}`)
+					modalIds.push(modalId)
+				})
+				const modalTriggerButtons = $item.find('[data-toggle="modal"]');
+				modalTriggerButtons.each(function(currentOrder,button){
+                	$(button).attr('data-target', `#${modalIds[currentOrder]}`);
+				})
                 $item.find('.modal').find('.modal-title').attr('id', `modalLabel-${index}-${Date.now()}`);
                 replaceRepeaterIndex(this)
-            }
-            , ready: function(setIndexes) {
-                $(selector + " [data-repeater-item]").each(function(index, element) {
-                    replaceRepeaterIndex(element)
-                })
             }
             , hide: function(deleteElement) {
                 if (confirm(translations.deleteConfirm)) {

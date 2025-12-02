@@ -603,11 +603,13 @@ function getNextKey(array $array, $key) {
 function getTableNamesThatHasColumn(string $columnName)
 {
   $database = DB::getDatabaseName();
+  $tableName = env('APP_ENV') == 'local' ? 'TABLE_NAME': 'table_name';
+  
 	return DB::table('information_schema.columns')
-        ->select('table_name')
+        ->select($tableName)
         ->where('column_name', $columnName)
         ->where('table_schema', $database)
-        ->distinct()->pluck('TABLE_NAME')->toArray();
+        ->distinct()->pluck($tableName)->toArray();
 	
 }
 function getNthKeyAfter($array, $specificKey, $n) {

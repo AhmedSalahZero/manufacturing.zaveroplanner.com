@@ -39,7 +39,9 @@
     };
 
 </script>
+
 <script>
+
  function initMultiselect(container) {
         const $container = $(container);
         const $trigger = $container.find('.multiselect-trigger');

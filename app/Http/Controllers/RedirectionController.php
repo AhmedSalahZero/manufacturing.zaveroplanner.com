@@ -159,14 +159,7 @@ class RedirectionController extends Controller
                     $manpowers['manpowers'][$index]['type'] = $id;
                     $manpowers['manpowers'][$index]['existing_count'] = $items['existing_count'];
                    
-                    // $hiringCounts  = $items['hirings']??[];
-                    // $monthlyNetSalary = $items['avg_salary'] ;
-                    // $salaryTaxesRate = $project->getSalaryTaxRate() / 100;
-                    // $socialInsuranceRate = $project->getSocialInsuranceRate() /100;
-                    // $salaryExpenses=$project->calculateManpowerResult($dateAsIndexes, $existingCount, $hiringCounts, $monthlyNetSalary, $salaryTaxesRate, $socialInsuranceRate);
-                    // foreach ($salaryExpenses as $columnName => $resultArr) {
-                    //     $manpowers['manpowers'][$index][$columnName] = $resultArr;
-                    // }
+                  
                             
                 }
                 $index++;

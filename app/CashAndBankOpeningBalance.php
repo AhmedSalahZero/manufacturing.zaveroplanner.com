@@ -58,7 +58,7 @@ class CashAndBankOpeningBalance extends Model
 	}
 	public function getPayload():array 
 	{
-		return $this->payload ;
+		return $this->payload?:[] ;
 	}
 	public function getPayloadAtDateIndex(int $dateAsIndex):float 
 	{

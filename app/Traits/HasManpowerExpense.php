@@ -58,8 +58,8 @@ trait HasManpowerExpense
     
         return [
             'accumulated_manpower_counts'=>$accumulatedManpowerCounts,
-            'salary_payments'=>$monthlySalariesPayments,
             'salary_expenses'=>$salaryExpenses,
+            'salary_payments'=>$monthlySalariesPayments,
             'tax_and_social_insurance_statement'=>$salaryTaxAndSocialInsuranceAmountsStatement
         ];
     }
