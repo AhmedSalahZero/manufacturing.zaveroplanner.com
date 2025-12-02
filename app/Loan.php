@@ -135,5 +135,45 @@ class  Loan extends Model
 	{
 		return $this->step_down_interval ;
 	}
+	 public static function calculateSettlementStatement(array $dates,array $settlements ,array $additions = [] , float $initialBeginningBalance = 0 , array $dateIndexWithDate , bool $notUpdateBeginning =false , $onlyMonthly = false  )
+    {
+		$financialYearStartMonth = 'january';
+        $withholdForIntervals = [
+            'monthly'=>$additions,
+            // 'quarterly'=>$onlyMonthly ? [] : sumIntervalsIndexes($additions, 'quarterly', $financialYearStartMonth, $dateIndexWithDate),
+            // 'semi-annually'=>$onlyMonthly ? [] : sumIntervalsIndexes($additions, 'semi-annually', $financialYearStartMonth, $dateIndexWithDate),
+            // 'annually'=>$onlyMonthly ? [] : sumIntervalsIndexes($additions, 'annually', $financialYearStartMonth, $dateIndexWithDate),
+        ];
+        $settlementsForInterval = [
+            'monthly'=>$settlements,
+            // 'quarterly'=>$onlyMonthly? []:sumIntervalsIndexes($settlements, 'quarterly', $financialYearStartMonth, $dateIndexWithDate),
+            // 'semi-annually'=>$onlyMonthly? []:sumIntervalsIndexes($settlements, 'semi-annually', $financialYearStartMonth, $dateIndexWithDate),
+            // 'annually'=>$onlyMonthly? []:sumIntervalsIndexes($settlements, 'annually', $financialYearStartMonth, $dateIndexWithDate),
+        ];
+
+        $result = [];
+		$intervals = $onlyMonthly ? ['monthly'=>__('Monthly')] : getIntervalFormatted() ;
+		// $intervals = $onlyMonthly ? ['monthly'=>__('Monthly')] : getIntervalFormatted() ;
+        foreach ($intervals as $intervalName=>$intervalNameFormatted) {
+            $beginningBalance = $initialBeginningBalance;
+            foreach ($dates as $dateIndex) {
+		
+				$settlementAtDate = $settlementsForInterval[$intervalName][$dateIndex]??0;
+                $result[$intervalName]['beginning_balance'][$dateIndex] = $beginningBalance;
+				$addition = $withholdForIntervals[$intervalName][$dateIndex]??0;
+                $totalDue[$dateIndex] =  $addition+$beginningBalance;
+                $endBalance[$dateIndex] = $totalDue[$dateIndex] - $settlementAtDate   ;
+                $beginningBalance = $notUpdateBeginning ? $beginningBalance :  $endBalance[$dateIndex] ;
+                $result[$intervalName]['addition'][$dateIndex] =  $addition ;
+                $result[$intervalName]['total_due'][$dateIndex] = $totalDue[$dateIndex];
+                $result[$intervalName]['payment'][$dateIndex] = $settlementAtDate;
+                $result[$intervalName]['end_balance'][$dateIndex] =$endBalance[$dateIndex];
+            }
+        }
+	
+        return $result;
+    
+        
+    }
 	
 }
