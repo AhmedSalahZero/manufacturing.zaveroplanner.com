@@ -74,6 +74,7 @@ class CopyProjectController extends Controller
 				foreach($oldProductIds as $oldProductId){
 					$newIds[] = (int)$newColumnsIdsMapping['products'][$oldProductId];
 				}
+				dd($expense,$newIds);
 				$expense->update([
 					'products'=>$newIds
 				]);
