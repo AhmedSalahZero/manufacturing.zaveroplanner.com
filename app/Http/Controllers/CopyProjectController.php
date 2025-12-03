@@ -21,7 +21,7 @@ class CopyProjectController extends Controller
 		
 		$newProject->save();
 		$tablesWithForeignKeysColumns = [
-			'products'=>['product_id','products'],
+			'products'=>['product_id'],
 			'raw_materials'=>['raw_material_id'],
 			'fixed_assets'=>['fixed_asset_id']
 		];
@@ -74,7 +74,6 @@ class CopyProjectController extends Controller
 				foreach($oldProductIds as $oldProductId){
 					$newIds[] = (int)$newColumnsIdsMapping['products'][$oldProductId];
 				}
-				dd($expense,$newIds);
 				$expense->update([
 					'products'=>$newIds
 				]);
