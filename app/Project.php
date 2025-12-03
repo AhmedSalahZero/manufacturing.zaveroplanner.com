@@ -313,11 +313,11 @@ class Project extends Model
     {
         return $this->new_company == 1 ;
     }
-    public function generateRelationDynamically(string $relationName, string $expenseType = 'Expense')
-    {
-        return $this->hasMany(Expense::class, 'model_id', 'id')->where('model_name', 'Project')
-        ->where('expense_type', $expenseType)->where('relation_name', $relationName);
-    }
+    // public function generateRelationDynamically(string $relationName, string $expenseType = 'Expense')
+    // {
+    //     return $this->hasMany(Expense::class, 'project_id', 'id')
+    //     ->where('expense_type', $expenseType)->where('relation_name', $relationName);
+    // }
     
 
     public function recalculateFixedAsset(bool $isSensitivity = false)

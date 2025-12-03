@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Expense;
 use App\Project;
+use App\Seasonality;
 use App\Sharing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,18 +20,64 @@ class CopyProjectController extends Controller
 		$tablesWithOnlyHospitalitySectorAsForeignKey =getTableNamesThatHasColumn('project_id') ;
 		
 		$newProject->save();
-		
+		$tablesWithForeignKeysColumns = [
+			'products'=>['product_id','products'],
+			'raw_materials'=>['raw_material_id'],
+			'fixed_assets'=>['fixed_asset_id']
+		];
+		/**
+		 * * وليكن مثلا الاي دي القديم بتاع المنتج بقي ايه في النسخه الجديدة
+		 */
+		$newColumnsIdsMapping = [];
 		foreach( $tablesWithOnlyHospitalitySectorAsForeignKey as $tableName){
 			
 			$rows = DB::table($tableName)->where('project_id', $id)->get(); // استرجاع الصف ككائن stdClass
 			foreach($rows as $row){
 				$data = (array) $row; // تحويله إلى مصفوفة
+				$oldRowId = $data['id'];
 				unset($data['id']); // حذف الـ id حتى لا يحدث تعارض (أو المفتاح الأساسي)
 				$data['project_id'] = $newProject->id ; 
-				DB::table($tableName)->insert($data); // إدراج نسخة جديدة
+				$newRowId=DB::table($tableName)->insertGetId($data); // إدراج نسخة جديدة
+				if(in_array($tableName,array_keys($tablesWithForeignKeysColumns))){
+					$newColumnsIdsMapping[$tableName][$oldRowId] = $newRowId ;
+				}
 			}
 			
 		}
+		foreach($tablesWithForeignKeysColumns as $tableName => $columnNames){
+			foreach($columnNames as $columnName){
+				$tables = getTableNamesThatHasColumn($columnName);
+				foreach($tables as $tableN){
+					$oldValues = $newColumnsIdsMapping[$tableName]??[] ;
+					foreach($oldValues as $oldValue => $newValue){
+						DB::table($tableN)->where('project_id',$newProject->id)->where($columnName,$oldValue)->update([$columnName=>$newValue]);
+					}
+				}
+			}
+		}
+		$seasonality = Seasonality::where('project_id',$newProject->id)->where('model_name','Product')->get();
+		foreach($seasonality as $season){
+			$season->update([
+				'model_id'=>$newColumnsIdsMapping['products'][$season->model_id]
+			]);
+		}
+		
+		$expenses = Expense::where('project_id',$newProject->id)->get();
+		foreach($expenses as $expense){
+			$oldProductIds = $expense->getProductArr();
+			if(count($oldProductIds)){
+				$newIds = [];
+				foreach($oldProductIds as $oldProductId){
+					$newIds[] = $newColumnsIdsMapping['products'][$oldProductId];
+				}
+				$expense->update([
+					'products'=>$newIds
+				]);
+				
+			}
+		}
+		
+		
 		return redirect()->back()->with('success',__('Done!'));
     }
   

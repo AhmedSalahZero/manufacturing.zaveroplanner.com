@@ -40,5 +40,20 @@ class TestCommand extends Command
      */
     public function handle()
     {
+		
+		$database = env('DB_DATABASE');
+
+$columns = DB::table('information_schema.columns')
+    ->select('table_name', 'column_name')
+    ->where('table_schema', $database)
+    ->where('column_name', 'like', '%\_id')
+    ->orderBy('table_name')
+	->whereNotIn('column_name',['project_id','user_id','category_id','business_sector_id'])
+    ->orderBy('column_name')
+    ->get();
+	dd($columns);
+return $columns;
+
+		dd(getTableNamesThatHasColumn('manpower_id'));
     }
 }

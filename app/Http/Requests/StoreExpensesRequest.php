@@ -81,8 +81,8 @@ class StoreExpensesRequest extends FormRequest
 				}
 				$expensesFormatted['expenses'][$currentIndex]['collection_statements'] = [];
 				$expensesFormatted['expenses'][$currentIndex]['project_id'] = $project->id;
-				$expensesFormatted['expenses'][$currentIndex]['model_id'] = $project->id;
-				$expensesFormatted['expenses'][$currentIndex]['model_name'] = 'Project';
+			//	$expensesFormatted['expenses'][$currentIndex]['model_id'] = $project->id;
+			//	$expensesFormatted['expenses'][$currentIndex]['model_name'] = 'Project';
 				$expensesFormatted['expenses'][$currentIndex]['expense_type'] = 'Expense';
 				$expensesFormatted['expenses'][$currentIndex]['relation_name'] =$expenseTypeId;
 	

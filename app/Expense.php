@@ -35,12 +35,12 @@ class Expense extends Model
         return $this->belongsTo(Project::class, 'project_id', 'id');
     }
 	
-    public function model()
-    {
-        $modelName = '\App\Models\\'.$this->model_name ;
-        return $this->belongsTo($modelName, 'model_id', 'id');
+    // public function model()
+    // {
+    //     $modelName = '\App\Models\\'.$this->model_name ;
+    //     return $this->belongsTo($modelName, 'model_id', 'id');
         
-    }
+    // }
    
     public function getName()
     {
