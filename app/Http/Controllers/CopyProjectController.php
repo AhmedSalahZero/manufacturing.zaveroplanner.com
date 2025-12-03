@@ -57,9 +57,13 @@ class CopyProjectController extends Controller
 		}
 		$seasonality = Seasonality::where('project_id',$newProject->id)->where('model_name','Product')->get();
 		foreach($seasonality as $season){
-			$season->update([
-				'model_id'=>$newColumnsIdsMapping['products'][$season->model_id]
-			]);
+			$val= $newColumnsIdsMapping['products'][$season->model_id]??null;
+			if($val){
+				$season->update([
+					'model_id'=>$val
+				]);
+				
+			}
 		}
 		
 		$expenses = Expense::where('project_id',$newProject->id)->get();
@@ -68,7 +72,7 @@ class CopyProjectController extends Controller
 			if(count($oldProductIds)){
 				$newIds = [];
 				foreach($oldProductIds as $oldProductId){
-					$newIds[] = $newColumnsIdsMapping['products'][$oldProductId];
+					$newIds[] = (int)$newColumnsIdsMapping['products'][$oldProductId];
 				}
 				$expense->update([
 					'products'=>$newIds
