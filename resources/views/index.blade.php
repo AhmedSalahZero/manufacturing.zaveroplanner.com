@@ -141,7 +141,7 @@
                 </div>
             </div>
         </div>
-
+ <form action="{{ route('sharingLink.store', $project) }}" id="form{{ $project->id }}" method="POST">
         <!-- Sharing Modal -->
         <div class="modal fade" id="sharing{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="sharingModalLabel{{ $project->id }}" aria-hidden="true" style="color: black">
             <div class="modal-dialog" role="document">
@@ -149,12 +149,12 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="sharingModalLabel{{ $project->id }}">{{ __('Sharing Link') }}</h5>
                     </div>
+					
                     <div class="modal-body">
-                        <form action="{{ route('sharingLink.store', $project) }}" id="form{{ $project->id }}" method="POST">
+                       
                             {{ csrf_field() }}
                             <div class="form-group">
                                 <label for="name{{ $project->id }}" class="col-form-label">{{ __('Add the contact name you want to share the study with') }}</label>
-                                {{-- <span class="sharing-span"> {{__('This field will help you to control Show/Hide the project for them in the future')}} </span> --}}
                                 <input type="text" name="name" class="form-control" id="name{{ $project->id }}">
                             </div>
                             <?php  $code = uniqid(rand()); ?>
@@ -164,7 +164,7 @@
                                 <input type="hidden" name="link_code" value="{{ $code }}">
                             </div>
                             <input name="user_id" type="hidden" value="{{ auth()->user()->id }}">
-                        </form>
+                
                     </div>
                     <div class="modal-footer d-flex">
                         <a href="{{ route('sharing.page', $project) }}" class="btn btn-light mr-auto p-2">{{__('Sharing Links')}}</a>
@@ -175,7 +175,7 @@
                 </div>
             </div>
         </div>
-
+        </form>
         {{-- old Share Modal --}}
         <div class="modal fade" id="shareModal{{ $project->id }}" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
