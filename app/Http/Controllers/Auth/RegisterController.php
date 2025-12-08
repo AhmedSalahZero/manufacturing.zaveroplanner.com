@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -55,11 +58,8 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            // 'mobile' => 'required',
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'last_name' => 'required',
-            // 'company_name'=> 'required',
-            // 'department' => 'required',
         ]);
     }
 
@@ -71,7 +71,8 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+
+		$user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'mobile' => $data['mobile'],
@@ -79,6 +80,28 @@ class RegisterController extends Controller
             'company_name'=> $data['company_name'],
             'department' => $data['department'],
             'password' => Hash::make($data['password']),
-        ]);
+        ]) ;
+
+        return $user ;
+    
+	}
+	
+	 public function register(Request $request)
+    {
+		
+
+        // $this->validator($request->all())->validate();
+        event(new Registered($user = $this->create($request->all())));
+
+        $this->guard()->login($user);
+
+        if ($response = $this->registered($request, $user)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+                    ? new JsonResponse([], 201)
+                    : redirect($this->redirectPath());
     }
+	
 }
