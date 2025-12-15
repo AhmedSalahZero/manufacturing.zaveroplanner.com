@@ -144,11 +144,12 @@
             , defaultValues: {
                 'position': ''
                 , 'avg_salary': '0'
-                , 'existing_count': '0'
+                , 'existing_count': '0',
+				'raw_material_id':null
             }
             , show: function() {
                 $(this).slideDown();
-
+			
             }
             , ready: function(setIndexes) {
 

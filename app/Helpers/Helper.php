@@ -634,3 +634,7 @@ function getNthKeyAfter($array, $specificKey, $n) {
     
     return null; // No nth key exists
 }
+function getIterableRaws($fieldName , $rows):Iterable
+{
+	return count(old($fieldName,[])) ? old($fieldName,[])  : (count($rows)?$rows:[null]);
+}

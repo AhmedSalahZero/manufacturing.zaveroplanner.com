@@ -313,6 +313,10 @@ class Project extends Model
     {
         return $this->new_company == 1 ;
     }
+	public function isExistingCompany():bool
+    {
+        return $this->new_company == 0 ;
+    }
     // public function generateRelationDynamically(string $relationName, string $expenseType = 'Expense')
     // {
     //     return $this->hasMany(Expense::class, 'project_id', 'id')

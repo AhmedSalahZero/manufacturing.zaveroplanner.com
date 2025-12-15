@@ -546,17 +546,20 @@ $canAddNewItem = true;
 
     $(document).ready(function() {
         var selector = "#{{ $repeaterId }}";
-	
         $(selector).repeater({
             initEmpty: initEmpty
             , defaultValues: {
                 'position': ''
                 , 'avg_salary': '0'
-                , 'existing_count': '0'
+                , 'existing_count': '0',
+				'raw_material_id':0,
+				"percentages":0
+				
             }
             , show: function() {
                 $(this).slideDown();
-
+				 $(this).find('select').val($(this).find('select option:first-of-type').val()).trigger('change');
+				   $(this).find('input:not([type="hidden"])').trigger('change');
             }
             , ready: function(setIndexes) {
 

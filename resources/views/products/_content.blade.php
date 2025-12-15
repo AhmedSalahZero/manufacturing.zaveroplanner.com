@@ -554,7 +554,7 @@
                 @endforeach
             </x-slot>
             <x-slot name="trs">
-                @foreach(count($rawMaterials) ? $rawMaterials : [null] as $rawMaterial )
+                @foreach(getIterableRaws('rawMaterials',$rawMaterials) as $rawMaterial )
                 <tr data-repeater-item data-repeat-formatting-decimals="2" data-repeater-style>
 
                     <td class="text-center">

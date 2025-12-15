@@ -25,7 +25,6 @@ class CreateBalanceSheetsTable extends Migration
 				'net_change_in_working_capital'=>'array',
 				'debit_funding_percentages'=>'array',
 				'equity_funding_percentages'=>'array',
-				
 			] as $columnName => $columnCast)
 			{
 				$table->json($columnName)->nullable();

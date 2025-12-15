@@ -92,12 +92,16 @@
 
                     <div class="col-md-3">
 
-                        
+                    
                         <div class="form-group">
                             <label>{{__('Duration In Years')}}</label><span class="red"> *</span>
                             <select name="duration" id="duration" class="form-control @error('duration') is-invalid @enderror">
                                 <option value="">{{__('Select')}}</option>
-                                @for ($value =1 ; $value <= $max_length ; $value++) <option value="{{$value}}" {{$duration_data == $value ?  'selected' : ''}}>{{$value}}</option>
+								@php
+									$oldDuration = old('duration');
+									$oldDuration = $oldDuration?: $duration_data;
+								@endphp
+                                @for ($value =1 ; $value <= $max_length ; $value++) <option value="{{$value}}" {{$oldDuration == $value ?  'selected' : ''}}>{{$value}}</option>
                                     @endfor
                             </select>
                             @error('duration')
@@ -206,10 +210,16 @@
             @php
             $currentRepeaterId = 'products';
             @endphp
-
             <div class="formItem repeater_products">
                 <div data-repeater-list="{{ $currentRepeaterId }}">
-                    @foreach(count($products) ? $products : [null] as $product)
+                    @foreach( getIterableRaws($currentRepeaterId,$products)  as $index=>$product)
+				
+					@if(is_array($product))
+						@php
+							$product = new \App\Product($product);
+						@endphp
+					@endif 
+					
                     <div data-repeater-item>
                         <input type="hidden" name="id" value="{{ $product ? $product->id : 0 }}">
                         <div class="row ml-1 mr-1">
@@ -218,7 +228,7 @@
                                     <label> {{ __('Name') }} </label>
                                     @php
                                     $name = "name";
-                                    $nameToOld = generateOldNameFromFieldName($name) ;
+                                    $nameToOld = 'products.'.$index.'.name' ;
                                     @endphp
                                     <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($product) ? $product->getName() : '' ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
@@ -230,7 +240,7 @@
                                 <div class="form-group">
                                     @php
                                     $currentFieldName = "measurement_unit";
-                                    $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
+									$nameToOld = 'products.'.$index.'.'.$currentFieldName ;
                                     $currentFieldId = 'measurement-unit-id';
                                     @endphp
                                     <label for="{{ $currentFieldId }}">{{__("Measurement Units")}}
@@ -249,15 +259,14 @@
                                 </div>
                             </div>
 
-
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="month">{{__("Selling Start Date")}}
                                         @include('required')
                                     </label>
                                     @include('components.calendar-month-year',[
-                                    'name'=>'selling_start_date',
-                                    'value'=>$product ? $product->getSellingStartDateYearAndMonth() : now()->format('Y-m')
+                                    'name'=>$name='selling_start_date',
+                                    'value'=>old('products.'.$index.'.'.$name , ($product && is_null(old('products.'.$index.'.'.$name)) ? $product->getSellingStartDateYearAndMonth() : now()->format('Y-m'))) 
                                     ])
                                 </div>
                             </div>
@@ -268,9 +277,9 @@
                                     <label> {{ __('Vat Rate %') }} </label>
                                     @php
                                     $name = "vat_rate";
-                                    $nameToOld = generateOldNameFromFieldName($name) ;
+									$nameToOld = 'products.'.$index.'.'.$name ;
                                     @endphp
-                                    <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($product) ? $product->getVatRate() : 0 ) }}">
+                                    <input type="text" class="form-control only-greater-than-or-equal-zero-allowed @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($product) ? $product->getVatRate() : 0 ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
                                 </div>
                             </div>
@@ -280,7 +289,7 @@
                                     <label> {{ __('Withhold Rate %') }} </label>
                                     @php
                                     $name = "withhold_tax_rate";
-                                    $nameToOld = generateOldNameFromFieldName($name) ;
+									$nameToOld = 'products.'.$index.'.'.$name ;
                                     @endphp
                                     <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($product) ? $product->getWithholdTaxRate() : 0 ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
@@ -341,7 +350,12 @@
             @endphp
             <div class="formItem repeater_rawMaterials">
                 <div data-repeater-list="{{ $currentRepeaterId }}">
-                    @foreach(count($rawMaterials) ? $rawMaterials : [null] as $rawMaterial)
+                    @foreach(getIterableRaws($currentRepeaterId,$rawMaterials) as $index=>$rawMaterial)
+					@if(is_array($rawMaterial))
+						@php
+							$rawMaterial = new \App\RawMaterial($rawMaterial);
+						@endphp
+					@endif 
                     <div data-repeater-item>
                         <input type="hidden" name="id" value="{{ $rawMaterial ? $rawMaterial->id : 0 }}">
                         <div class="row ml-1 mr-1">
@@ -350,7 +364,7 @@
                                     <label> {{ __('Name') }} </label>
                                     @php
                                     $name = "name";
-                                    $nameToOld = generateOldNameFromFieldName($name) ;
+									$nameToOld = $currentRepeaterId.'.'.$index.'.'.$name ;
                                     @endphp
                                     <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($rawMaterial) ? $rawMaterial->getName() : '' ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
@@ -362,16 +376,22 @@
 
                             @php
                             $name = "rm_inventory_coverage_days";
-                            $nameToOld = generateOldNameFromFieldName($name) ;
+							$nameToOld = $currentRepeaterId.'.'.$index.'.'.$name ;
                             @endphp
 
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>{{__('Inventory Coverage Days')}} @include('required') </label>
                                     <select class="form-control  @error($nameToOld) is-invalid @enderror" name="{{ $name }}" id="{{ $nameToOld }}">
+									@php
+										$currentVal = isset($rawMaterial) && $rawMaterial->getRmInventoryCoverageDays() ;
+										if(old($nameToOld)){
+											$currentVal = old($nameToOld);
+										}
+									@endphp
                                         <option selected value="">{{__('Select')}}</option>
                                         @foreach(getRmInventoryCoverageDays() as $id => $title)
-                                        <option value="{{ $id }}" {{isset($rawMaterial) && $rawMaterial->getRmInventoryCoverageDays() ==$id    ?'selected' : '' }}>{{ $title }}</option>
+                                        <option value="{{ $id }}" {{ $currentVal == $id  ?'selected' : '' }}>{{ $title }}</option>
                                         @endforeach
                                     </select>
 
@@ -383,7 +403,7 @@
                                 <div class="form-group">
                                     @php
                                     $currentFieldName = "measurement_unit";
-                                    $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
+									$nameToOld = $currentRepeaterId.'.'.$index.'.'.$currentFieldName ;
                                     $currentFieldId = 'measurement-unit-id';
                                     @endphp
                                     <label for="{{ $currentFieldId }}">{{__("Measurement Units")}}
@@ -407,7 +427,8 @@
                                     <label> {{ __('Vat Rate %') }} </label>
                                     @php
                                     $name = "vat_rate";
-                                    $nameToOld = generateOldNameFromFieldName($name) ;
+                      
+										$nameToOld = $currentRepeaterId.'.'.$index.'.'.$name ;
                                     @endphp
                                     <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($rawMaterial) ? $rawMaterial->getVatRate() : 0 ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
@@ -419,7 +440,7 @@
                                     <label> {{ __('Withhold Rate %') }} </label>
                                     @php
                                     $name = "withhold_tax_rate";
-                                    $nameToOld = generateOldNameFromFieldName($name) ;
+									$nameToOld = $currentRepeaterId.'.'.$index.'.'.$name ;
                                     @endphp
                                     <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($rawMaterial) ? $rawMaterial->getWithholdTaxRate() : 0 ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
@@ -561,7 +582,9 @@
             , defaultValues: {
                 'position': ''
                 , 'avg_salary': '0'
-                , 'existing_count': '0'
+                , 'existing_count': '0',
+				'vat_rate':0,
+				'withhold_tax_rate':0
             }
             , show: function() {
                 $(this).slideDown();
@@ -589,7 +612,9 @@
             , defaultValues: {
                 'position': ''
                 , 'avg_salary': '0'
-                , 'existing_count': '0'
+                , 'existing_count': '0',
+					'vat_rate':0,
+				'withhold_tax_rate':0
             }
             , show: function() {
                 $(this).slideDown();

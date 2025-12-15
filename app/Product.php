@@ -98,7 +98,7 @@ class Product extends Model
 	{
 		return $this->id;
 	}
-	public function getName():string 
+	public function getName():?string 
 	{
 		return $this->name ; 
 	}
@@ -373,11 +373,11 @@ class Product extends Model
 	
 	public function getVatRate():float 
 	{
-		return $this->vat_rate ;
+		return $this->vat_rate?:0 ;
 	}
 	public function getWithholdTaxRate():float 
 	{
-		return $this->withhold_tax_rate ;
+		return $this->withhold_tax_rate?:0 ;
 	}
 	
 	//Finished Goods Beginning Inventory Quantity

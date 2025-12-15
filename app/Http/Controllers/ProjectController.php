@@ -43,6 +43,7 @@ class ProjectController extends Controller
             'name' => $request->name,
             'slug' => \Str::slug($request->name, '-'),
             'user_id' => auth()->user()->id,
+			'new_company'=>1
         ]);
         return redirect()->back();
     }

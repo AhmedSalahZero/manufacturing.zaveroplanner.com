@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Rules\LocalAndExportCollectionPolicyRule;
+use App\Rules\RawMaterialIdRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProductsRequest extends FormRequest
@@ -25,10 +26,12 @@ class StoreProductsRequest extends FormRequest
     public function rules()
     {
         return [
-			'collection_policy_value'=>['required',new LocalAndExportCollectionPolicyRule()]
+			'collection_policy_value'=>['required',new LocalAndExportCollectionPolicyRule()],
+			'rawMaterials.*.raw_material_id'=>['required' ]
         ];
     }
 	protected function prepareForValidation(){
+	
 		$collectionPolicyValue = $this->get('collection_policy_value');
 		foreach($collectionPolicyValue as $localOrExport => &$collectionPolicyArrs){
 			foreach($collectionPolicyArrs as $loopIndex=>&$collectionArr){
@@ -48,7 +51,7 @@ class StoreProductsRequest extends FormRequest
 		$yearsAsIndexes =array_keys($years);
 		 foreach ($this->get('rawMaterials') as $index => &$rawMaterialArr) {
 			$rawMaterialArr['product_id'] = $product->id;
-            if ($rawMaterialArr['raw_material_id']) {
+            if (isset($rawMaterialArr['raw_material_id']) && $rawMaterialArr['raw_material_id']) {
 				$rawMaterialArr['percentages'] = array_combine($yearsAsIndexes,$rawMaterialArr['percentages']); 
                 $rawMaterials[$index] = $rawMaterialArr;
             }
