@@ -3215,7 +3215,7 @@ class Project extends Model
             $withholdRate = $tableDataArr['withhold_tax_rate']??0;
             $loopEndDate = $tableDataArr['end_date'] >=  $studyEndDateAsIndex ? $studyExtendedEndDateAsIndex : $tableDataArr['end_date'];
                 
-            $loopEndDate = $loopEndDate ==  0 && $tableId == 'one_time_expense' ? $studyEndDateAsIndex : $loopEndDate ;
+          //  $loopEndDate = $loopEndDate ==  0 && $tableId == 'one_time_expense' ? $studyEndDateAsIndex : $loopEndDate ;
     
 
             //     ;
