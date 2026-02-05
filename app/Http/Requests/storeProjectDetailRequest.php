@@ -32,6 +32,7 @@ class storeProjectDetailRequest extends FormRequest
 		$duration = $this->project->duration ;
 		$perpetualIsRequired = $duration >  1  ? 'required' : 'sometimes';
         return [
+			'duration'=>['required','gt:0'],
             'operation_start_date'=>['required',$operationStartDateValidation,'before:end_date'],
 			'products.*.selling_start_date'=>['required','after_or_equal:operation_start_date','before:end_date'],
 			'products.*.name'=>['required'],
@@ -43,6 +44,8 @@ class storeProjectDetailRequest extends FormRequest
 	public function messages()
 	{
 		return [
+			'duration.required'=>__('Please Select Duration'),
+			'duration.gt'=>__('Duration Must Be Greater Than Zero'),
 			'operation_start_date.required'=>__('Please Enter Operation Start Date'),
 			'operation_start_date.date_equals'=>__('Operation Start Date Must Be Equal To Study Start Date'),
 			'operation_start_date.after_or_equal'=>__('Operation Start Date Must Be Greater Than Or Equal Study Start Date'),

@@ -700,7 +700,6 @@ return $result;
 				return $itemArr['title'];
 			}
 		}
-		dd('title not found');
 	}
 	public static function getIndexUsingName(array $array , $searchName)
 	{
@@ -709,7 +708,6 @@ return $result;
 				return  $key;
 			}
 		}
-		dd('name not found');
 	}
 	public static function getLatestNonZeroExecutionKeys(array $data): array
 {

@@ -554,7 +554,13 @@
                 @endforeach
             </x-slot>
             <x-slot name="trs">
+			
                 @foreach(getIterableRaws('rawMaterials',$rawMaterials) as $rawMaterial )
+				@if(is_array($rawMaterial))
+						@php
+							$rawMaterial = new \App\RawMaterial($rawMaterial);
+						@endphp
+					@endif 
                 <tr data-repeater-item data-repeat-formatting-decimals="2" data-repeater-style>
 
                     <td class="text-center">
@@ -570,7 +576,8 @@
                             @php
                             $currentFieldName = "raw_material_id";
                             $nameToOld = generateOldNameFromFieldName($currentFieldName) ;
-                            $currentVal = isset($rawMaterial) ? $rawMaterial->getName() : '' ;
+                           // $currentVal = isset($rawMaterial) ?  dd($rawMaterial) : '' ;
+                        //   $currentVal = isset($rawMaterial) ?  $rawMaterial->getName() : '' ;
                             @endphp
                             <div class="form-group w-full">
                                 {{-- <label class="text-green">{{ __('Raw Material Name') }} @include('required') </label> --}}

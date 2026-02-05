@@ -28,7 +28,6 @@ trait HasFixedAsset
         // } elseif ($fixedAssetType == FixedAsset::PER_EMPLOYEE) {
         //     return $this->perEmployeeFixedAssetsFundingStructure;
         // }
-        dd('not supported fixed asset type');
         // return $this->fixedAssetsFundingStructure->where('fixed_asset_type',$fixedAssetType)->first();
     }
 	

@@ -68,9 +68,7 @@ trait HasBasicStoreRequest
 		$idsFromRequest =array_column($relationDataArray,'id') ;
 		
 		$elementsToDelete = array_diff($oldIdsFromDatabase,$idsFromRequest);
-		if(count($oldIdsFromDatabase) && !count($idsFromRequest)){
-			dd('there is no old ids from request .. !!');
-		}
+		
 		$elementsToUpdate = array_intersect($idsFromRequest,$oldIdsFromDatabase);
 		$this->$relationName()->whereIn($relationTableName.'.id',$elementsToDelete)->delete();
 		

@@ -532,7 +532,6 @@ class Project extends Model
                 // $currentManufacturingExpenseArr = HArr::sumWithNumber($currentManufacturingExpenseArr,$fgBeginningInventoryBreakdownValue);
                 
             }
-            // dd($fgStatementValues)
             $product->update([
                 'product_manpower_statement'=>$fgStatementValues[$productId]['direct_labor_value']??[],
                 'raw_material_statement'=>$fgStatementValues[$productId]['raw_material_value']??[],
@@ -2591,11 +2590,7 @@ class Project extends Model
         return array_values($barChart);
                     
     }
-    // public function calculateAnnuallySalesBreakEvens()
-    // {
-    // 	$expensePerPercentages = $this->expenses->where('relation_name','expense_as_percentage');
-    // 	dd($expensePerPercentages);
-    // }
+ 
     public function getDashboardViewVars():array
     {
         $project = $this ;
@@ -2751,7 +2746,6 @@ class Project extends Model
                 
         $freeCashFlowForEquity = HArr::subtractAtDates([$totalCustomerCollection,$totalCashOut], $sumKeys);
         $accumulatedFreeCashFlowForEquity = HArr::accumulateArray(HArr::extendFreeCashflowTenYears($freeCashFlowForEquity, $perptual));
-        // dump($accumulatedFreeCashFlowForEquity);
         $equityInjection = $cashflow ? $cashflow->equity_injection : [];
         $workingCapital = $cashflow ? $cashflow->working_capital_injection : [];
         $totalEquity = array_sum(HArr::sumAtDates([$equityInjection,$workingCapital], $sumKeys));
@@ -2837,7 +2831,6 @@ class Project extends Model
         
             
         ];
-        // dd($requiredInvestments);
         $liquidityRatio = [
             'current-ratio'=>[
                 'number-format'=>2 ,

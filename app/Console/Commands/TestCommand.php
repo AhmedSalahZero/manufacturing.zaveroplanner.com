@@ -51,9 +51,7 @@ $columns = DB::table('information_schema.columns')
 	->whereNotIn('column_name',['project_id','user_id','category_id','business_sector_id'])
     ->orderBy('column_name')
     ->get();
-	dd($columns);
 return $columns;
 
-		dd(getTableNamesThatHasColumn('manpower_id'));
     }
 }
