@@ -384,7 +384,7 @@
                                     <label>{{__('Inventory Coverage Days')}} @include('required') </label>
                                     <select class="form-control  @error($nameToOld) is-invalid @enderror" name="{{ $name }}" id="{{ $nameToOld }}">
 									@php
-										$currentVal = isset($rawMaterial) && $rawMaterial->getRmInventoryCoverageDays() ;
+										$currentVal = isset($rawMaterial) ? $rawMaterial->getRmInventoryCoverageDays() : 0;
 										if(old($nameToOld)){
 											$currentVal = old($nameToOld);
 										}
