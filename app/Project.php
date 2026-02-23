@@ -376,8 +376,13 @@ class Project extends Model
     
         
             $transferredDateForFFEAsIndex = array_key_last($projectUnderProgressFFE['transferred_date_and_vales']??[]);
+			if(is_null($transferredDateForFFEAsIndex)){
+				return [];
+			}
             $ffeAssetItems = [];
-        
+        /**
+		 * @var FixedAsset $fixedAsset
+		 */
             $ffeAssetItems = $fixedAsset->calculateFFEAssetsForFFE($transferredDateForFFEAsIndex, Arr::last($projectUnderProgressFFE['transferred_date_and_vales']??[], null, 0), $studyDates, $studyEndDateAsIndex, $this);
             
             $totalMonthlyDepreciation = $ffeAssetItems['total_monthly_depreciation'] ?? [];
