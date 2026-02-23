@@ -552,7 +552,8 @@ function getBusinessSectors()
 		'Others',
 		'Leather Products',
 		'Agro-Processing'
-    ] ;}
+    ] ;
+	}
 	
 	function getDivisionNumber(){
 	return 1000;

@@ -367,7 +367,7 @@ class Project extends Model
                 'loan_capitalized_interests'=>$loanCapitalizedInterest
             ]);
             $projectUnderProgressFFE = $projectUnderProgressService->calculateForFFE( $fixedAsset->getStartDateAsIndex(), $fixedAsset->getEndDateAsIndex(), $ffeExecutionAndPayment, $ffeLoanInterestAmounts, $ffeLoanWithdrawalInterestAmounts, $this, $operationStartDateAsIndex, $datesAsStringAndIndex, $datesIndexWithYearIndex, $yearIndexWithYear, $dateIndexWithDate, $dateWithMonthNumber);
-            $transferDateAsIndex  = array_key_last($projectUnderProgressFFE['end_balance'])  ;
+            $transferDateAsIndex  = array_key_last($projectUnderProgressFFE['end_balance']??[])  ;
             $incomeStatementLoanCapitalizedInterests = is_null($transferDateAsIndex) ? [] :  HArr::slice_from_index($loanCapitalizedInterest, $transferDateAsIndex)  ;
             $fixedAsset->update([
                 'income_statement_loan_capitalized_interests'=>$incomeStatementLoanCapitalizedInterests
