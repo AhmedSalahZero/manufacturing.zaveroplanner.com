@@ -291,7 +291,7 @@
                                     $name = "withhold_tax_rate";
 									$nameToOld = 'products.'.$index.'.'.$name ;
                                     @endphp
-                                    <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($product) ? $product->getWithholdTaxRate() : 0 ) }}">
+                                    <input type="text" class="form-control only-greater-than-or-equal-zero-allowed @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($product) ? $product->getWithholdTaxRate() : 0 ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
                                 </div>
                             </div>
@@ -430,7 +430,7 @@
                       
 										$nameToOld = $currentRepeaterId.'.'.$index.'.'.$name ;
                                     @endphp
-                                    <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($rawMaterial) ? $rawMaterial->getVatRate() : 0 ) }}">
+                                    <input type="text" class="form-control only-greater-than-or-equal-zero-allowed @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($rawMaterial) ? $rawMaterial->getVatRate() : 0 ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
                                 </div>
                             </div>
@@ -442,7 +442,7 @@
                                     $name = "withhold_tax_rate";
 									$nameToOld = $currentRepeaterId.'.'.$index.'.'.$name ;
                                     @endphp
-                                    <input type="text" class="form-control @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($rawMaterial) ? $rawMaterial->getWithholdTaxRate() : 0 ) }}">
+                                    <input type="text" class="form-control only-greater-than-or-equal-zero-allowed @error($nameToOld) is-invalid @enderror  " name="{{ $name }}" value="{{ old($nameToOld) ?: (isset($rawMaterial) ? $rawMaterial->getWithholdTaxRate() : 0 ) }}">
                                     <span>{{ @$errors->first($nameToOld) }}</span>
                                 </div>
                             </div>
@@ -634,4 +634,5 @@
     });
 
 </script>
+<script type="text/javascript"  src="{{ asset('js/validation.js') }}"></script>
 @endpush
